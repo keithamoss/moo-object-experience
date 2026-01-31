@@ -1,12 +1,26 @@
 import { AppBar, Box, Container, Toolbar, Typography } from '@mui/material';
-import { Outlet } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
+import Footer from './components/Footer';
 
 function App() {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+          <Typography
+            variant="h6"
+            component={Link}
+            to="/"
+            aria-label="Museum Object Experience - Go to homepage"
+            sx={{
+              flexGrow: 1,
+              textDecoration: 'none',
+              color: 'inherit',
+              '&:hover': {
+                opacity: 0.8,
+              },
+            }}
+          >
             Museum Object Experience
           </Typography>
         </Toolbar>
@@ -14,6 +28,7 @@ function App() {
       <Container component="main" sx={{ mt: 4, mb: 4, flex: 1 }}>
         <Outlet />
       </Container>
+      <Footer />
     </Box>
   );
 }

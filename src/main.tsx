@@ -5,6 +5,9 @@ import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
+import NotFoundPage from './components/NotFoundPage';
+import HomePage from './features/home/HomePage';
+import ObjectDetailPage from './features/objects/ObjectDetailPage';
 import { store } from './store/store';
 import { theme } from './theme/theme';
 
@@ -16,12 +19,15 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: (
-          <div>
-            <h1>Welcome to the Westralian People's Museum Object Experience</h1>
-            <p>Search and discovery interface for objects in the Westralian People's Museum of Objects of Interest and Reference Library</p>
-          </div>
-        ),
+        element: <HomePage />,
+      },
+      {
+        path: '/object/:id/:slug?',
+        element: <ObjectDetailPage />,
+      },
+      {
+        path: '*',
+        element: <NotFoundPage />,
       },
     ],
   },

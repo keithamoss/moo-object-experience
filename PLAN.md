@@ -102,21 +102,21 @@ Contains all object data with columns aligned to metadata field definitions
 - [x] Phase 1.2 complete ✅
 
 ### Phase 1.3: Core UI Shell (Day 2-3)
-- [ ] Copy and adapt layout components from demsausage:
+- [x] Copy and adapt layout components from demsausage:
   - AppBar/Header component
   - Footer component
   - Main layout wrapper
   - Responsive breakpoints
   - Code splitting setup (vendor bundle + app bundle)
-- [ ] Set up React Router with basic routes:
+- [x] Set up React Router with basic routes:
   - `/` - Home/Search page
   - `/object/:id/:slug?` - Object detail page (placeholder)
-- [ ] Create minimal homepage with:
+- [x] Create minimal homepage with:
   - Site title/branding
   - Search input placeholder
   - Loading state component
-- [ ] Ensure mobile-first responsive design
-- [ ] Deploy and verify
+- [x] Ensure mobile-first responsive design
+- [x] Deploy and verify
 
 **Deliverable**: Live static site with basic navigation and placeholder content
 
