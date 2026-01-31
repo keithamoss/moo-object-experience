@@ -122,10 +122,17 @@ export function parseObjectsData(rows: string[][], schema: MetadataSchema): Obje
   // First row contains field names (should match schema field names)
   const fieldNames = rows[0];
   
+  // Find the index of the identifier field
+  const identifierIndex = fieldNames.findIndex(field => field === 'dcterms:identifier.moooi');
+  
   // Parse data rows (skip header)
   const objects: ObjectData[] = rows
     .slice(1)
-    .filter(row => row.some(cell => cell && cell.trim() !== '')) // Filter out completely empty rows
+    .filter(row => {
+      // Only include rows that have a non-empty identifier (required field)
+      const identifier = row[identifierIndex];
+      return identifier && identifier.trim() !== '';
+    })
     .map(row => {
       const obj: ObjectData = {};
       
