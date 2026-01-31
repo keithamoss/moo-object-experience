@@ -131,12 +131,37 @@ Contains all object data with columns aligned to metadata field definitions:
 - ✅ Material-UI theme and component library
 - ✅ Redux Toolkit for state management
 - ✅ React Router v7 for routing
+- ✅ GitHub Pages deployment workflow
 - 🔲 Google Sheets API integration
 - 🔲 Client-side search with MiniSearch
 - 🔲 Object detail pages
 - 🔲 Mobile-responsive design
 - 🔲 URL-based state management
-- 🔲 GitHub Pages deployment
+
+## Deployment
+
+The site automatically deploys to GitHub Pages on every push to the `main` branch.
+
+- **Production URL**: https://moo.keithandhelenmakestuff.com
+- **GitHub Pages URL**: https://keithamoss.github.io/moo-object-experience/
+- **DNS Provider**: Cloudflare
+
+### First-Time Setup
+
+See [GITHUB_PAGES_SETUP.md](GITHUB_PAGES_SETUP.md) for detailed instructions on:
+- Configuring GitHub Pages settings
+- Setting up custom domain in Cloudflare DNS
+- Adding API key secrets
+- Troubleshooting deployment issues
+
+### Deployment Process
+
+1. Push changes to `main` branch
+2. GitHub Actions automatically builds the site
+3. Deploys to GitHub Pages
+4. Site is live within 1-2 minutes
+
+View deployment status in the **Actions** tab of the repository.
 
 ## Development Principles
 

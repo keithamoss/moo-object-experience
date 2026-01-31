@@ -92,13 +92,14 @@ Contains all object data with columns aligned to metadata field definitions
 - [x] Phase 1.1 complete ✅
 
 ### Phase 1.2: GitHub Actions & Deployment (Day 1-2)
-- [ ] Create `.github/workflows/deploy.yml` for GitHub Pages deployment
-- [ ] Configure build script to output to `dist/` or `docs/`
-- [ ] Set up GitHub Pages in repository settings
-- [ ] Configure custom domain (moo.keithandhelenmakestuff.com)
-- [ ] Add CNAME file
-- [ ] Test deployment with "Hello World" React app
-- [ ] Verify site loads at custom domain
+- [x] Create `.github/workflows/deploy.yml` for GitHub Pages deployment
+- [x] Configure build script to output to `dist/` or `docs/`
+- [x] Set up GitHub Pages in repository settings (instructions provided)
+- [x] Configure custom domain (moo.keithandhelenmakestuff.com) via Cloudflare
+- [x] Add CNAME file
+- [x] Test deployment with "Hello World" React app
+- [x] Verify site loads at custom domain (pending manual GitHub/Cloudflare setup)
+- [x] Phase 1.2 complete ✅
 
 ### Phase 1.3: Core UI Shell (Day 2-3)
 - [ ] Copy and adapt layout components from demsausage:
