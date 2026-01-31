@@ -1,6 +1,9 @@
 import { AppBar, Box, Container, Toolbar, Typography } from '@mui/material';
+import { Suspense } from 'react';
 import { Link, Outlet } from 'react-router-dom';
 import Footer from './components/Footer';
+import LoadingIndicator from './components/LoadingIndicator';
+import { ErrorBoundary } from './store';
 
 function App() {
   return (
@@ -26,7 +29,11 @@ function App() {
         </Toolbar>
       </AppBar>
       <Container component="main" sx={{ mt: 4, mb: 4, flex: 1 }}>
-        <Outlet />
+        <ErrorBoundary>
+          <Suspense fallback={<LoadingIndicator message="Loading..." />}>
+            <Outlet />
+          </Suspense>
+        </ErrorBoundary>
       </Container>
       <Footer />
     </Box>

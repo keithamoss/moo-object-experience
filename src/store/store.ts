@@ -1,12 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
-
-// Placeholder reducer - will be replaced with actual slices
-const rootReducer = {
-	// Add your reducers here as you create them
-};
+import { sheetsApi } from './api';
 
 export const store = configureStore({
-	reducer: rootReducer,
+	reducer: {
+		[sheetsApi.reducerPath]: sheetsApi.reducer,
+	},
+	middleware: (getDefaultMiddleware) =>
+		getDefaultMiddleware().concat(sheetsApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
