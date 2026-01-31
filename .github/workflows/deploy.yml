@@ -35,10 +35,6 @@ jobs:
 
       - name: Build
         run: npm run build
-        # Add environment variables when Google Sheets API is ready:
-        # env:
-        #   VITE_GOOGLE_SHEETS_API_KEY: ${{ secrets.GOOGLE_SHEETS_API_KEY }}
-        #   VITE_GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

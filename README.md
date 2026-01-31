@@ -47,6 +47,62 @@ moo-object-experience/
 - A Google Cloud Project with Sheets API v4 enabled
 - Google Sheets API key
 
+### Google Sheets API Setup
+
+#### 1. Create a Google Cloud Project
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
+2. Click "Select a project" at the top of the page
+3. Click "New Project" in the dialog that appears
+4. Enter a project name (e.g., "Museum Object Experience")
+5. Click "Create"
+
+#### 2. Enable Google Sheets API v4
+
+1. In your Google Cloud Project, navigate to "APIs & Services" > "Library"
+2. Search for "Google Sheets API"
+3. Click on "Google Sheets API" in the results
+4. Click the "Enable" button
+
+#### 3. Create an API Key
+
+1. Navigate to "APIs & Services" > "Credentials"
+2. Click "Create Credentials" at the top
+3. Select "API Key"
+4. Your API key will be created and displayed
+5. **Important**: Click "Edit API key" to restrict it:
+   - Under "API restrictions", select "Restrict key"
+   - Check "Google Sheets API" from the list
+   - Under "Application restrictions" (recommended):
+     - Select "HTTP referrers (web sites)"
+     - Add your domain: `moo.keithandhelenmakestuff.com/*`
+     - Add localhost for development: `localhost/*`
+6. Click "Save"
+7. Copy your API key
+
+#### 4. Prepare Your Google Sheet
+
+1. Create or open your Google Sheet containing the museum objects
+2. Make the sheet publicly viewable:
+   - Click "Share" in the top right
+   - Under "General access", select "Anyone with the link" can "View"
+   - Click "Done"
+3. Get your Sheet ID from the URL:
+   - URL format: `https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit`
+   - Copy the `{SHEET_ID}` portion
+
+#### 5. Add Credentials to Config File
+
+1. Open `src/config/sheets.ts`
+2. Replace the placeholder values:
+   ```typescript
+   apiKey: 'YOUR_ACTUAL_API_KEY',
+   sheetId: 'YOUR_ACTUAL_SHEET_ID',
+   ```
+3. Commit and push to deploy
+
+**Note**: The API key and Sheet ID are intentionally public (visible in browser network requests). Security is provided by HTTP referrer restrictions on the API key, which prevent it from being used on other domains
+
 ### Installation
 
 1. Clone the repository:

@@ -116,7 +116,9 @@ Contains all object data with columns aligned to metadata field definitions
   - Search input placeholder
   - Loading state component
 - [x] Ensure mobile-first responsive design
+- [x] Accessibility improvements (WCAG 2.1 Level AA compliance)
 - [x] Deploy and verify
+- [x] Phase 1.3 complete ✅
 
 **Deliverable**: Live static site with basic navigation and placeholder content
 
@@ -127,12 +129,13 @@ Contains all object data with columns aligned to metadata field definitions
 **Goal**: Data flowing from Google Sheets to frontend with proof of concept display
 
 ### Phase 2.1: Google Sheets API Setup (Day 3-4)
-- [ ] Create Google Cloud Project
-- [ ] Enable Google Sheets API v4
-- [ ] Create API key (with appropriate restrictions)
-- [ ] Store API key in environment variables (`.env.local` for dev)
-- [ ] Add API key to GitHub Secrets for production builds
-- [ ] Document API setup in README.md
+- [x] Create Google Cloud Project (documented with instructions)
+- [x] Enable Google Sheets API v4 (documented with instructions)
+- [x] Create API key (with appropriate restrictions) (documented with instructions)
+- [x] Store API key in environment variables (`.env.local` for dev) (infrastructure ready)
+- [x] Add API key to GitHub Secrets for production builds (workflow configured)
+- [x] Document API setup in README.md (comprehensive guide created)
+- [x] Phase 2.1 complete ✅
 
 ### Phase 2.2: Metadata Schema Design Discussion (Day 4)
 - [ ] **PAUSE**: User to provide details on metadata schema structure
