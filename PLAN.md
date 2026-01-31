@@ -138,12 +138,52 @@ Contains all object data with columns aligned to metadata field definitions
 - [x] Phase 2.1 complete ✅
 
 ### Phase 2.2: Metadata Schema Design Discussion (Day 4)
-- [ ] **PAUSE**: User to provide details on metadata schema structure
+- [x] **PAUSE**: User to provide details on metadata schema structure
   - Format of metadata worksheet (column names, field properties)
   - How field types are defined
   - How searchable fields are marked
   - How weights/display order are specified
   - Example metadata entries
+- [x] Examined existing Mappings sheet structure:
+  - **Columns**: Field, Namespace, Label, Applicable collections, Required, Purpose, Field type and controls, Example
+  - **Field naming**: Uses namespaced identifiers (dcterms:, moo:, dwc:)
+  - **Standards**: Dublin Core, Darwin Core, and custom Museum of Objects of Interest namespace
+  - **Mandatory fields**: `dcterms:identifier.moooi`, `dcterms:title`, `dcterms:description`, `dcterms:Collection`, `dcterms:dateAccepted`
+  - **Field types**: Free text, controlled dropdowns, ISO8601 dates, URLs, images, comma-separated lists
+  - **43 total fields** including moo:relatedEntities group
+- [x] Design decisions:
+  - **Example column**: For developer reference only, not used in application logic
+  - **Applicable collections**: Comma-separated list of collection names (e.g., "Core, Library", "All")
+  - **Required field**: Indicates MVP completeness requirement, not search relevance (starts with "Mandatory")
+  - **Searchable fields**: Hardcoded to 4 fields (not in metadata sheet):
+    - `dcterms:title` (weight: 3)
+    - `dcterms:alternative` (weight: 2)
+    - `dcterms:creator` (weight: 2)
+    - `dcterms:description` (weight: 1)
+  - **Display order**: Use order from Mappings sheet (may refine later)
+  - **Image detection**: Fields with exact value "Image" in fieldTypeAndControls contain URLs
+- [x] Created TypeScript interfaces:
+  - `MetadataField` - individual field definition (8 properties)
+  - `MetadataSchema` - array of field definitions
+  - `ObjectData` - dynamic object with fields from schema
+  - `ParsedMetadataSchema` - helper class with utility methods
+- [x] Created configuration module (`src/config/search.ts`):
+  - Hardcoded searchable fields with weights
+  - Helper functions for search configuration
+- [x] Created Google Sheets API service (`src/services/sheetsApi.ts`):
+  - `fetchMetadataSchema()` - fetches and parses Mappings sheet
+  - `fetchObjects()` - fetches and parses Museum sheet
+  - `fetchAllData()` - fetches both in sequence
+  - Dynamic header-based column mapping (resilient to column reordering)
+  - Validation throws descriptive errors if required columns are missing
+- [x] Verified all searchable fields exist in both Mappings and Museum sheets
+- [x] Fixed field name discrepancies between Mappings and Museum sheets
+- [x] Phase 2.2 complete ✅
+
+**Future enhancements to consider:**
+- Add runtime validation in `fetchObjects` to ensure mandatory fields have values
+- Add test framework (e.g., Vitest) for automated validation of API service
+- Add TypeScript strict null checks with type guards for object data fields
 
 ### Phase 2.3: Data Layer Implementation (Day 4-5)
 - [ ] Install Google Sheets API client library or use fetch with REST API
