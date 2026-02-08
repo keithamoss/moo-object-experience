@@ -30,6 +30,7 @@
  */
 
 import { useCallback, useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
 import { SearchableFieldName } from '../../config/searchConfig';
 import { URL_PARAMS } from '../../constants/urlParams';
@@ -169,6 +170,15 @@ export default function SearchContainer({ metadata, objects, disabled = false }:
 
   return (
     <>
+      {/* Page title */}
+      <Helmet>
+        <title>
+          {committedQuery.trim()
+            ? `Search: ${committedQuery} - Museum Object Experience`
+            : 'Museum Object Experience'}
+        </title>
+      </Helmet>
+
       {/* Search Bar with integrated filters */}
       <SearchBar
         query={localQuery}

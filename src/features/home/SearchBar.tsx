@@ -6,7 +6,6 @@
 
 import ClearIcon from '@mui/icons-material/Clear';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import SearchIcon from '@mui/icons-material/Search';
 import { Badge, Box, Collapse, IconButton, InputAdornment, Paper, TextField, Typography } from '@mui/material';
 import { useMemo, useState } from 'react';
 import KeyboardKey from '../../components/KeyboardKey';
@@ -100,11 +99,6 @@ export default function SearchBar({
           autoComplete: 'off',
         }}
         InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon aria-hidden="true" />
-            </InputAdornment>
-          ),
           endAdornment: (
             <>
               {/* Filter button */}
@@ -151,7 +145,7 @@ export default function SearchBar({
                     disabled={disabled}
                     size="small"
                   >
-                    <SearchIcon />
+                    Go
                   </IconButton>
                 </InputAdornment>
               )}
