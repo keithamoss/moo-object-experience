@@ -122,15 +122,12 @@ export const searchSlice = createSlice({
 export const { setQuery, toggleSearchField, setActiveFields, clearSearch, setIndexReady, resetSearch } =
   searchSlice.actions;
 
-// Basic selectors (now memoized)
-export const selectSearchQuery = createSelector([(state: RootState) => state.search.query], (query) => query);
+// Basic selectors (plain functions - no transformation needed)
+export const selectSearchQuery = (state: RootState): string => state.search.query;
 
-export const selectSearchResults = createSelector([(state: RootState) => state.search.results], (results) => results);
+export const selectSearchResults = (state: RootState): SearchResult[] => state.search.results;
 
-export const selectActiveSearchFields = createSelector(
-  [(state: RootState) => state.search.activeSearchFields],
-  (fields) => fields,
-);
+export const selectActiveSearchFields = (state: RootState): SearchableFieldName[] => state.search.activeSearchFields;
 
 export const selectIndexReady = (state: RootState): boolean => state.search.indexReady;
 

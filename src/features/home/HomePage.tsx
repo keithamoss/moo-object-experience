@@ -1,11 +1,13 @@
-import SearchIcon from '@mui/icons-material/Search';
-import { Alert, Box, Chip, Container, InputAdornment, Paper, TextField, Typography } from '@mui/material';
+import { Alert, Box, Chip, Container, Paper, Typography } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { useData } from '../../hooks/useData';
+import SearchContainer from './SearchContainer';
 
 export default function HomePage() {
   const { metadata, objects, isLoading, error, isSuccess } = useData();
+
+  const isSearchDisabled = !isSuccess || !objects || objects.length === 0;
 
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
@@ -29,29 +31,10 @@ export default function HomePage() {
         </Typography>
       </Box>
 
-      <Paper elevation={2} sx={{ p: 2 }}>
-        <TextField
-          fullWidth
-          label="Search"
-          placeholder="Search the collection..."
-          variant="outlined"
-          disabled
-          inputProps={{
-            'aria-label': 'Search the collection',
-            'aria-describedby': 'search-status',
-          }}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon aria-hidden="true" />
-              </InputAdornment>
-            ),
-          }}
-        />
-        <Typography id="search-status" variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
-          Search functionality coming soon
-        </Typography>
-      </Paper>
+      {/* Search UI */}
+      {isSuccess && metadata && objects && (
+        <SearchContainer metadata={metadata} objects={objects} disabled={isSearchDisabled} />
+      )}
 
       {/* Loading State */}
       {isLoading ? (
