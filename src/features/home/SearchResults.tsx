@@ -83,7 +83,7 @@ export default function SearchResults({ results, objects, query, isSearching = f
           const object = objectsById.get(result.id);
           if (!object) return null;
 
-          return <ResultCard key={result.id} result={result} object={object} />;
+          return <ResultCard key={result.id} result={result} object={object} query={query} />;
         })}
       </Grid>
     </Box>

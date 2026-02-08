@@ -6,12 +6,15 @@
 import { Card, CardContent, Grid, Typography } from '@mui/material';
 import type { SearchResult } from '../services/search';
 import type { ObjectData } from '../types/metadata';
+import { highlightSearchTerms } from '../utils/highlightText';
 
 export interface ResultCardProps {
   /** Search result with score and ID */
   result: SearchResult;
   /** Object data for display */
   object: ObjectData;
+  /** Search query for highlighting (optional) */
+  query?: string;
 }
 
 /**
@@ -24,11 +27,16 @@ const DESCRIPTION_LINE_CLAMP = 3;
  */
 const IDENTIFIER_FIELD = 'dcterms:identifier.moooi';
 
-export default function ResultCard({ result, object }: ResultCardProps) {
+export default function ResultCard({ result, object, query = '' }: ResultCardProps) {
   const title = object['dcterms:title'] || 'Untitled';
   const description = object['dcterms:description'] || '';
   const identifier = object[IDENTIFIER_FIELD];
   const creator = object['dcterms:creator'] || '';
+
+  // Highlighted versions
+  const highlightedTitle = highlightSearchTerms(title, query);
+  const highlightedDescription = highlightSearchTerms(description, query);
+  const highlightedCreator = highlightSearchTerms(creator, query);
 
   return (
     <Grid item xs={12} sm={12} md={6} key={result.id}>
@@ -42,7 +50,7 @@ export default function ResultCard({ result, object }: ResultCardProps) {
       >
         <CardContent sx={{ flexGrow: 1 }}>
           <Typography variant="h6" component="h3" gutterBottom>
-            {title}
+            {highlightedTitle}
           </Typography>
 
           <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
@@ -51,7 +59,7 @@ export default function ResultCard({ result, object }: ResultCardProps) {
 
           {creator && (
             <Typography variant="body2" color="text.secondary" gutterBottom>
-              <strong>Creator:</strong> {creator}
+              <strong>Creator:</strong> {highlightedCreator}
             </Typography>
           )}
 
@@ -67,7 +75,7 @@ export default function ResultCard({ result, object }: ResultCardProps) {
                 textOverflow: 'ellipsis',
               }}
             >
-              {description}
+              {highlightedDescription}
             </Typography>
           )}
         </CardContent>
