@@ -1,7 +1,7 @@
 /**
  * Error Boundary component for catching and displaying React errors
  * Essential for use with Suspense and async components
- * 
+ *
  * Usage:
  * ```tsx
  * <ErrorBoundary>
@@ -10,7 +10,7 @@
  *   </Suspense>
  * </ErrorBoundary>
  * ```
- * 
+ *
  * Or with custom fallback:
  * ```tsx
  * <ErrorBoundary fallback={<CustomErrorUI />}>
@@ -77,26 +77,17 @@ export class ErrorBoundary extends Component<Props, State> {
               textAlign: 'center',
             }}
           >
-            <ErrorOutlineIcon
-              sx={{ fontSize: 64, color: 'error.main', mb: 2 }}
-            />
+            <ErrorOutlineIcon sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
             <Typography variant="h5" gutterBottom>
               Something went wrong
             </Typography>
             <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
               {this.state.error?.message || 'An unexpected error occurred'}
             </Typography>
-            <Button
-              variant="contained"
-              onClick={this.handleReset}
-              sx={{ mr: 2 }}
-            >
+            <Button variant="contained" onClick={this.handleReset} sx={{ mr: 2 }}>
               Try Again
             </Button>
-            <Button
-              variant="outlined"
-              onClick={() => window.location.href = '/'}
-            >
+            <Button variant="outlined" onClick={() => (window.location.href = '/')}>
               Go Home
             </Button>
           </Paper>

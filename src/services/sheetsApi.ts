@@ -18,19 +18,19 @@ function buildSheetUrl(worksheetName: string): string {
  */
 async function fetchSheetData(worksheetName: string): Promise<string[][]> {
   const url = buildSheetUrl(worksheetName);
-  
+
   const response = await fetch(url);
-  
+
   if (!response.ok) {
     throw new Error(`Failed to fetch ${worksheetName}: ${response.status} ${response.statusText}`);
   }
-  
+
   const data: SheetsApiResponse = await response.json();
-  
+
   if (!data.values || data.values.length === 0) {
     throw new Error(`No data found in ${worksheetName} worksheet`);
   }
-  
+
   return data.values;
 }
 
@@ -41,17 +41,17 @@ export function parseMetadataSchema(rows: string[][]): MetadataSchema {
   if (rows.length < 2) {
     throw new Error('Mappings sheet must have at least a header row and one data row');
   }
-  
+
   // First row contains headers
   const headers = rows[0];
-  
+
   // Map headers to their indices (case-insensitive, flexible matching)
   const headerMap = new Map<string, number>();
   headers.forEach((header, index) => {
     const normalized = header.toLowerCase().trim();
     headerMap.set(normalized, index);
   });
-  
+
   // Required headers with flexible matching patterns
   const requiredHeaders = [
     { key: 'field', patterns: ['field'] },
@@ -63,17 +63,15 @@ export function parseMetadataSchema(rows: string[][]): MetadataSchema {
     { key: 'fieldTypeAndControls', patterns: ['field type'] },
     { key: 'example', patterns: ['example'] },
   ];
-  
+
   // Find column indices for each required header
   const columnIndices: Record<string, number> = {};
   const missingHeaders: string[] = [];
-  
+
   for (const { key, patterns } of requiredHeaders) {
     let found = false;
     for (const pattern of patterns) {
-      const matchingHeader = Array.from(headerMap.entries()).find(
-        ([header]) => header.includes(pattern)
-      );
+      const matchingHeader = Array.from(headerMap.entries()).find(([header]) => header.includes(pattern));
       if (matchingHeader) {
         columnIndices[key] = matchingHeader[1];
         found = true;
@@ -84,20 +82,20 @@ export function parseMetadataSchema(rows: string[][]): MetadataSchema {
       missingHeaders.push(patterns[0]);
     }
   }
-  
+
   // Throw error if critical columns are missing
   if (missingHeaders.length > 0) {
     throw new Error(
       `Mappings sheet is missing required columns: ${missingHeaders.join(', ')}. ` +
-      `Found columns: ${headers.join(', ')}`
+        `Found columns: ${headers.join(', ')}`,
     );
   }
-  
+
   // Parse data rows using the column mapping
   const schema: MetadataSchema = rows
     .slice(1)
-    .filter(row => row[columnIndices.field] && row[columnIndices.field].trim() !== '') // Filter out empty rows
-    .map(row => ({
+    .filter((row) => row[columnIndices.field] && row[columnIndices.field].trim() !== '') // Filter out empty rows
+    .map((row) => ({
       field: row[columnIndices.field] || '',
       namespace: row[columnIndices.namespace] || '',
       label: row[columnIndices.label] || '',
@@ -107,7 +105,7 @@ export function parseMetadataSchema(rows: string[][]): MetadataSchema {
       fieldTypeAndControls: row[columnIndices.fieldTypeAndControls] || '',
       example: row[columnIndices.example] || '',
     }));
-  
+
   return schema;
 }
 
@@ -118,33 +116,33 @@ export function parseObjectsData(rows: string[][], schema: MetadataSchema): Obje
   if (rows.length < 2) {
     throw new Error('Museum sheet must have at least a header row and one data row');
   }
-  
+
   // First row contains field names (should match schema field names)
   const fieldNames = rows[0];
-  
+
   // Find the index of the identifier field
-  const identifierIndex = fieldNames.findIndex(field => field === 'dcterms:identifier.moooi');
-  
+  const identifierIndex = fieldNames.findIndex((field) => field === 'dcterms:identifier.moooi');
+
   // Parse data rows (skip header)
   const objects: ObjectData[] = rows
     .slice(1)
-    .filter(row => {
+    .filter((row) => {
       // Only include rows that have a non-empty identifier (required field)
       const identifier = row[identifierIndex];
       return identifier && identifier.trim() !== '';
     })
-    .map(row => {
+    .map((row) => {
       const obj: ObjectData = {};
-      
+
       fieldNames.forEach((fieldName, index) => {
         if (fieldName && fieldName.trim() !== '') {
           obj[fieldName] = row[index] || '';
         }
       });
-      
+
       return obj;
     });
-  
+
   return objects;
 }
 
@@ -184,6 +182,6 @@ export async function fetchAllData(): Promise<{
 }> {
   const schema = await fetchMetadataSchema();
   const objects = await fetchObjects(schema);
-  
+
   return { schema, objects };
 }

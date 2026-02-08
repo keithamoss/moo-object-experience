@@ -10,16 +10,12 @@ import { metadataAdapter, objectsAdapter } from '../store/api';
 /**
  * Fetches metadata first, then uses it to fetch objects
  * Returns combined loading/error states and both datasets
- * 
+ *
  * Standard version (compatible with current React patterns)
  */
 export function useData() {
   // Fetch metadata first
-  const {
-    data: metadataState,
-    isLoading: isLoadingMetadata,
-    error: metadataError,
-  } = useGetMetadataQuery();
+  const { data: metadataState, isLoading: isLoadingMetadata, error: metadataError } = useGetMetadataQuery();
 
   // Extract metadata array from normalized state
   const metadata = useMemo(() => {

@@ -4,14 +4,14 @@
 
 import { useAppSelector } from './hooks';
 import {
-	selectActiveSearchFields,
-	selectCanSearch,
-	selectHasResults,
-	selectIndexReady,
-	selectIsQueryValid,
-	selectResultCount,
-	selectSearchQuery,
-	selectSearchResults,
+  selectActiveSearchFields,
+  selectCanSearch,
+  selectHasResults,
+  selectIndexReady,
+  selectIsQueryValid,
+  selectResultCount,
+  selectSearchQuery,
+  selectSearchResults,
 } from './searchSlice';
 
 export const useSearchQuery = () => useAppSelector(selectSearchQuery);

@@ -37,10 +37,7 @@ export const sheetsApi = createApi({
         try {
           const schema = await fetchMetadataSchema();
           // Transform to normalized state
-          const normalizedState = metadataAdapter.addMany(
-            metadataAdapter.getInitialState(),
-            schema
-          );
+          const normalizedState = metadataAdapter.addMany(metadataAdapter.getInitialState(), schema);
           return { data: normalizedState };
         } catch (error) {
           return {
@@ -64,10 +61,7 @@ export const sheetsApi = createApi({
         try {
           const objects = await fetchObjects(schema);
           // Transform to normalized state
-          const normalizedState = objectsAdapter.addMany(
-            objectsAdapter.getInitialState(),
-            objects
-          );
+          const normalizedState = objectsAdapter.addMany(objectsAdapter.getInitialState(), objects);
           return { data: normalizedState };
         } catch (error) {
           return {

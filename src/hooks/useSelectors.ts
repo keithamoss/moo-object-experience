@@ -90,10 +90,7 @@ export function useObjectsSample(count: number = 5, metadata?: MetadataField[]) 
 /**
  * Hook to search/filter objects by a predicate function
  */
-export function useFilteredObjects(
-  predicate: (object: ObjectData) => boolean,
-  metadata?: MetadataField[]
-) {
+export function useFilteredObjects(predicate: (object: ObjectData) => boolean, metadata?: MetadataField[]) {
   return useGetObjectsQuery(metadata ?? [], {
     skip: !metadata,
     selectFromResult: ({ data, ...rest }) => ({

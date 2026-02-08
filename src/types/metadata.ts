@@ -8,25 +8,25 @@
 export interface MetadataField {
   /** The field name (e.g., "moo:workingNotes", "dcterms:Collection") */
   field: string;
-  
+
   /** The namespace/standard (e.g., "Dublin Core", "Darwin Core", "Museum of Objects of Interest") */
   namespace: string;
-  
+
   /** Human-readable label for display */
   label: string;
-  
+
   /** Comma-separated list of collection names this field applies to (e.g., "Core, Library", "All") */
   applicableCollections: string;
-  
+
   /** Whether field is required for MVP completeness: "Mandatory", "Optional", or "For future development" */
   required: string;
-  
+
   /** Description of the field's purpose */
   purpose: string;
-  
+
   /** Field type and control hints (e.g., "Free text", "ISO8601 compliant date", "Image") */
   fieldTypeAndControls: string;
-  
+
   /** Example value(s) for developer reference only - not used in application logic */
   example: string;
 }
@@ -51,19 +51,19 @@ export interface ObjectData {
 export interface ObjectDataTyped extends ObjectData {
   /** Object identifier (mandatory) */
   'dcterms:identifier.moooi': string;
-  
+
   /** Object title (mandatory) */
   'dcterms:title': string;
-  
+
   /** Object description (mandatory) */
   'dcterms:description': string;
-  
+
   /** Collection name (mandatory) */
   'dcterms:Collection': string;
-  
+
   /** Date accessioned (mandatory) */
   'dcterms:dateAccepted': string;
-  
+
   /** Photograph/image (optional) */
   'dcterms:image'?: string;
 }
@@ -82,50 +82,49 @@ export interface SheetsApiResponse {
  */
 export class ParsedMetadataSchema {
   private fields: Map<string, MetadataField>;
+
   private fieldsByLabel: Map<string, MetadataField>;
-  
+
   constructor(public schema: MetadataSchema) {
-    this.fields = new Map(schema.map(field => [field.field, field]));
-    this.fieldsByLabel = new Map(schema.map(field => [field.label, field]));
+    this.fields = new Map(schema.map((field) => [field.field, field]));
+    this.fieldsByLabel = new Map(schema.map((field) => [field.label, field]));
   }
-  
+
   /**
    * Get field definition by field name
    */
   getField(fieldName: string): MetadataField | undefined {
     return this.fields.get(fieldName);
   }
-  
+
   /**
    * Get field definition by label
    */
   getFieldByLabel(label: string): MetadataField | undefined {
     return this.fieldsByLabel.get(label);
   }
-  
+
   /**
    * Get all field names in the order they appear in the schema
    */
   getAllFieldNames(): string[] {
-    return this.schema.map(field => field.field);
+    return this.schema.map((field) => field.field);
   }
-  
+
   /**
    * Get all mandatory fields (required for MVP completeness)
    */
   getMandatoryFields(): MetadataField[] {
-    return this.schema.filter(field => field.required.startsWith('Mandatory'));
+    return this.schema.filter((field) => field.required.startsWith('Mandatory'));
   }
-  
+
   /**
    * Get all image fields (identified by "Image" in fieldTypeAndControls)
    */
   getImageFields(): MetadataField[] {
-    return this.schema.filter(field => 
-      field.fieldTypeAndControls === 'Image'
-    );
+    return this.schema.filter((field) => field.fieldTypeAndControls === 'Image');
   }
-  
+
   /**
    * Check if a field is mandatory for MVP completeness
    */
@@ -133,7 +132,7 @@ export class ParsedMetadataSchema {
     const field = this.getField(fieldName);
     return field?.required.startsWith('Mandatory') ?? false;
   }
-  
+
   /**
    * Check if a field contains image URLs
    */
@@ -141,17 +140,17 @@ export class ParsedMetadataSchema {
     const field = this.getField(fieldName);
     return field?.fieldTypeAndControls === 'Image';
   }
-  
+
   /**
    * Get applicable collections as an array
    */
   getApplicableCollections(fieldName: string): string[] {
     const field = this.getField(fieldName);
     if (!field) return [];
-    
+
     return field.applicableCollections
       .split(',')
-      .map(c => c.trim())
-      .filter(c => c.length > 0);
+      .map((c) => c.trim())
+      .filter((c) => c.length > 0);
   }
 }
