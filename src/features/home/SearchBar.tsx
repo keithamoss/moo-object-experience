@@ -135,20 +135,6 @@ export default function SearchBar({
                   </IconButton>
                 </InputAdornment>
               )}
-              {/* Mobile search button (only on mobile when there's text) */}
-              {isMobile && query.trim() && (
-                <InputAdornment position="end">
-                  <IconButton
-                    aria-label="Search"
-                    onClick={onCommit}
-                    color="primary"
-                    disabled={disabled}
-                    size="small"
-                  >
-                    Go
-                  </IconButton>
-                </InputAdornment>
-              )}
             </>
           ),
         }}
