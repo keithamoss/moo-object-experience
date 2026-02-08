@@ -69,7 +69,10 @@ export default function HomePage() {
             </Typography>
             <Typography variant="body2">
               {typeof error === 'object' && error !== null && 'status' in error
-                ? `Error ${(error as { status: number }).status}: ${JSON.stringify((error as { data?: unknown }).data)}`
+                ? `Error ${(error as { status: string | number }).status}: ${(error as { error?: string; data?: unknown }).error ||
+                JSON.stringify((error as { data?: unknown }).data) ||
+                'Unknown error'
+                }`
                 : (error as { message?: string })?.message || 'An unknown error occurred'}
             </Typography>
           </Alert>
