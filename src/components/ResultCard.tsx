@@ -3,10 +3,14 @@
  * Displays a single search result with metadata
  */
 
-import { Card, CardContent, Grid, Typography } from '@mui/material';
+import { Card, CardActionArea, CardContent, Grid, Typography } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { OBJECT_FIELDS } from '../constants/objectFields';
 import type { SearchResult } from '../services/search';
+import { CARD_HOVER_SX } from '../theme/cardStyles';
 import type { ObjectData } from '../types/metadata';
 import { highlightSearchTerms } from '../utils/highlightText';
+import { generateObjectUrl } from '../utils/urlUtils';
 
 export interface ResultCardProps {
   /** Search result with score and ID */
@@ -23,20 +27,39 @@ export interface ResultCardProps {
 const DESCRIPTION_LINE_CLAMP = 3;
 
 /**
- * Field name constant for object identifier
+ * Extract common object fields with defaults
  */
-const IDENTIFIER_FIELD = 'dcterms:identifier.moooi';
+function extractObjectFields(object: ObjectData) {
+  return {
+    title: (object[OBJECT_FIELDS.TITLE] as string) || 'Untitled',
+    description: (object[OBJECT_FIELDS.DESCRIPTION] as string) || '',
+    identifier: (object[OBJECT_FIELDS.IDENTIFIER] as string) || '',
+    creator: (object[OBJECT_FIELDS.CREATOR] as string) || '',
+  };
+}
 
 export default function ResultCard({ result, object, query = '' }: ResultCardProps) {
-  const title = object['dcterms:title'] || 'Untitled';
-  const description = object['dcterms:description'] || '';
-  const identifier = object[IDENTIFIER_FIELD];
-  const creator = object['dcterms:creator'] || '';
+  const navigate = useNavigate();
+  const { title, description, identifier, creator } = extractObjectFields(object);
 
   // Highlighted versions
   const highlightedTitle = highlightSearchTerms(title, query);
   const highlightedDescription = highlightSearchTerms(description, query);
   const highlightedCreator = highlightSearchTerms(creator, query);
+
+  const handleClick = () => {
+    // Don't navigate if identifier is missing
+    if (!identifier) {
+      console.error('Object missing identifier', object);
+      return;
+    }
+    try {
+      const url = generateObjectUrl(identifier, title);
+      navigate(url);
+    } catch (error) {
+      console.error('Failed to generate URL for object', { identifier, title, error });
+    }
+  };
 
   return (
     <Grid item xs={12} sm={12} md={6} key={result.id}>
@@ -46,39 +69,50 @@ export default function ResultCard({ result, object, query = '' }: ResultCardPro
           height: '100%',
           display: 'flex',
           flexDirection: 'column',
+          ...CARD_HOVER_SX,
         }}
       >
-        <CardContent sx={{ flexGrow: 1 }}>
-          <Typography variant="h6" component="h3" gutterBottom>
-            {highlightedTitle}
-          </Typography>
-
-          <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
-            {identifier}
-          </Typography>
-
-          {creator && (
-            <Typography variant="body2" color="text.secondary" gutterBottom>
-              <strong>Creator:</strong> {highlightedCreator}
+        <CardActionArea
+          onClick={handleClick}
+          sx={{
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'stretch',
+          }}
+        >
+          <CardContent sx={{ flexGrow: 1, width: '100%' }}>
+            <Typography variant="h6" component="h3" gutterBottom>
+              {highlightedTitle}
             </Typography>
-          )}
 
-          {description && (
-            <Typography
-              variant="body2"
-              sx={{
-                mt: 1,
-                display: '-webkit-box',
-                WebkitLineClamp: DESCRIPTION_LINE_CLAMP,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-              }}
-            >
-              {highlightedDescription}
+            <Typography variant="caption" color="text.secondary" display="block" gutterBottom>
+              {identifier}
             </Typography>
-          )}
-        </CardContent>
+
+            {creator && (
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                <strong>Creator:</strong> {highlightedCreator}
+              </Typography>
+            )}
+
+            {description && (
+              <Typography
+                variant="body2"
+                sx={{
+                  mt: 1,
+                  display: '-webkit-box',
+                  WebkitLineClamp: DESCRIPTION_LINE_CLAMP,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                }}
+              >
+                {highlightedDescription}
+              </Typography>
+            )}
+          </CardContent>
+        </CardActionArea>
       </Card>
     </Grid>
   );
