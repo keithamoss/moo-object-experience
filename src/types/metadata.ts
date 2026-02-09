@@ -153,4 +153,40 @@ export class ParsedMetadataSchema {
       .map((c) => c.trim())
       .filter((c) => c.length > 0);
   }
+
+  /**
+   * Get image URLs from an object based on image-type fields
+   */
+  getImageUrls(object: ObjectData): string[] {
+    const imageFields = this.getImageFields();
+    return imageFields
+      .map((field) => object[field.field])
+      .filter((url): url is string => !!url && url.trim() !== '');
+  }
+
+  /**
+   * Get fields to display in metadata section
+   * Excludes hero fields (title, identifier), description, and empty fields
+   */
+  getDisplayFields(object: ObjectData, excludeFields: string[]): MetadataField[] {
+    return this.schema.filter((field) => {
+      // Skip excluded fields
+      if (excludeFields.includes(field.field)) {
+        return false;
+      }
+      // Skip empty fields
+      const value = object[field.field];
+      if (!value || value.trim() === '') {
+        return false;
+      }
+      return true;
+    });
+  }
+
+  /**
+   * Get label for a field, with fallback
+   */
+  getFieldLabel(fieldName: string, fallback: string): string {
+    return this.getField(fieldName)?.label || fallback;
+  }
 }

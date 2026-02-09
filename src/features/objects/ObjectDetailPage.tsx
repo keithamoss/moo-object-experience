@@ -1,11 +1,23 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { Box, Container, IconButton, Paper, Typography } from '@mui/material';
+import {
+  Box,
+  Container,
+  Divider,
+  Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Paper,
+  Typography,
+} from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import NotFoundPage from '../../components/NotFoundPage';
-import { OBJECT_FIELDS } from '../../constants/objectFields';
 import { useMetadataFields, useObject } from '../../store';
+import { FieldValue } from './FieldValue';
+import { useObjectDisplay } from './useObjectDisplay';
 
 export default function ObjectDetailPage() {
   const { id } = useParams<{ id: string; slug?: string }>();
@@ -60,9 +72,12 @@ export default function ObjectDetailPage() {
     return <LoadingIndicator message="Loading object..." />;
   }
 
-  // At this point we know object exists - extract fields
-  const title = object[OBJECT_FIELDS.TITLE] || 'Untitled';
-  const identifier = object[OBJECT_FIELDS.IDENTIFIER];
+  // Extract display data using custom hook
+  const { title, identifier, description, identifierLabel, descriptionLabel, imageUrls, fieldsToDisplay } =
+    useObjectDisplay({
+      object,
+      metadata,
+    });
 
   // Defensive check: identifier should always exist but handle edge case
   if (!identifier) {
@@ -71,28 +86,122 @@ export default function ObjectDetailPage() {
   }
 
   return (
-    <Container maxWidth="md" sx={{ mt: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Helmet>
         <title>{title} | Westralian People's Museum</title>
       </Helmet>
 
+      {/* Back button */}
       <Box sx={{ mb: 2 }}>
         <IconButton onClick={handleBack} aria-label="back to previous page">
           <ArrowBackIcon />
         </IconButton>
       </Box>
 
-      <Paper elevation={2} sx={{ p: 3 }}>
+      {/* Hero Section */}
+      <Paper elevation={2} sx={{ p: 3, mb: 3 }}>
         <Typography variant="h4" component="h1" gutterBottom>
           {title}
         </Typography>
-        <Typography variant="body2" color="text.secondary" paragraph>
-          ID: {identifier}
-        </Typography>
-        <Typography variant="body1" sx={{ mt: 3 }}>
-          Full object details will be displayed here in Phase 4.2.
+        <Typography variant="body2" color="text.secondary">
+          {identifierLabel}: {identifier}
         </Typography>
       </Paper>
+
+      {/* Main Content: 2-column layout on desktop, stacked on mobile */}
+      <Grid container spacing={3}>
+        {/* Left Column: Description and Images */}
+        <Grid item xs={12} md={6}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+            {/* Description Section */}
+            {description && (
+              <Paper elevation={2} sx={{ p: 3 }}>
+                <Typography variant="h6" component="h2" gutterBottom>
+                  {descriptionLabel}
+                </Typography>
+                <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+                  {description}
+                </Typography>
+              </Paper>
+            )}
+
+            {/* Images Section */}
+            {imageUrls.length > 0 && (
+              <Paper elevation={2} sx={{ p: 3 }}>
+                <Typography variant="h6" component="h2" gutterBottom>
+                  Images
+                </Typography>
+                {imageUrls.map((url, idx) => (
+                  <Box key={idx} sx={{ mb: idx < imageUrls.length - 1 ? 2 : 0 }}>
+                    <img
+                      src={url}
+                      alt={`${title} - Image ${idx + 1}`}
+                      loading="lazy"
+                      style={{
+                        width: '100%',
+                        height: 'auto',
+                        display: 'block',
+                        borderRadius: '4px',
+                      }}
+                    />
+                  </Box>
+                ))}
+              </Paper>
+            )}
+          </Box>
+        </Grid>
+
+        {/* Right Column: Metadata Fields */}
+        <Grid item xs={12} md={6}>
+          <Paper elevation={2} sx={{ p: 3 }}>
+            <Typography variant="h6" component="h2" gutterBottom>
+              Metadata
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+
+            {fieldsToDisplay.length === 0 ? (
+              <Typography variant="body2" color="text.secondary">
+                No additional metadata available
+              </Typography>
+            ) : (
+              <List disablePadding>
+                {fieldsToDisplay.map((field, idx) => (
+                  <ListItem
+                    key={field.field}
+                    alignItems="flex-start"
+                    sx={{
+                      px: 0,
+                      py: 1.5,
+                      borderBottom: idx < fieldsToDisplay.length - 1 ? '1px solid' : 'none',
+                      borderColor: 'divider',
+                    }}
+                  >
+                    <ListItemText
+                      primary={field.label}
+                      secondary={
+                        <FieldValue
+                          value={object[field.field]}
+                          fieldTypeAndControls={field.fieldTypeAndControls}
+                        />
+                      }
+                      primaryTypographyProps={{
+                        variant: 'body2',
+                        fontWeight: 'bold',
+                        color: 'text.secondary',
+                      }}
+                      secondaryTypographyProps={{
+                        variant: 'body1',
+                        color: 'text.primary',
+                        component: 'div',
+                      }}
+                    />
+                  </ListItem>
+                ))}
+              </List>
+            )}
+          </Paper>
+        </Grid>
+      </Grid>
     </Container>
   );
 }
