@@ -1,4 +1,5 @@
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import BrokenImageIcon from '@mui/icons-material/BrokenImage';
 import {
   Box,
   Container,
@@ -11,6 +12,7 @@ import {
   Paper,
   Typography,
 } from '@mui/material';
+import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate, useParams } from 'react-router-dom';
 import LoadingIndicator from '../../components/LoadingIndicator';
@@ -22,6 +24,7 @@ import { useObjectDisplay } from './useObjectDisplay';
 export default function ObjectDetailPage() {
   const { id } = useParams<{ id: string; slug?: string }>();
   const navigate = useNavigate();
+  const [brokenImages, setBrokenImages] = useState<Set<number>>(new Set());
 
   // Decode the ID from the URL (in case it was URL-encoded)
   const decodedId = id ? decodeURIComponent(id) : '';
@@ -47,6 +50,10 @@ export default function ObjectDetailPage() {
 
   const handleBack = () => {
     navigate(-1);
+  };
+
+  const handleImageError = (idx: number) => {
+    setBrokenImages((prev) => new Set(prev).add(idx));
   };
 
   // Consolidate all loading checks
@@ -133,17 +140,39 @@ export default function ObjectDetailPage() {
                 </Typography>
                 {imageUrls.map((url, idx) => (
                   <Box key={idx} sx={{ mb: idx < imageUrls.length - 1 ? 2 : 0 }}>
-                    <img
-                      src={url}
-                      alt={`${title} - Image ${idx + 1}`}
-                      loading="lazy"
-                      style={{
-                        width: '100%',
-                        height: 'auto',
-                        display: 'block',
-                        borderRadius: '4px',
-                      }}
-                    />
+                    {brokenImages.has(idx) ? (
+                      <Box
+                        sx={{
+                          width: '100%',
+                          minHeight: 200,
+                          display: 'flex',
+                          flexDirection: 'column',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: 'grey.100',
+                          borderRadius: 1,
+                          p: 3,
+                        }}
+                      >
+                        <BrokenImageIcon sx={{ fontSize: 48, color: 'grey.400', mb: 1 }} />
+                        <Typography variant="body2" color="text.secondary" textAlign="center">
+                          Image unavailable
+                        </Typography>
+                      </Box>
+                    ) : (
+                      <img
+                        src={url}
+                        alt={`${title} - Image ${idx + 1}`}
+                        loading="lazy"
+                        onError={() => handleImageError(idx)}
+                        style={{
+                          width: '100%',
+                          height: 'auto',
+                          display: 'block',
+                          borderRadius: '4px',
+                        }}
+                      />
+                    )}
                   </Box>
                 ))}
               </Paper>

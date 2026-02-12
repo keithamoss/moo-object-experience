@@ -13,11 +13,23 @@ type FieldRenderer = (value: string) => React.ReactNode;
 
 /**
  * Render a URL as a clickable link
+ * Shortens the display text for better readability while keeping full URL in href
  */
 function renderUrl(value: string): React.ReactNode {
+  const maxLength = 60;
+  const displayText = value.length > maxLength
+    ? `${value.substring(0, maxLength)}...`
+    : value;
+
   return (
-    <a href={value} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>
-      {value}
+    <a
+      href={value}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: 'inherit', wordBreak: 'break-all' }}
+      title={value}
+    >
+      {displayText}
     </a>
   );
 }
@@ -78,29 +90,74 @@ function getRenderer(fieldTypeAndControls: string): FieldRenderer {
 }
 
 /**
- * Component for rendering a field value based on its type
+ * Component for rendering a field value based on its type from the metadata schema
  *
  * Uses a strategy pattern to select the appropriate renderer based on
- * the field's metadata type.
+ * the field's metadata type. Field types are determined by the `fieldTypeAndControls` 
+ * value from the metadata schema.
  *
- * Field type rendering behavior:
- * - **URLs** (fieldTypeAndControls includes "url")
- *   → Clickable link opening in new tab
- * 
- * - **Dates** (fieldTypeAndControls includes "date")
- *   → Formatted as "15 January 2024" (Australian format)
- * 
- * - **Comma-separated lists** (fieldTypeAndControls includes "comma-separated")
- *   → Material-UI chips for each item
- * 
- * - **Multi-line text** (all other types)
- *   → Preserves line breaks with <br> tags
- * 
- * - **Empty values**
- *   → Returns null (field won't be displayed)
+ * ## Supported Field Types
  *
- * @param value - Field value from object data
- * @param fieldTypeAndControls - Field type metadata from schema
+ * ### 1. URL Fields
+ * **Detection**: `fieldTypeAndControls` includes "url" (case-insensitive)
+ * **Rendering**: 
+ * - Clickable link opening in new tab with security attributes (noopener, noreferrer)
+ * - Display text truncated to 60 characters with ellipsis for readability
+ * - Full URL shown on hover via title attribute
+ * - Word breaks enabled for long URLs (wordBreak: 'break-all')
+ * **Example**:
+ * - Input: `"https://example.com/very/long/path/to/resource/file.jpg"`
+ * - Display: `"https://example.com/very/long/path/to/resource/file...."`
+ * - Hover: Shows full URL
+ * 
+ * ### 2. Date Fields
+ * **Detection**: `fieldTypeAndControls` includes "date" (case-insensitive)
+ * **Rendering**:
+ * - Human-readable Australian date format via `formatDate()` utility
+ * - Supports multiple ISO8601 formats:
+ *   - Full date: "2024-01-15" → "15 January 2024"
+ *   - Year-month: "2024-01" → "January 2024"
+ *   - Year only: "2024" → "2024"
+ *   - Date with time: "2024-01-15T10:30:00Z" → "15 January 2024" (time component stripped)
+ * - Invalid or malformed dates returned as-is
+ * **Example**:
+ * - Input: `"2024-03-15"`
+ * - Display: `"15 March 2024"`
+ * 
+ * ### 3. Comma-Separated Lists
+ * **Detection**: `fieldTypeAndControls` includes "comma-separated" or "comma separated" (case-insensitive)
+ * **Rendering**:
+ * - Material-UI Chip components for each item (small size)
+ * - Chips wrap to multiple lines on narrow screens (flexWrap: 'wrap')
+ * - Empty items automatically filtered out after trimming
+ * - 0.5 spacing units between chips
+ * **Example**:
+ * - Input: `"Ceramics, Pottery, Sculpture"`
+ * - Display: Three chips with grey background: [Ceramics] [Pottery] [Sculpture]
+ * 
+ * ### 4. Multi-Line Text (Default/Fallback)
+ * **Detection**: All other field types (fallback when no specific type matches)
+ * **Rendering**:
+ * - Line breaks preserved using `<br>` tags
+ * - No special formatting or truncation
+ * - Displayed as plain text
+ * **Example**:
+ * - Input: `"First line\nSecond line\nThird line"`
+ * - Display: Three separate lines with visual line breaks
+ * 
+ * ### 5. Empty Values
+ * **Detection**: `!value` or `value.trim() === ''`
+ * **Rendering**: Returns `null` (field will not be displayed in UI)
+ *
+ * ## Architecture Notes
+ * - Uses strategy pattern with separate renderer functions for each type
+ * - `getRenderer()` selects appropriate renderer based on field type
+ * - Each renderer is a pure function: `(value: string) => React.ReactNode`
+ * - Rendering decision made once per field (no re-evaluation on re-renders)
+ *
+ * @param value - Field value from object data (may be undefined or empty)
+ * @param fieldTypeAndControls - Field type metadata from schema (e.g., "Free text", "URL", "ISO8601 compliant date", "Comma-separated list")
+ * @returns React node or null if value is empty
  */
 export function FieldValue({ value, fieldTypeAndControls }: FieldValueProps) {
   if (!value || value.trim() === '') {
