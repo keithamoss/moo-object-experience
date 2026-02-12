@@ -1,11 +1,9 @@
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import BrokenImageIcon from '@mui/icons-material/BrokenImage';
 import {
   Box,
   Container,
   Divider,
   Grid,
-  IconButton,
   List,
   ListItem,
   ListItemText,
@@ -14,17 +12,24 @@ import {
 } from '@mui/material';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { useNavigate, useParams } from 'react-router-dom';
-import LoadingIndicator from '../../components/LoadingIndicator';
+import { useParams, useSearchParams } from 'react-router-dom';
+import Breadcrumbs from '../../components/Breadcrumbs';
 import NotFoundPage from '../../components/NotFoundPage';
+import ObjectDetailSkeleton from '../../components/ObjectDetailSkeleton';
 import { useMetadataFields, useObject } from '../../store';
+import { useAppSelector } from '../../store/hooks';
+import { selectSearchQuery } from '../../store/searchSlice';
+import { buildSearchURL } from '../../utils/urlUtils';
 import { FieldValue } from './FieldValue';
 import { useObjectDisplay } from './useObjectDisplay';
 
 export default function ObjectDetailPage() {
   const { id } = useParams<{ id: string; slug?: string }>();
-  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [brokenImages, setBrokenImages] = useState<Set<number>>(new Set());
+
+  // Get current search query from Redux for breadcrumb link
+  const searchQuery = useAppSelector(selectSearchQuery);
 
   // Decode the ID from the URL (in case it was URL-encoded)
   const decodedId = id ? decodeURIComponent(id) : '';
@@ -48,9 +53,12 @@ export default function ObjectDetailPage() {
     isSuccess: isSuccessObject,
   } = useObject(decodedId, shouldFetchObject ? metadata : []);
 
-  const handleBack = () => {
-    navigate(-1);
-  };
+  // Extract display data using custom hook (must be called before conditional returns)
+  const { title, identifier, description, identifierLabel, descriptionLabel, imageUrls, fieldsToDisplay } =
+    useObjectDisplay({
+      object,
+      metadata,
+    });
 
   const handleImageError = (idx: number) => {
     setBrokenImages((prev) => new Set(prev).add(idx));
@@ -64,9 +72,9 @@ export default function ObjectDetailPage() {
     return <NotFoundPage />;
   }
 
-  // Show loading if data is being fetched
+  // Show loading skeleton while data is being fetched
   if (isLoading) {
-    return <LoadingIndicator message="Loading object..." />;
+    return <ObjectDetailSkeleton />;
   }
 
   // Only show 404 if the query has completed successfully but returned no object
@@ -76,15 +84,8 @@ export default function ObjectDetailPage() {
 
   // Wait for object to load
   if (!object) {
-    return <LoadingIndicator message="Loading object..." />;
+    return <ObjectDetailSkeleton />;
   }
-
-  // Extract display data using custom hook
-  const { title, identifier, description, identifierLabel, descriptionLabel, imageUrls, fieldsToDisplay } =
-    useObjectDisplay({
-      object,
-      metadata,
-    });
 
   // Defensive check: identifier should always exist but handle edge case
   if (!identifier) {
@@ -92,18 +93,32 @@ export default function ObjectDetailPage() {
     return <NotFoundPage />;
   }
 
+  // Build breadcrumb navigation
+  const breadcrumbItems: Array<{ label: string; path?: string }> = [
+    { label: 'Home', path: '/' },
+  ];
+
+  // Add search results breadcrumb if we have a search query
+  if (searchQuery) {
+    breadcrumbItems.push({
+      label: 'Search Results',
+      path: buildSearchURL(searchQuery, searchParams),
+    });
+  }
+
+  // Current object is the last breadcrumb (not clickable)
+  breadcrumbItems.push({
+    label: title || identifier,
+  });
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
       <Helmet>
-        <title>{title} | Westralian People's Museum</title>
+        <title>{title} | Museum Object Experience</title>
       </Helmet>
 
-      {/* Back button */}
-      <Box sx={{ mb: 2 }}>
-        <IconButton onClick={handleBack} aria-label="back to previous page">
-          <ArrowBackIcon />
-        </IconButton>
-      </Box>
+      {/* Breadcrumb navigation */}
+      <Breadcrumbs items={breadcrumbItems} />
 
       {/* Hero Section */}
       <Paper elevation={2} sx={{ p: 3, mb: 3 }}>

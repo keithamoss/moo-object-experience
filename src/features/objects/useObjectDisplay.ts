@@ -2,7 +2,7 @@ import { OBJECT_FIELDS } from '../../constants/objectFields';
 import { MetadataField, ObjectData, ParsedMetadataSchema } from '../../types/metadata';
 
 interface UseObjectDisplayParams {
-  object: ObjectData;
+  object: ObjectData | undefined;
   metadata: MetadataField[];
 }
 
@@ -34,6 +34,19 @@ export function useObjectDisplay({
 }: UseObjectDisplayParams): UseObjectDisplayReturn {
   // Parse metadata schema
   const parsedSchema = new ParsedMetadataSchema(metadata);
+
+  // Return default values if object is undefined
+  if (!object) {
+    return {
+      title: '',
+      identifier: '',
+      description: undefined,
+      identifierLabel: 'Identifier',
+      descriptionLabel: 'Description',
+      imageUrls: [],
+      fieldsToDisplay: [],
+    };
+  }
 
   // Extract core fields
   const title = object[OBJECT_FIELDS.TITLE] || 'Untitled';

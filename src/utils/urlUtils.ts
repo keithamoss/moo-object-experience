@@ -95,3 +95,32 @@ export function generateObjectUrl(id: string, title: string): string {
 
   return `/object/${encodeURIComponent(id)}/${validation.slug}`;
 }
+
+/**
+ * Build a search page URL from a query and optional search params
+ * Preserves filter state if present in search params
+ *
+ * @param query - Search query string
+ * @param searchParams - URLSearchParams containing optional filter state
+ * @returns URL path with query parameters
+ *
+ * @example
+ * buildSearchURL('pottery', new URLSearchParams()) // '/?q=pottery'
+ * buildSearchURL('pottery', new URLSearchParams('fields=title,creator')) // '/?q=pottery&fields=title,creator'
+ */
+export function buildSearchURL(query: string, searchParams?: URLSearchParams): string {
+  const params = new URLSearchParams();
+  
+  // Add query
+  if (query) {
+    params.set('q', query);
+  }
+  
+  // Preserve fields filter if present
+  if (searchParams?.has('fields')) {
+    params.set('fields', searchParams.get('fields')!);
+  }
+  
+  const queryString = params.toString();
+  return queryString ? `/?${queryString}` : '/';
+}
