@@ -7,7 +7,7 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { Badge, Box, Collapse, IconButton, InputAdornment, Paper, TextField, Typography } from '@mui/material';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import KeyboardKey from '../../components/KeyboardKey';
 import type { SearchableFieldName } from '../../config/searchConfig';
 import type { MetadataField } from '../../types/metadata';
@@ -49,6 +49,9 @@ export default function SearchBar({
   // Memoize mobile detection (only needs to run once)
   const isMobile = useMemo(() => /iPhone|iPad|Android/i.test(navigator.userAgent), []);
 
+  // Ref to access the input element directly
+  const inputRef = useRef<HTMLInputElement>(null);
+
   // State for showing/hiding filters
   const [showFilters, setShowFilters] = useState(false);
 
@@ -59,7 +62,11 @@ export default function SearchBar({
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter') {
-      event.currentTarget.blur(); // Dismiss mobile keyboard
+      event.preventDefault(); // Prevent form submission
+      // Blur to dismiss keyboard on mobile
+      if (inputRef.current) {
+        inputRef.current.blur();
+      }
       onCommit();
     } else if (event.key === 'Escape') {
       onClear();
@@ -92,6 +99,7 @@ export default function SearchBar({
         onKeyDown={handleKeyDown}
         onBlur={handleBlur}
         disabled={disabled}
+        inputRef={inputRef}
         inputProps={{
           'aria-label': 'Search the collection',
           enterKeyHint: 'search', // Mobile keyboard shows "Search" button

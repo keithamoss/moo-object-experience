@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
 import NotFoundPage from './components/NotFoundPage';
 import HomePage from './features/home/HomePage';
@@ -12,7 +12,8 @@ import { store } from './store/store';
 import { theme } from './theme/theme';
 
 // Define routes
-const router = createBrowserRouter([
+// Using HashRouter for GitHub Pages compatibility (avoids 404 on refresh)
+const router = createHashRouter([
   {
     path: '/',
     element: <App />,
