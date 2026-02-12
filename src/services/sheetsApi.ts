@@ -129,7 +129,11 @@ export function parseObjectsData(rows: string[][], schema: MetadataSchema): Obje
     .filter((row) => {
       // Only include rows that have a non-empty identifier (required field)
       const identifier = row[identifierIndex];
-      return identifier && identifier.trim() !== '';
+      if (!identifier || identifier.trim() === '') {
+        console.warn('Skipping object row with missing identifier');
+        return false;
+      }
+      return true;
     })
     .map((row) => {
       const obj: ObjectData = {};
@@ -139,6 +143,12 @@ export function parseObjectsData(rows: string[][], schema: MetadataSchema): Obje
           obj[fieldName] = row[index] || '';
         }
       });
+
+      // Validate required fields exist
+      const identifier = obj['dcterms:identifier.moooi'];
+      if (!identifier || typeof identifier !== 'string' || identifier.trim() === '') {
+        throw new Error(`Object missing required identifier field`);
+      }
 
       return obj;
     });

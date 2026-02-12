@@ -1,12 +1,12 @@
 import { OBJECT_FIELDS } from '../../constants/objectFields';
 import { MetadataField, ObjectData, ParsedMetadataSchema } from '../../types/metadata';
 
-interface UseObjectDisplayParams {
+interface ExtractObjectDisplayDataParams {
   object: ObjectData | undefined;
   metadata: MetadataField[];
 }
 
-interface UseObjectDisplayReturn {
+interface ExtractObjectDisplayDataReturn {
   title: string;
   identifier: string;
   description: string | undefined;
@@ -19,6 +19,8 @@ interface UseObjectDisplayReturn {
 /**
  * Extracts and organizes object data for display on detail page
  * 
+ * This is a pure data transformation function, not a React hook.
+ * 
  * Returns:
  * - Core fields: title, identifier, description
  * - Field labels for identifier and description
@@ -28,10 +30,10 @@ interface UseObjectDisplayReturn {
  * @param object - The object data from API
  * @param metadata - Metadata schema definitions
  */
-export function useObjectDisplay({
+export function extractObjectDisplayData({
   object,
   metadata,
-}: UseObjectDisplayParams): UseObjectDisplayReturn {
+}: ExtractObjectDisplayDataParams): ExtractObjectDisplayDataReturn {
   // Parse metadata schema
   const parsedSchema = new ParsedMetadataSchema(metadata);
 

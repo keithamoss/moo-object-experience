@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Breadcrumbs from '../../components/Breadcrumbs';
+import InvalidObjectPage from '../../components/InvalidObjectPage';
 import NotFoundPage from '../../components/NotFoundPage';
 import ObjectDetailSkeleton from '../../components/ObjectDetailSkeleton';
 import { useMetadataFields, useObject } from '../../store';
@@ -21,7 +22,7 @@ import { useAppSelector } from '../../store/hooks';
 import { selectSearchQuery } from '../../store/searchSlice';
 import { buildSearchURL } from '../../utils/urlUtils';
 import { FieldValue } from './FieldValue';
-import { useObjectDisplay } from './useObjectDisplay';
+import { extractObjectDisplayData } from './useObjectDisplay';
 
 export default function ObjectDetailPage() {
   const { id } = useParams<{ id: string; slug?: string }>();
@@ -53,9 +54,9 @@ export default function ObjectDetailPage() {
     isSuccess: isSuccessObject,
   } = useObject(decodedId, shouldFetchObject ? metadata : []);
 
-  // Extract display data using custom hook (must be called before conditional returns)
+  // Extract display data (must be called before conditional returns)
   const { title, identifier, description, identifierLabel, descriptionLabel, imageUrls, fieldsToDisplay } =
-    useObjectDisplay({
+    extractObjectDisplayData({
       object,
       metadata,
     });
@@ -87,10 +88,10 @@ export default function ObjectDetailPage() {
     return <ObjectDetailSkeleton />;
   }
 
-  // Defensive check: identifier should always exist but handle edge case
+  // Defensive check: identifier should always exist (validation upstream should prevent this)
   if (!identifier) {
     console.error('Object missing required identifier field', object);
-    return <NotFoundPage />;
+    return <InvalidObjectPage reason="missing-identifier" objectId={id} />;
   }
 
   // Build breadcrumb navigation
