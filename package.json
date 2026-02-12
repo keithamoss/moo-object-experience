@@ -8,7 +8,11 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "lint": "tsc --noEmit && eslint src/**/*.ts{,x} --cache --max-warnings=0",
-    "lint:fix": "eslint src/**/*.ts{,x} --fix"
+    "lint:fix": "eslint src/**/*.ts{,x} --fix",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui --run",
+    "test:coverage": "vitest --coverage --run"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
@@ -25,6 +29,9 @@
     "react-router-dom": "^7.1.1"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^20.12.12",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
@@ -34,6 +41,8 @@
     "@typescript-eslint/parser": "^6.7.5",
     "@vitejs/plugin-basic-ssl": "^2.1.4",
     "@vitejs/plugin-react-swc": "^3.7.2",
+    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/ui": "^4.0.18",
     "eslint": "^8.51.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-airbnb-typescript": "^17.1.0",
@@ -45,11 +54,13 @@
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
+    "jsdom": "^25.0.1",
     "prettier": "^3.2.5",
     "typescript": "^5.4.5",
     "vite": "^6.0.5",
     "vite-plugin-checker": "^0.8.0",
-    "vite-tsconfig-paths": "^4.3.2"
+    "vite-tsconfig-paths": "^4.3.2",
+    "vitest": "^4.0.18"
   },
   "browserslist": {
     "production": [

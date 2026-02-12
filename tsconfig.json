@@ -8,7 +8,8 @@
       "ES2017.Object"
     ],
     "types": [
-      "vite/client"
+      "vite/client",
+      "vitest/globals"
     ],
     "allowJs": true,
     "skipLibCheck": true,

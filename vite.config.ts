@@ -38,5 +38,17 @@ export default defineConfig(({ command, mode }) => {
 			// TODO: Add Sentry plugin later for error monitoring
 			// sentryVitePlugin({ ... })
 		],
+		test: {
+			globals: true,
+			environment: 'jsdom',
+			setupFiles: './src/vitest.setup.ts',
+			css: true,
+			pool: 'threads',
+			server: {
+				deps: {
+					inline: ['@vitest/ui'],
+				},
+			},
+		},
 	};
 });
