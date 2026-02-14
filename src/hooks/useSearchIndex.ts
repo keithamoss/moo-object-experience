@@ -12,16 +12,16 @@ import type { ObjectData } from '../types/metadata';
 /**
  * Builds search index when objects are loaded
  * Dispatches setIndexReady(true) when complete
- * 
+ *
  * @param objects - Array of objects to index
  */
 export function useSearchIndex(objects: ObjectData[]) {
-  const dispatch = useAppDispatch();
+	const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (objects && objects.length > 0) {
-      searchService.buildIndex(objects);
-      dispatch(setIndexReady(true));
-    }
-  }, [objects, dispatch]);
+	useEffect(() => {
+		if (objects && objects.length > 0) {
+			searchService.buildIndex(objects);
+			dispatch(setIndexReady(true));
+		}
+	}, [objects, dispatch]);
 }

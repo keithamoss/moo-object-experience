@@ -14,35 +14,35 @@ import { theme } from './theme/theme';
 // Define routes
 // Using HashRouter for GitHub Pages compatibility (avoids 404 on refresh)
 const router = createHashRouter([
-  {
-    path: '/',
-    element: <App />,
-    children: [
-      {
-        index: true,
-        element: <HomePage />,
-      },
-      {
-        path: '/object/:id/:slug?',
-        element: <ObjectDetailPage />,
-      },
-      {
-        path: '*',
-        element: <NotFoundPage />,
-      },
-    ],
-  },
+	{
+		path: '/',
+		element: <App />,
+		children: [
+			{
+				index: true,
+				element: <HomePage />,
+			},
+			{
+				path: '/object/:id/:slug?',
+				element: <ObjectDetailPage />,
+			},
+			{
+				path: '*',
+				element: <NotFoundPage />,
+			},
+		],
+	},
 ]);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <Provider store={store}>
-      <HelmetProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <RouterProvider router={router} />
-        </ThemeProvider>
-      </HelmetProvider>
-    </Provider>
-  </React.StrictMode>,
+	<React.StrictMode>
+		<Provider store={store}>
+			<HelmetProvider>
+				<ThemeProvider theme={theme}>
+					<CssBaseline />
+					<RouterProvider router={router} />
+				</ThemeProvider>
+			</HelmetProvider>
+		</Provider>
+	</React.StrictMode>,
 );

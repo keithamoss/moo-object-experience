@@ -4,10 +4,10 @@
  */
 
 export interface SearchableField {
-  /** The field name from the metadata schema */
-  fieldName: string;
-  /** Weight for search ranking (higher = more important) */
-  weight: number;
+	/** The field name from the metadata schema */
+	fieldName: string;
+	/** Weight for search ranking (higher = more important) */
+	weight: number;
 }
 
 /**
@@ -19,22 +19,22 @@ export interface SearchableField {
  * - 1 = Medium priority (description)
  */
 export const SEARCHABLE_FIELDS = [
-  {
-    fieldName: 'dcterms:title',
-    weight: 3,
-  },
-  {
-    fieldName: 'dcterms:alternative',
-    weight: 2,
-  },
-  {
-    fieldName: 'dcterms:creator',
-    weight: 2,
-  },
-  {
-    fieldName: 'dcterms:description',
-    weight: 1,
-  },
+	{
+		fieldName: 'dcterms:title',
+		weight: 3,
+	},
+	{
+		fieldName: 'dcterms:alternative',
+		weight: 2,
+	},
+	{
+		fieldName: 'dcterms:creator',
+		weight: 2,
+	},
+	{
+		fieldName: 'dcterms:description',
+		weight: 1,
+	},
 ] as const;
 
 /**
@@ -51,7 +51,7 @@ export const ALL_SEARCHABLE_FIELD_NAMES: SearchableFieldName[] = SEARCHABLE_FIEL
  * Map of field names to weights for O(1) lookup
  */
 export const FIELD_WEIGHTS: Record<SearchableFieldName, number> = Object.fromEntries(
-  SEARCHABLE_FIELDS.map((f) => [f.fieldName, f.weight]),
+	SEARCHABLE_FIELDS.map((f) => [f.fieldName, f.weight]),
 ) as Record<SearchableFieldName, number>;
 
 /**
@@ -79,12 +79,12 @@ export const SEARCH_DEBOUNCE_MS = 300;
  * Get weight for a specific field (returns 0 if not searchable)
  */
 export function getFieldWeight(fieldName: SearchableFieldName): number {
-  return FIELD_WEIGHTS[fieldName] ?? 0;
+	return FIELD_WEIGHTS[fieldName] ?? 0;
 }
 
 /**
  * Check if a field is searchable
  */
 export function isFieldSearchable(fieldName: string): fieldName is SearchableFieldName {
-  return ALL_SEARCHABLE_FIELD_NAMES.includes(fieldName as SearchableFieldName);
+	return ALL_SEARCHABLE_FIELD_NAMES.includes(fieldName as SearchableFieldName);
 }

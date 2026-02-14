@@ -2,8 +2,8 @@ import { Box, Chip } from '@mui/material';
 import { formatDate } from '../../utils/dateUtils';
 
 interface FieldValueProps {
-  value: string | undefined;
-  fieldTypeAndControls: string;
+	value: string | undefined;
+	fieldTypeAndControls: string;
 }
 
 /**
@@ -16,91 +16,90 @@ type FieldRenderer = (value: string) => React.ReactNode;
  * Shortens the display text for better readability while keeping full URL in href
  */
 function renderUrl(value: string): React.ReactNode {
-  const maxLength = 60;
-  const displayText = value.length > maxLength
-    ? `${value.substring(0, maxLength)}...`
-    : value;
+	const maxLength = 60;
+	const displayText = value.length > maxLength ? `${value.substring(0, maxLength)}...` : value;
 
-  return (
-    <a
-      href={value}
-      target="_blank"
-      rel="noopener noreferrer"
-      style={{ color: 'inherit', wordBreak: 'break-all' }}
-      title={value}
-    >
-      {displayText}
-    </a>
-  );
+	return (
+		<a
+			href={value}
+			target="_blank"
+			rel="noopener noreferrer"
+			style={{ color: 'inherit', wordBreak: 'break-all' }}
+			title={value}
+		>
+			{displayText}
+		</a>
+	);
 }
 
 /**
  * Render a date in human-readable format
  */
 function renderDate(value: string): React.ReactNode {
-  return formatDate(value);
+	return formatDate(value);
 }
 
 /**
  * Render comma-separated values as chips
  */
 function renderCommaSeparated(value: string): React.ReactNode {
-  const items = value
-    .split(',')
-    .map((item) => item.trim())
-    .filter((item) => item.length > 0);
+	const items = value
+		.split(',')
+		.map((item) => item.trim())
+		.filter((item) => item.length > 0);
 
-  return (
-    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-      {items.map((item, idx) => (
-        <Chip key={idx} label={item} size="small" />
-      ))}
-    </Box>
-  );
+	return (
+		<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+			{items.map((item) => (
+				<Chip key={item} label={item} size="small" />
+			))}
+		</Box>
+	);
 }
 
 /**
  * Render multi-line text with preserved line breaks
  */
 function renderDefault(value: string): React.ReactNode {
-  return value.split('\n').map((line, idx) => (
-    <span key={idx}>
-      {line}
-      {idx < value.split('\n').length - 1 && <br />}
-    </span>
-  ));
+	const lines = value.split('\n');
+	return lines.map((line, idx) => (
+		<span key={`line-${idx}-${line.substring(0, 20)}`}>
+			{line}
+			{idx < lines.length - 1 && <br />}
+		</span>
+	));
 }
 
 /**
  * Determine which renderer to use based on field type
  */
 function getRenderer(fieldTypeAndControls: string): FieldRenderer {
-  const type = fieldTypeAndControls.toLowerCase();
+	const type = fieldTypeAndControls.toLowerCase();
 
-  switch (true) {
-    case type.includes('url'):
-      return renderUrl;
-    case type.includes('date'):
-      return renderDate;
-    case type.includes('comma-separated') || type.includes('comma separated'):
-      return renderCommaSeparated;
-    default:
-      return renderDefault;
-  }
+	switch (true) {
+		case type.includes('url'):
+			return renderUrl;
+		case type.includes('date'):
+			return renderDate;
+		case type.includes('comma-separated') || type.includes('comma separated'):
+			return renderCommaSeparated;
+		default:
+			return renderDefault;
+	}
 }
 
 /**
  * Component for rendering a field value based on its type from the metadata schema
  *
  * Uses a strategy pattern to select the appropriate renderer based on
- * the field's metadata type. Field types are determined by the `fieldTypeAndControls` 
+ * the field's metadata type. Field types are determined by the `fieldTypeAndControls`
  * value from the metadata schema.
  *
  * ## Supported Field Types
  *
  * ### 1. URL Fields
  * **Detection**: `fieldTypeAndControls` includes "url" (case-insensitive)
- * **Rendering**: 
+ * **Rendering**:
  * - Clickable link opening in new tab with security attributes (noopener, noreferrer)
  * - Display text truncated to 60 characters with ellipsis for readability
  * - Full URL shown on hover via title attribute
@@ -109,7 +108,7 @@ function getRenderer(fieldTypeAndControls: string): FieldRenderer {
  * - Input: `"https://example.com/very/long/path/to/resource/file.jpg"`
  * - Display: `"https://example.com/very/long/path/to/resource/file...."`
  * - Hover: Shows full URL
- * 
+ *
  * ### 2. Date Fields
  * **Detection**: `fieldTypeAndControls` includes "date" (case-insensitive)
  * **Rendering**:
@@ -123,7 +122,7 @@ function getRenderer(fieldTypeAndControls: string): FieldRenderer {
  * **Example**:
  * - Input: `"2024-03-15"`
  * - Display: `"15 March 2024"`
- * 
+ *
  * ### 3. Comma-Separated Lists
  * **Detection**: `fieldTypeAndControls` includes "comma-separated" or "comma separated" (case-insensitive)
  * **Rendering**:
@@ -134,7 +133,7 @@ function getRenderer(fieldTypeAndControls: string): FieldRenderer {
  * **Example**:
  * - Input: `"Ceramics, Pottery, Sculpture"`
  * - Display: Three chips with grey background: [Ceramics] [Pottery] [Sculpture]
- * 
+ *
  * ### 4. Multi-Line Text (Default/Fallback)
  * **Detection**: All other field types (fallback when no specific type matches)
  * **Rendering**:
@@ -144,7 +143,7 @@ function getRenderer(fieldTypeAndControls: string): FieldRenderer {
  * **Example**:
  * - Input: `"First line\nSecond line\nThird line"`
  * - Display: Three separate lines with visual line breaks
- * 
+ *
  * ### 5. Empty Values
  * **Detection**: `!value` or `value.trim() === ''`
  * **Rendering**: Returns `null` (field will not be displayed in UI)
@@ -160,13 +159,13 @@ function getRenderer(fieldTypeAndControls: string): FieldRenderer {
  * @returns React node or null if value is empty
  */
 export function FieldValue({ value, fieldTypeAndControls }: FieldValueProps) {
-  if (!value || value.trim() === '') {
-    return null;
-  }
+	if (!value || value.trim() === '') {
+		return null;
+	}
 
-  const trimmedValue = value.trim();
+	const trimmedValue = value.trim();
 
-  // Use strategy pattern to select renderer
-  const renderer = getRenderer(fieldTypeAndControls);
-  return <>{renderer(trimmedValue)}</>;
+	// Use strategy pattern to select renderer
+	const renderer = getRenderer(fieldTypeAndControls);
+	return <>{renderer(trimmedValue)}</>;
 }

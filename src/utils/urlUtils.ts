@@ -19,14 +19,14 @@
  * generateSlug('☆✿★') // ''
  */
 export function generateSlug(text: string): string {
-  return text
-    .toLowerCase() // Convert to lowercase for URL consistency
-    .trim() // Remove leading/trailing whitespace
-    .replace(/[^\w\s-]/g, '') // Remove special characters (keep letters, numbers, spaces, hyphens)
-    .replace(/[\s_]+/g, '-') // Replace spaces and underscores with single hyphens
-    .replace(/-+/g, '-') // Collapse multiple consecutive hyphens into one
-    .replace(/^-+|-+$/g, '') // Remove leading and trailing hyphens
-    .substring(0, 50); // Limit to 50 chars for reasonable URL length
+	return text
+		.toLowerCase() // Convert to lowercase for URL consistency
+		.trim() // Remove leading/trailing whitespace
+		.replace(/[^\w\s-]/g, '') // Remove special characters (keep letters, numbers, spaces, hyphens)
+		.replace(/[\s_]+/g, '-') // Replace spaces and underscores with single hyphens
+		.replace(/-+/g, '-') // Collapse multiple consecutive hyphens into one
+		.replace(/^-+|-+$/g, '') // Remove leading and trailing hyphens
+		.substring(0, 50); // Limit to 50 chars for reasonable URL length
 }
 
 /**
@@ -37,22 +37,22 @@ export function generateSlug(text: string): string {
  * @returns true if ID is safe for URLs
  */
 export function isValidObjectId(id: string): boolean {
-  // Reject empty, very long, or IDs with problematic URL characters
-  if (!id || id.length > 200) {
-    return false;
-  }
-  // Reject forward slashes, backslashes, hash, question marks, and other URL-breaking chars
-  const problematicChars = /[\/\\#?&%]/;
-  return !problematicChars.test(id);
+	// Reject empty, very long, or IDs with problematic URL characters
+	if (!id || id.length > 200) {
+		return false;
+	}
+	// Reject forward slashes, backslashes, hash, question marks, and other URL-breaking chars
+	const problematicChars = /[/\\#?&%]/;
+	return !problematicChars.test(id);
 }
 
 /**
  * Result of object URL validation
  */
 export interface UrlValidationResult {
-  valid: boolean;
-  error?: string;
-  slug?: string;
+	valid: boolean;
+	error?: string;
+	slug?: string;
 }
 
 /**
@@ -64,16 +64,16 @@ export interface UrlValidationResult {
  * @returns Validation result with error message if invalid
  */
 export function validateObjectForUrl(id: string, title: string): UrlValidationResult {
-  if (!isValidObjectId(id)) {
-    return { valid: false, error: `Invalid object ID for URL: ${id}` };
-  }
+	if (!isValidObjectId(id)) {
+		return { valid: false, error: `Invalid object ID for URL: ${id}` };
+	}
 
-  const slug = generateSlug(title);
-  if (!slug) {
-    return { valid: false, error: `Object has invalid title - cannot generate URL: ${title}` };
-  }
+	const slug = generateSlug(title);
+	if (!slug) {
+		return { valid: false, error: `Object has invalid title - cannot generate URL: ${title}` };
+	}
 
-  return { valid: true, slug };
+	return { valid: true, slug };
 }
 
 /**
@@ -88,12 +88,12 @@ export function validateObjectForUrl(id: string, title: string): UrlValidationRe
  * generateObjectUrl('OBJ-001', 'Stone Axe') // '/object/OBJ-001/stone-axe'
  */
 export function generateObjectUrl(id: string, title: string): string {
-  const validation = validateObjectForUrl(id, title);
-  if (!validation.valid) {
-    throw new Error(validation.error);
-  }
+	const validation = validateObjectForUrl(id, title);
+	if (!validation.valid) {
+		throw new Error(validation.error);
+	}
 
-  return `/object/${encodeURIComponent(id)}/${validation.slug}`;
+	return `/object/${encodeURIComponent(id)}/${validation.slug}`;
 }
 
 /**
@@ -109,18 +109,18 @@ export function generateObjectUrl(id: string, title: string): string {
  * buildSearchURL('pottery', new URLSearchParams('fields=title,creator')) // '/?q=pottery&fields=title,creator'
  */
 export function buildSearchURL(query: string, searchParams?: URLSearchParams): string {
-  const params = new URLSearchParams();
-  
-  // Add query
-  if (query) {
-    params.set('q', query);
-  }
-  
-  // Preserve fields filter if present
-  if (searchParams?.has('fields')) {
-    params.set('fields', searchParams.get('fields')!);
-  }
-  
-  const queryString = params.toString();
-  return queryString ? `/?${queryString}` : '/';
+	const params = new URLSearchParams();
+
+	// Add query
+	if (query) {
+		params.set('q', query);
+	}
+
+	// Preserve fields filter if present
+	if (searchParams?.has('fields')) {
+		params.set('fields', searchParams.get('fields')!);
+	}
+
+	const queryString = params.toString();
+	return queryString ? `/?${queryString}` : '/';
 }

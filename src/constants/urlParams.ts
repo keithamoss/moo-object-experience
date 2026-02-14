@@ -4,8 +4,8 @@
  */
 
 export const URL_PARAMS = {
-  /** Query string parameter (?q=search+term) */
-  QUERY: 'q',
-  /** Active search fields parameter (?fields=title,description) */
-  FIELDS: 'fields',
+	/** Query string parameter (?q=search+term) */
+	QUERY: 'q',
+	/** Active search fields parameter (?fields=title,description) */
+	FIELDS: 'fields',
 } as const;

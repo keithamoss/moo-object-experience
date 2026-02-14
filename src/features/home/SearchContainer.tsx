@@ -32,173 +32,158 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useSearchParams } from 'react-router-dom';
-import { SearchableFieldName } from '../../config/searchConfig';
+import type { SearchableFieldName } from '../../config/searchConfig';
 import { URL_PARAMS } from '../../constants/urlParams';
 import { useSearchIndex } from '../../hooks/useSearchIndex';
 import { useURLSearchState } from '../../hooks/useURLSearchState';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import {
-  selectActiveSearchFields,
-  selectSearchQuery,
-  selectSearchResults,
-} from '../../store/searchSlice';
+import { selectActiveSearchFields, selectSearchQuery, selectSearchResults } from '../../store/searchSlice';
 import type { MetadataField, ObjectData } from '../../types/metadata';
 import { areAllFieldsSelected, parseFieldsFromURL } from '../../utils/searchUtils';
 import SearchBar from './SearchBar';
 import SearchResults from './SearchResults';
 
 export interface SearchContainerProps {
-  /** Metadata schema for field labels */
-  metadata: MetadataField[];
-  /** All objects for display */
-  objects: ObjectData[];
-  /** Whether search should be disabled */
-  disabled?: boolean;
+	/** Metadata schema for field labels */
+	metadata: MetadataField[];
+	/** All objects for display */
+	objects: ObjectData[];
+	/** Whether search should be disabled */
+	disabled?: boolean;
 }
 
 export default function SearchContainer({ metadata, objects, disabled = false }: SearchContainerProps) {
-  const dispatch = useAppDispatch();
-  const [searchParams, setSearchParams] = useSearchParams();
+	const _dispatch = useAppDispatch();
+	const [searchParams, setSearchParams] = useSearchParams();
 
-  // Local state for typing experience (not committed until Enter/blur)
-  const [localQuery, setLocalQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
+	// Local state for typing experience (not committed until Enter/blur)
+	const [localQuery, setLocalQuery] = useState('');
+	const [isSearching, setIsSearching] = useState(false);
 
-  // Redux search state (committed search)
-  const committedQuery = useAppSelector(selectSearchQuery);
-  const results = useAppSelector(selectSearchResults);
-  const activeFields = useAppSelector(selectActiveSearchFields);
+	// Redux search state (committed search)
+	const committedQuery = useAppSelector(selectSearchQuery);
+	const results = useAppSelector(selectSearchResults);
+	const activeFields = useAppSelector(selectActiveSearchFields);
 
-  // Sync URL to Redux using custom hook
-  // This is unidirectional: URL → Redux (no reverse sync needed)
-  useURLSearchState(searchParams, committedQuery, activeFields);
+	// Sync URL to Redux using custom hook
+	// This is unidirectional: URL → Redux (no reverse sync needed)
+	useURLSearchState(searchParams, committedQuery, activeFields);
 
-  // Build search index when objects are loaded
-  useSearchIndex(objects);
+	// Build search index when objects are loaded
+	useSearchIndex(objects);
 
-  // Update local query when URL changes (for committed searches)
-  useEffect(() => {
-    const urlQuery = searchParams.get(URL_PARAMS.QUERY) || '';
-    setLocalQuery(urlQuery);
-  }, [searchParams]);
+	// Update local query when URL changes (for committed searches)
+	useEffect(() => {
+		const urlQuery = searchParams.get(URL_PARAMS.QUERY) || '';
+		setLocalQuery(urlQuery);
+	}, [searchParams]);
 
-  // Clear loading state when results update
-  useEffect(() => {
-    setIsSearching(false);
-  }, [results]);
+	// Clear loading state when results update
+	useEffect(() => {
+		setIsSearching(false);
+	}, []);
 
-  // Consolidated URL update function (memoized to prevent recreation)
-  // Builds URL params from current state and updates browser URL
-  const updateURL = useCallback(
-    (newQuery?: string, newFields?: SearchableFieldName[]) => {
-      const params = new URLSearchParams();
+	// Consolidated URL update function (memoized to prevent recreation)
+	// Builds URL params from current state and updates browser URL
+	const updateURL = useCallback(
+		(newQuery?: string, newFields?: SearchableFieldName[]) => {
+			const params = new URLSearchParams();
 
-      const queryToUse = newQuery ?? localQuery;
-      if (queryToUse.trim()) {
-        params.set(URL_PARAMS.QUERY, queryToUse);
-      }
+			const queryToUse = newQuery ?? localQuery;
+			if (queryToUse.trim()) {
+				params.set(URL_PARAMS.QUERY, queryToUse);
+			}
 
-      const fieldsToUse = newFields ?? activeFields;
-      // Only set fields param if not all fields (for cleaner URLs)
-      // - No param = all fields selected (default)
-      // - Empty string = no fields selected
-      // - Comma list = specific fields selected
-      if (!areAllFieldsSelected(fieldsToUse)) {
-        params.set(URL_PARAMS.FIELDS, fieldsToUse.join(','));
-      }
+			const fieldsToUse = newFields ?? activeFields;
+			// Only set fields param if not all fields (for cleaner URLs)
+			// - No param = all fields selected (default)
+			// - Empty string = no fields selected
+			// - Comma list = specific fields selected
+			if (!areAllFieldsSelected(fieldsToUse)) {
+				params.set(URL_PARAMS.FIELDS, fieldsToUse.join(','));
+			}
 
-      setSearchParams(params);
-    },
-    [localQuery, activeFields, setSearchParams]
-  );
+			setSearchParams(params);
+		},
+		[localQuery, activeFields, setSearchParams],
+	);
 
-  // Handlers - typing doesn't commit, only Enter/blur/filter-toggle commits
-  const handleQueryChange = useCallback(
-    (newQuery: string) => {
-      setLocalQuery(newQuery);
-    },
-    []
-  );
+	// Handlers - typing doesn't commit, only Enter/blur/filter-toggle commits
+	const handleQueryChange = useCallback((newQuery: string) => {
+		setLocalQuery(newQuery);
+	}, []);
 
-  const handleCommit = useCallback(() => {
-    const trimmedQuery = localQuery.trim();
+	const handleCommit = useCallback(() => {
+		const trimmedQuery = localQuery.trim();
 
-    if (trimmedQuery) {
-      // Only set loading state if query actually changed
-      if (trimmedQuery !== committedQuery) {
-        setIsSearching(true);
-      }
-      updateURL(trimmedQuery, activeFields);
-    } else {
-      // Empty query - clear everything
-      setSearchParams(new URLSearchParams());
-    }
-  }, [localQuery, committedQuery, activeFields, updateURL, setSearchParams]);
+		if (trimmedQuery) {
+			// Only set loading state if query actually changed
+			if (trimmedQuery !== committedQuery) {
+				setIsSearching(true);
+			}
+			updateURL(trimmedQuery, activeFields);
+		} else {
+			// Empty query - clear everything
+			setSearchParams(new URLSearchParams());
+		}
+	}, [localQuery, committedQuery, activeFields, updateURL, setSearchParams]);
 
-  const handleClear = useCallback(() => {
-    setLocalQuery('');
-    setSearchParams(new URLSearchParams()); // Commits empty state immediately
-  }, [setSearchParams]);
+	const handleClear = useCallback(() => {
+		setLocalQuery('');
+		setSearchParams(new URLSearchParams()); // Commits empty state immediately
+	}, [setSearchParams]);
 
-  const handleToggleField = useCallback(
-    (fieldName: SearchableFieldName) => {
-      // Read current state from URL (source of truth) to avoid race conditions
-      const fieldsParam = searchParams.get(URL_PARAMS.FIELDS);
-      const currentFields = parseFieldsFromURL(fieldsParam);
+	const handleToggleField = useCallback(
+		(fieldName: SearchableFieldName) => {
+			// Read current state from URL (source of truth) to avoid race conditions
+			const fieldsParam = searchParams.get(URL_PARAMS.FIELDS);
+			const currentFields = parseFieldsFromURL(fieldsParam);
 
-      // Calculate new field list
-      const newFields = currentFields.includes(fieldName)
-        ? currentFields.filter((f) => f !== fieldName)
-        : [...currentFields, fieldName];
+			// Calculate new field list
+			const newFields = currentFields.includes(fieldName)
+				? currentFields.filter((f) => f !== fieldName)
+				: [...currentFields, fieldName];
 
-      // Use committed query from Redux
-      const trimmedQuery = committedQuery.trim();
+			// Use committed query from Redux
+			const trimmedQuery = committedQuery.trim();
 
-      // Only set loading if there's a query and fields actually changed
-      const fieldsChanged =
-        newFields.length !== currentFields.length ||
-        !newFields.every((field, index) => field === currentFields[index]);
+			// Only set loading if there's a query and fields actually changed
+			const fieldsChanged =
+				newFields.length !== currentFields.length || !newFields.every((field, index) => field === currentFields[index]);
 
-      if (trimmedQuery && fieldsChanged) {
-        setIsSearching(true);
-      }
+			if (trimmedQuery && fieldsChanged) {
+				setIsSearching(true);
+			}
 
-      updateURL(trimmedQuery, newFields);
-    },
-    [searchParams, committedQuery, updateURL]
-  );
+			updateURL(trimmedQuery, newFields);
+		},
+		[searchParams, committedQuery, updateURL],
+	);
 
-  return (
-    <>
-      {/* Page title */}
-      <Helmet>
-        <title>
-          {committedQuery.trim()
-            ? `Search: ${committedQuery} - Museum Object Experience`
-            : 'Museum Object Experience'}
-        </title>
-      </Helmet>
+	return (
+		<>
+			{/* Page title */}
+			<Helmet>
+				<title>
+					{committedQuery.trim() ? `Search: ${committedQuery} - Museum Object Experience` : 'Museum Object Experience'}
+				</title>
+			</Helmet>
 
-      {/* Search Bar with integrated filters */}
-      <SearchBar
-        query={localQuery}
-        onQueryChange={handleQueryChange}
-        onCommit={handleCommit}
-        onClear={handleClear}
-        disabled={disabled}
-        committedQuery={committedQuery}
-        metadataFields={metadata}
-        activeFields={activeFields}
-        onToggleField={handleToggleField}
-      />
+			{/* Search Bar with integrated filters */}
+			<SearchBar
+				query={localQuery}
+				onQueryChange={handleQueryChange}
+				onCommit={handleCommit}
+				onClear={handleClear}
+				disabled={disabled}
+				committedQuery={committedQuery}
+				metadataFields={metadata}
+				activeFields={activeFields}
+				onToggleField={handleToggleField}
+			/>
 
-      {/* Search Results */}
-      <SearchResults
-        results={results}
-        objects={objects}
-        query={committedQuery}
-        isSearching={isSearching}
-      />
-    </>
-  );
+			{/* Search Results */}
+			<SearchResults results={results} objects={objects} query={committedQuery} isSearching={isSearching} />
+		</>
+	);
 }
