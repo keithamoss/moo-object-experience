@@ -38,25 +38,5 @@ export default defineConfig(({ command, mode }) => {
 			// TODO: Add Sentry plugin later for error monitoring
 			// sentryVitePlugin({ ... })
 		],
-		test: {
-			globals: true,
-			environment: 'jsdom',
-			setupFiles: './src/vitest.setup.ts',
-			css: true,
-			pool: 'threads',
-			exclude: ['**/node_modules/**', '**/dist/**', '**/e2e/**'],
-			server: {
-				deps: {
-					inline: ['@vitest/ui'],
-				},
-			},
-			reporters: ['default', 'html'],
-			outputFile: {
-				html: './testing/vitest-report/index.html',
-			},
-			coverage: {
-				reportsDirectory: './testing/vitest-coverage',
-			},
-		},
 	};
 });
