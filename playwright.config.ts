@@ -6,6 +6,7 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './e2e',
+  outputDir: './testing/playwright-results',
   
   // Maximum time one test can run
   timeout: 30 * 1000,
@@ -21,7 +22,7 @@ export default defineConfig({
   
   // Reporter to use
   reporter: [
-    ['html', { open: 'always' }]
+    ['html', { open: 'always', outputFolder: 'testing/playwright-report' }]
   ],  
 
   // Shared settings for all the projects below

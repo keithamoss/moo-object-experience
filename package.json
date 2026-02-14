@@ -10,13 +10,14 @@
     "lint": "tsc --noEmit && eslint src/**/*.ts{,x} --cache --max-warnings=0",
     "lint:fix": "eslint src/**/*.ts{,x} --fix",
     "test": "vitest --run",
+    "test:report": "vitest --run; npx vite preview --outDir testing/vitest-report",
     "test:watch": "vitest",
     "test:ui": "vitest --ui --run",
     "test:coverage": "vitest --coverage --run",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
-    "test:e2e:report": "playwright show-report"
+    "test:e2e:report": "playwright show-report testing/playwright-report"
   },
   "dependencies": {
     "@emotion/react": "^11.11.4",
