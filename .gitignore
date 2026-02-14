@@ -31,3 +31,8 @@ lerna-debug.log*
 
 # ESLint cache
 .eslintcache
+
+# Testing
+test-results/
+playwright-report/
+coverage/
