@@ -129,6 +129,27 @@ export default function SearchContainer({ metadata, objects, disabled = false }:
 		}
 	}, [localQuery, committedQuery, activeFields, updateURL, setSearchParams]);
 
+	// Handler for immediate commit with a specific query (e.g., when selecting from autocomplete)
+	const handleCommitWithQuery = useCallback(
+		(query: string) => {
+			const trimmedQuery = query.trim();
+
+			if (trimmedQuery) {
+				// Update local state
+				setLocalQuery(trimmedQuery);
+				// Only set loading state if query actually changed
+				if (trimmedQuery !== committedQuery) {
+					setIsSearching(true);
+				}
+				updateURL(trimmedQuery, activeFields);
+			} else {
+				// Empty query - clear everything
+				setSearchParams(new URLSearchParams());
+			}
+		},
+		[committedQuery, activeFields, updateURL, setSearchParams],
+	);
+
 	const handleClear = useCallback(() => {
 		setLocalQuery('');
 		setSearchParams(new URLSearchParams()); // Commits empty state immediately
@@ -175,6 +196,7 @@ export default function SearchContainer({ metadata, objects, disabled = false }:
 				query={localQuery}
 				onQueryChange={handleQueryChange}
 				onCommit={handleCommit}
+				onCommitWithQuery={handleCommitWithQuery}
 				onClear={handleClear}
 				disabled={disabled}
 				committedQuery={committedQuery}

@@ -38,7 +38,7 @@ moo-object-experience/
 ├── package.json        # Dependencies
 ├── tsconfig.json       # TypeScript configuration
 ├── vite.config.ts      # Vite configuration
-└── .eslintrc.cjs       # ESLint configuration
+└── biome.json          # Biome linter/formatter configuration
 ```
 
 ## Getting Started
@@ -110,8 +110,9 @@ npm run test:e2e:report   # View test report
 
 **Linting:**
 ```bash
-npm run lint              # Check TypeScript and ESLint issues
-npm run lint:fix          # Auto-fix ESLint issues
+npm run lint              # Check TypeScript and Biome linting issues
+npm run lint:fix          # Auto-fix Biome linting issues
+npm run format            # Format code with Biome
 ```
 
 ### Building for Production
