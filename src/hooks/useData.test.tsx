@@ -17,13 +17,15 @@ describe('useData', () => {
 			data: undefined,
 			isLoading: true,
 			error: undefined,
-		} as any);
+			refetch: vi.fn(),
+		} as ReturnType<typeof storeHooks.useGetMetadataQuery>);
 
 		vi.spyOn(storeHooks, 'useGetObjectsQuery').mockReturnValue({
 			data: undefined,
 			isLoading: false,
 			error: undefined,
-		} as any);
+			refetch: vi.fn(),
+		} as ReturnType<typeof storeHooks.useGetObjectsQuery>);
 
 		const { result } = renderHook(() => useData(), {
 			wrapper: ({ children }) => <AllTheProviders store={store}>{children}</AllTheProviders>,
@@ -39,13 +41,15 @@ describe('useData', () => {
 			data: undefined,
 			isLoading: false,
 			error: undefined,
-		} as any);
+			refetch: vi.fn(),
+		} as ReturnType<typeof storeHooks.useGetObjectsQuery>);
 
 		vi.spyOn(storeHooks, 'useGetMetadataQuery').mockReturnValue({
 			data: undefined,
 			isLoading: true,
 			error: undefined,
-		} as any);
+			refetch: vi.fn(),
+		} as ReturnType<typeof storeHooks.useGetMetadataQuery>);
 
 		vi.spyOn(storeHooks, 'useGetObjectsQuery').mockImplementation(mockUseGetObjectsQuery);
 
@@ -64,13 +68,15 @@ describe('useData', () => {
 			data: undefined,
 			isLoading: false,
 			error,
-		} as any);
+			refetch: vi.fn(),
+		} as ReturnType<typeof storeHooks.useGetMetadataQuery>);
 
 		vi.spyOn(storeHooks, 'useGetObjectsQuery').mockReturnValue({
 			data: undefined,
 			isLoading: false,
 			error: undefined,
-		} as any);
+			refetch: vi.fn(),
+		} as ReturnType<typeof storeHooks.useGetObjectsQuery>);
 
 		const { result } = renderHook(() => useData(), {
 			wrapper: ({ children }) => <AllTheProviders store={store}>{children}</AllTheProviders>,
@@ -87,13 +93,15 @@ describe('useData', () => {
 			data: mockMetadata,
 			isLoading: false,
 			error: undefined,
-		} as any);
+			refetch: vi.fn(),
+		} as ReturnType<typeof storeHooks.useGetMetadataQuery>);
 
 		vi.spyOn(storeHooks, 'useGetObjectsQuery').mockReturnValue({
 			data: mockObjects,
 			isLoading: false,
 			error: undefined,
-		} as any);
+			refetch: vi.fn(),
+		} as ReturnType<typeof storeHooks.useGetObjectsQuery>);
 
 		const { result } = renderHook(() => useData(), {
 			wrapper: ({ children }) => <AllTheProviders store={store}>{children}</AllTheProviders>,

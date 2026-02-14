@@ -117,8 +117,9 @@ export function buildSearchURL(query: string, searchParams?: URLSearchParams): s
 	}
 
 	// Preserve fields filter if present
-	if (searchParams?.has('fields')) {
-		params.set('fields', searchParams.get('fields')!);
+	const fieldsValue = searchParams?.get('fields');
+	if (fieldsValue) {
+		params.set('fields', fieldsValue);
 	}
 
 	const queryString = params.toString();

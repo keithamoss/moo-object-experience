@@ -6,14 +6,14 @@
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
-    Box,
-    Checkbox,
-    FormControlLabel,
-    FormGroup,
-    Typography,
+	Accordion,
+	AccordionDetails,
+	AccordionSummary,
+	Box,
+	Checkbox,
+	FormControlLabel,
+	FormGroup,
+	Typography,
 } from '@mui/material';
 import { useMemo } from 'react';
 import { SEARCHABLE_FIELDS, type SearchableFieldName } from '../../config/searchConfig';

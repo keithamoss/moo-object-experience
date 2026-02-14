@@ -28,7 +28,7 @@ export default function SearchResults({ results, objects, query, isSearching = f
 			new Map<string, ObjectData>(
 				objects
 					.filter((obj) => obj['dcterms:identifier.moooi'] !== undefined)
-					.map((obj) => [obj['dcterms:identifier.moooi']!, obj]),
+					.map((obj) => [obj['dcterms:identifier.moooi'] as string, obj]),
 			),
 		[objects],
 	);

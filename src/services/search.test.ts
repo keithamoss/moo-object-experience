@@ -162,7 +162,9 @@ describe('SearchService', () => {
 		});
 
 		it('should throw error for invalid prefix option', () => {
-			expect(() => service.search('test', { prefix: 'true' as any })).toThrow('Prefix must be a boolean');
+			expect(() => service.search('test', { prefix: 'true' as unknown as boolean })).toThrow(
+				'Prefix must be a boolean',
+			);
 		});
 
 		it('should return results with match information', () => {
