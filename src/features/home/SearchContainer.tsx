@@ -79,9 +79,10 @@ export default function SearchContainer({ metadata, objects, disabled = false }:
 	}, [searchParams]);
 
 	// Clear loading state when search completes (when committedQuery updates)
+	// biome-ignore lint/correctness/useExhaustiveDependencies: We intentionally depend on committedQuery to trigger when search completes, even though we don't use the value
 	useEffect(() => {
 		setIsSearching(false);
-	}, [
+	}, [committedQuery]);
 
 	// Consolidated URL update function (memoized to prevent recreation)
 	// Builds URL params from current state and updates browser URL

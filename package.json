@@ -10,7 +10,7 @@
     "lint": "tsc --noEmit && biome check --diagnostic-level=error .",
     "lint:fix": "biome check --write --unsafe .",
     "format": "biome format --write .",
-    "test": "vitest --run",
+    "test": "tsc --noEmit && vitest --run",
     "test:report": "vitest --run; npx vite preview --outDir testing/vitest-report",
     "test:watch": "vitest",
     "test:ui": "vitest --ui --run",

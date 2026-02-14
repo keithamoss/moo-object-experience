@@ -13,7 +13,7 @@ import { Fragment } from 'react';
 export function highlightSearchTerms(text: string, query: string): React.ReactNode[] {
 	const trimmedText = text?.trim();
 	const trimmedQuery = query?.trim();
-	
+
 	if (!trimmedText || !trimmedQuery) {
 		return [text ?? ''];
 	}
