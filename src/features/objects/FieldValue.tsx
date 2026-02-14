@@ -2,8 +2,8 @@ import { Box, Chip } from '@mui/material';
 import { formatDate } from '../../utils/dateUtils';
 
 interface FieldValueProps {
-	value: string | undefined;
-	fieldTypeAndControls: string;
+	readonly value: string | undefined;
+	readonly fieldTypeAndControls: string;
 }
 
 /**
@@ -158,7 +158,7 @@ function getRenderer(fieldTypeAndControls: string): FieldRenderer {
  * @param fieldTypeAndControls - Field type metadata from schema (e.g., "Free text", "URL", "ISO8601 compliant date", "Comma-separated list")
  * @returns React node or null if value is empty
  */
-export function FieldValue({ value, fieldTypeAndControls }: FieldValueProps) {
+export function FieldValue({ value, fieldTypeAndControls }: FieldValueProps): React.ReactNode {
 	if (!value || value.trim() === '') {
 		return null;
 	}

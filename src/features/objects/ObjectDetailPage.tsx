@@ -30,7 +30,7 @@ export default function ObjectDetailPage() {
 
 	// Only fetch object if we have valid ID and metadata is loaded
 	const hasMetadata = metadata && metadata.length > 0;
-	const shouldFetchObject = !!id && hasMetadata;
+	const shouldFetchObject = id !== undefined && hasMetadata;
 
 	// Fetch the object from the store
 	const {

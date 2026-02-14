@@ -3,32 +3,42 @@
  */
 
 /**
+ * Field requirement levels (with fallback to any string for flexibility)
+ */
+export type FieldRequirement = 'Mandatory' | 'Optional' | 'For future development' | string;
+
+/**
+ * Field type and control types (with fallback to any string for flexibility)
+ */
+export type FieldTypeControl = 'Free text' | 'ISO8601 compliant date' | 'Image' | string;
+
+/**
  * Represents a single field definition from the Mappings sheet
  */
 export interface MetadataField {
 	/** The field name (e.g., "moo:workingNotes", "dcterms:Collection") */
-	field: string;
+	readonly field: string;
 
 	/** The namespace/standard (e.g., "Dublin Core", "Darwin Core", "Museum of Objects of Interest") */
-	namespace: string;
+	readonly namespace: string;
 
 	/** Human-readable label for display */
-	label: string;
+	readonly label: string;
 
 	/** Comma-separated list of collection names this field applies to (e.g., "Core, Library", "All") */
-	applicableCollections: string;
+	readonly applicableCollections: string;
 
-	/** Whether field is required for MVP completeness: "Mandatory", "Optional", or "For future development" */
-	required: string;
+	/** Whether field is required for MVP completeness */
+	readonly required: FieldRequirement;
 
 	/** Description of the field's purpose */
-	purpose: string;
+	readonly purpose: string;
 
-	/** Field type and control hints (e.g., "Free text", "ISO8601 compliant date", "Image") */
-	fieldTypeAndControls: string;
+	/** Field type and control hints */
+	readonly fieldTypeAndControls: FieldTypeControl;
 
 	/** Example value(s) for developer reference only - not used in application logic */
-	example: string;
+	readonly example: string;
 }
 
 /**
@@ -72,9 +82,9 @@ export interface ObjectDataTyped extends ObjectData {
  * Response from Google Sheets API
  */
 export interface SheetsApiResponse {
-	range: string;
-	majorDimension: 'ROWS' | 'COLUMNS';
-	values: string[][];
+	readonly range: string;
+	readonly majorDimension: 'ROWS' | 'COLUMNS';
+	readonly values: string[][];
 }
 
 /**
@@ -159,7 +169,9 @@ export class ParsedMetadataSchema {
 	 */
 	getImageUrls(object: ObjectData): string[] {
 		const imageFields = this.getImageFields();
-		return imageFields.map((field) => object[field.field]).filter((url): url is string => !!url && url.trim() !== '');
+		return imageFields
+			.map((field) => object[field.field])
+			.filter((url): url is string => url !== undefined && url.trim() !== '');
 	}
 
 	/**

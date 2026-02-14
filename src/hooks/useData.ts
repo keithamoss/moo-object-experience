@@ -43,6 +43,6 @@ export function useData() {
 		objects,
 		isLoading: isLoadingMetadata || isLoadingObjects,
 		error: metadataError || objectsError,
-		isSuccess: !!metadata && !!objects,
+		isSuccess: metadata !== undefined && objects !== undefined,
 	};
 }

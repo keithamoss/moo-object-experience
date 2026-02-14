@@ -16,23 +16,23 @@ import SearchFilters from './SearchFilters';
 
 export interface SearchBarProps {
 	/** Current search query */
-	query: string;
+	readonly query: string;
 	/** Callback when query changes */
-	onQueryChange: (query: string) => void;
+	readonly onQueryChange: (query: string) => void;
 	/** Callback when search is committed (Enter/blur) */
-	onCommit: () => void;
+	readonly onCommit: () => void;
 	/** Callback when clear button clicked */
-	onClear: () => void;
+	readonly onClear: () => void;
 	/** Whether search is disabled */
-	disabled?: boolean;
+	readonly disabled?: boolean;
 	/** Current committed query from URL (for blur comparison) */
-	committedQuery?: string;
+	readonly committedQuery?: string;
 	/** Metadata schema for field labels */
-	metadataFields: MetadataField[];
+	readonly metadataFields: MetadataField[];
 	/** Currently active search fields */
-	activeFields: SearchableFieldName[];
+	readonly activeFields: SearchableFieldName[];
 	/** Callback when a field is toggled */
-	onToggleField: (fieldName: SearchableFieldName) => void;
+	readonly onToggleField: (fieldName: SearchableFieldName) => void;
 }
 
 export default function SearchBar({

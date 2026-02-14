@@ -5,7 +5,7 @@ import Footer from './components/Footer';
 import LoadingIndicator from './components/LoadingIndicator';
 import { ErrorBoundary } from './store';
 
-function App() {
+function App(): React.ReactElement {
 	return (
 		<Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
 			<AppBar position="static">

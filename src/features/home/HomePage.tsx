@@ -2,6 +2,7 @@ import { Alert, Box, Chip, Container, Paper, Typography } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { useData } from '../../hooks/useData';
+import { getErrorMessage } from '../../utils/errorUtils';
 import SearchContainer from './SearchContainer';
 
 export default function HomePage() {
@@ -50,15 +51,7 @@ export default function HomePage() {
 						<Typography variant="h6" gutterBottom>
 							Failed to load collection data
 						</Typography>
-						<Typography variant="body2">
-							{typeof error === 'object' && error !== null && 'status' in error
-								? `Error ${(error as { status: string | number }).status}: ${
-										(error as { error?: string; data?: unknown }).error ||
-										JSON.stringify((error as { data?: unknown }).data) ||
-										'Unknown error'
-									}`
-								: (error as { message?: string })?.message || 'An unknown error occurred'}
-						</Typography>
+						<Typography variant="body2">{getErrorMessage(error)}</Typography>
 					</Alert>
 				</Box>
 			) : null}

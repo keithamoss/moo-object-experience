@@ -18,11 +18,11 @@ import type { ObjectData } from '../types/metadata';
  */
 export interface SearchResult {
 	/** Object identifier */
-	id: string;
+	readonly id: string;
 	/** Search relevance score */
-	score: number;
+	readonly score: number;
 	/** Matching terms per searchable field */
-	match: Partial<Record<SearchableFieldName, string[]>>;
+	readonly match: Partial<Record<SearchableFieldName, string[]>>;
 }
 
 /**
@@ -30,11 +30,11 @@ export interface SearchResult {
  */
 export interface SearchOptions {
 	/** Which searchable fields to include (defaults to all) */
-	activeFields?: SearchableFieldName[];
+	readonly activeFields?: SearchableFieldName[];
 	/** Enable fuzzy matching (defaults to true) */
-	fuzzy?: boolean | number;
+	readonly fuzzy?: boolean | number;
 	/** Enable prefix matching (defaults to true) */
-	prefix?: boolean;
+	readonly prefix?: boolean;
 }
 
 /**

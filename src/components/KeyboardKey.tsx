@@ -7,7 +7,7 @@ import { Box } from '@mui/material';
 
 export interface KeyboardKeyProps {
 	/** The keyboard key to display */
-	children: React.ReactNode;
+	readonly children: React.ReactNode;
 }
 
 /**

@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Typography } from '@mui/material';
 
 interface LoadingIndicatorProps {
-	message?: string;
+	readonly message?: string;
 }
 
 export default function LoadingIndicator({ message = 'Loading...' }: LoadingIndicatorProps) {

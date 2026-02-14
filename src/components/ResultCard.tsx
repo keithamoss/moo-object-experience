@@ -14,11 +14,11 @@ import { generateObjectUrl } from '../utils/urlUtils';
 
 export interface ResultCardProps {
 	/** Search result with score and ID */
-	result: SearchResult;
+	readonly result: SearchResult;
 	/** Object data for display */
-	object: ObjectData;
+	readonly object: ObjectData;
 	/** Search query for highlighting (optional) */
-	query?: string;
+	readonly query?: string;
 }
 
 /**
@@ -29,7 +29,12 @@ const DESCRIPTION_LINE_CLAMP = 3;
 /**
  * Extract common object fields with defaults
  */
-function extractObjectFields(object: ObjectData) {
+function extractObjectFields(object: ObjectData): {
+	title: string;
+	description: string;
+	identifier: string;
+	creator: string;
+} {
 	return {
 		title: (object[OBJECT_FIELDS.TITLE] as string) || 'Untitled',
 		description: (object[OBJECT_FIELDS.DESCRIPTION] as string) || '',

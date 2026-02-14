@@ -21,15 +21,15 @@ import type { MetadataField } from '../../types/metadata';
 
 export interface SearchFiltersProps {
 	/** Metadata schema to get field labels */
-	metadataFields: MetadataField[];
+	readonly metadataFields: MetadataField[];
 	/** Currently active search fields */
-	activeFields: SearchableFieldName[];
+	readonly activeFields: SearchableFieldName[];
 	/** Callback when a field is toggled */
-	onToggleField: (fieldName: SearchableFieldName) => void;
+	readonly onToggleField: (fieldName: SearchableFieldName) => void;
 	/** Whether filters are disabled */
-	disabled?: boolean;
+	readonly disabled?: boolean;
 	/** Whether to display inline (without Accordion wrapper) */
-	inline?: boolean;
+	readonly inline?: boolean;
 }
 
 export default function SearchFilters({

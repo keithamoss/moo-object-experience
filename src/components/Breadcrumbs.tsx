@@ -3,12 +3,12 @@ import { Link, Breadcrumbs as MuiBreadcrumbs, Typography } from '@mui/material';
 import { Link as RouterLink } from 'react-router-dom';
 
 interface BreadcrumbItem {
-	label: string;
-	path?: string; // Optional - last item (current page) has no path
+	readonly label: string;
+	readonly path?: string; // Optional - last item (current page) has no path
 }
 
 interface BreadcrumbsProps {
-	items: BreadcrumbItem[];
+	readonly items: BreadcrumbItem[];
 }
 
 /**

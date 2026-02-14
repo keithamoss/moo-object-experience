@@ -45,11 +45,11 @@ import SearchResults from './SearchResults';
 
 export interface SearchContainerProps {
 	/** Metadata schema for field labels */
-	metadata: MetadataField[];
+	readonly metadata: MetadataField[];
 	/** All objects for display */
-	objects: ObjectData[];
-	/** Whether search should be disabled */
-	disabled?: boolean;
+	readonly objects: ObjectData[];
+	/** Whether search is disabled */
+	readonly disabled?: boolean;
 }
 
 export default function SearchContainer({ metadata, objects, disabled = false }: SearchContainerProps) {
@@ -78,10 +78,10 @@ export default function SearchContainer({ metadata, objects, disabled = false }:
 		setLocalQuery(urlQuery);
 	}, [searchParams]);
 
-	// Clear loading state when results update
+	// Clear loading state when search completes (when committedQuery updates)
 	useEffect(() => {
 		setIsSearching(false);
-	}, []);
+	}, [
 
 	// Consolidated URL update function (memoized to prevent recreation)
 	// Builds URL params from current state and updates browser URL

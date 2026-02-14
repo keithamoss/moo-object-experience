@@ -12,13 +12,13 @@ import type { ObjectData } from '../../types/metadata';
 
 export interface SearchResultsProps {
 	/** Search results with scores */
-	results: SearchResult[];
+	readonly results: SearchResult[];
 	/** All objects for lookup */
-	objects: ObjectData[];
+	readonly objects: ObjectData[];
 	/** Current search query */
-	query: string;
+	readonly query: string;
 	/** Whether search is currently executing */
-	isSearching?: boolean;
+	readonly isSearching?: boolean;
 }
 
 export default function SearchResults({ results, objects, query, isSearching = false }: SearchResultsProps) {
@@ -68,6 +68,7 @@ export default function SearchResults({ results, objects, query, isSearching = f
 						justifyContent: 'center',
 						bgcolor: 'rgba(255, 255, 255, 0.8)',
 						zIndex: 1,
+						pointerEvents: 'none',
 					}}
 				>
 					<CircularProgress />

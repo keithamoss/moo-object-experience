@@ -3,8 +3,8 @@ import { Box, Button, Container, Paper, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
 interface InvalidObjectPageProps {
-	reason: 'missing-identifier' | 'invalid-data';
-	objectId?: string;
+	readonly reason: 'missing-identifier' | 'invalid-data';
+	readonly objectId?: string;
 }
 
 /**

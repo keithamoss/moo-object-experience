@@ -15,7 +15,7 @@ import type { ObjectData } from '../types/metadata';
  *
  * @param objects - Array of objects to index
  */
-export function useSearchIndex(objects: ObjectData[]) {
+export function useSearchIndex(objects: ObjectData[]): void {
 	const dispatch = useAppDispatch();
 
 	useEffect(() => {

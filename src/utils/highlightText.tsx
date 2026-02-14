@@ -11,14 +11,16 @@ import { Fragment } from 'react';
  * @returns Array of text fragments with highlighted portions
  */
 export function highlightSearchTerms(text: string, query: string): React.ReactNode[] {
-	if (!text || !query || query.trim() === '') {
-		return [text];
+	const trimmedText = text?.trim();
+	const trimmedQuery = query?.trim();
+	
+	if (!trimmedText || !trimmedQuery) {
+		return [text ?? ''];
 	}
 
 	// Extract individual words from query (split by whitespace)
 	// Example: "stone axe" → ["stone", "axe"]
-	const searchTerms = query
-		.trim()
+	const searchTerms = trimmedQuery
 		.split(/\s+/) // Split on one or more whitespace characters
 		.filter((term) => term.length > 0) // Remove empty strings
 		.map((term) => term.toLowerCase()); // Normalize to lowercase for case-insensitive matching
