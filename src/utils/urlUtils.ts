@@ -20,13 +20,13 @@
  */
 export function generateSlug(text: string): string {
   return text
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
-    .replace(/[\s_]+/g, '-') // Replace spaces and underscores with hyphens
-    .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
-    .replace(/^-+|-+$/g, '') // Trim hyphens from start and end
-    .substring(0, 50); // Limit length
+    .toLowerCase() // Convert to lowercase for URL consistency
+    .trim() // Remove leading/trailing whitespace
+    .replace(/[^\w\s-]/g, '') // Remove special characters (keep letters, numbers, spaces, hyphens)
+    .replace(/[\s_]+/g, '-') // Replace spaces and underscores with single hyphens
+    .replace(/-+/g, '-') // Collapse multiple consecutive hyphens into one
+    .replace(/^-+|-+$/g, '') // Remove leading and trailing hyphens
+    .substring(0, 50); // Limit to 50 chars for reasonable URL length
 }
 
 /**

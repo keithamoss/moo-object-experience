@@ -76,17 +76,17 @@ export class SearchService {
    * Search the index with optional field filtering
    */
   search(query: string, options: SearchOptions = {}): SearchResult[] {
-    // Early validation
+    // Early validation - ensure index is built before searching
     if (!this.miniSearch) {
       throw new Error(
         'Search index not initialized. Call buildIndex() first or check that indexReady is true before searching.',
       );
     }
 
-    // Default options
+    // Default options - use all fields and standard fuzzy/prefix settings
     const { activeFields = ALL_SEARCHABLE_FIELD_NAMES, fuzzy = FUZZY_TOLERANCE, prefix = true } = options;
 
-    // Validate options upfront
+    // Validate options upfront rather than silently accepting invalid values
     if (typeof fuzzy === 'number' && (fuzzy < 0 || fuzzy > 1)) {
       throw new Error(`Fuzzy tolerance must be between 0 and 1, got ${fuzzy}`);
     }
@@ -94,16 +94,18 @@ export class SearchService {
       throw new Error(`Prefix must be a boolean, got ${typeof prefix}`);
     }
 
-    // Build field boost weights (only for active fields - optimized)
+    // Build field boost weights (only for active fields - optimized for performance)
+    // This creates a { fieldName: weight } object dynamically based on active fields
+    // Example: { 'dcterms:title': 3, 'dcterms:description': 1 }
     const boost = Object.fromEntries(activeFields.map((field) => [field, FIELD_WEIGHTS[field]]));
 
     // Perform search with custom options
     const results = this.miniSearch.search(query, {
-      fields: activeFields, // Only search in active fields
-      boost, // Apply weights
-      fuzzy, // Fuzzy matching
-      prefix, // Prefix matching
-      combineWith: SEARCH_COMBINE_MODE, // All terms must match (more precise results)
+      fields: activeFields, // Only search in active fields (narrower search = better performance)
+      boost, // Apply field weights (title matches score higher than description matches)
+      fuzzy, // Fuzzy matching tolerance (0.2 = allow ~1 character difference per 5 chars)
+      prefix, // Prefix matching enabled (allows partial word matches like "ston" matching "stone")
+      combineWith: SEARCH_COMBINE_MODE, // AND mode = all query terms must match (more precise results)
     });
 
     // Map to our SearchResult interface

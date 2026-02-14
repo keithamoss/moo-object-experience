@@ -33,6 +33,10 @@ const initialState: SearchState = {
 
 /**
  * Helper: Check if search should be performed
+ * 
+ * Search requirements:
+ * 1. Query must meet minimum length (avoid searching for single chars)
+ * 2. At least one field must be active (can't search with no fields)
  */
 function shouldPerformSearch(state: SearchState): boolean {
   const trimmedQuery = state.query.trim();
@@ -41,13 +45,19 @@ function shouldPerformSearch(state: SearchState): boolean {
 
 /**
  * Helper: Perform search and update results
+ * 
+ * This is called whenever query or field selection changes.
+ * It checks if conditions are met before calling the search service.
  */
 function performSearch(state: SearchState): void {
+  // Only search if index is ready AND query is valid
   if (state.indexReady && shouldPerformSearch(state)) {
+    // Call the search service with current query and field configuration
     state.results = searchService.search(state.query, {
       activeFields: state.activeSearchFields,
     });
   } else {
+    // Clear results if conditions aren't met (empty query, index not ready, etc.)
     state.results = [];
   }
 }

@@ -160,26 +160,144 @@ Fix linting issues automatically:
 npm run lint:fix
 ```
 
-## Google Sheets Setup
+## Google Sheets Structure
 
-Your Google Sheet should have two worksheets:
+Your Google Sheet must contain exactly two worksheets with specific structures:
 
-### Worksheet 1: Metadata Schema
-Defines field structure, types, and properties:
-- Field name
-- Field type (text, date, url, etc.)
-- Display label
-- Searchable (yes/no)
-- Search weight
-- Display order
-- Other metadata as needed
+### Worksheet 1: Mappings (Metadata Schema)
 
-### Worksheet 2: Objects
-Contains all object data with columns aligned to metadata field definitions:
-- `object_identifier` (required, unique)
-- `object_title` (required)
-- `object_description` (required)
-- Additional fields as defined in metadata
+The Mappings worksheet defines the structure, types, and properties of all data fields. Each row represents one field definition.
+
+**Required Columns:**
+
+| Column Name | Purpose | Example Values |
+|------------|---------|----------------|
+| `Field` | The field identifier (used as column header in Objects sheet) | `dcterms:identifier.moooi`, `dcterms:title`, `moo:material` |
+| `Namespace` | The metadata standard namespace | `dcterms`, `moo`, `dwc` |
+| `Label` | Human-readable field name (displayed in UI) | "Identifier", "Title", "Material" |
+| `Applicable collections` | Which collections use this field | "All", "Core, Library", "Ephemera" |
+| `Required` | Whether field is mandatory for completeness | "Mandatory", "Optional", "" |
+| `Purpose` | Description of what this field represents | "A unique identifier for the object" |
+| `Field type and controls` | Data type and input constraints | "Free text", "Controlled - Dropdown", "Image", "ISO8601 date" |
+| `Example` | Sample value (for documentation only) | "MOO-2024-001", "Stone axe head" |
+
+**Important Notes:**
+
+- The first row must be the header row with these column names
+- Column names are case-insensitive and matched flexibly (e.g., "field type" matches "Field type and controls")
+- Only the `Field` column is strictly required; other columns can be empty but must exist
+- Fields are displayed in the order they appear in this sheet
+- Example column is for developer reference only and not used by the application
+
+**Field Types:**
+
+The `Field type and controls` column determines how fields are displayed:
+
+- `Free text` - Plain text display with line breaks preserved
+- `Controlled - Dropdown` - Plain text (dropdown is editor-side only)
+- `Image` - Displays as an image with lazy loading (field value should be a URL)
+- `ISO8601 date` - Formatted as human-readable dates (supports YYYY, YYYY-MM, YYYY-MM-DD)
+- `URL` - Rendered as clickable links
+- `Comma-separated list` - Rendered as Material-UI chips
+
+**Example Metadata Rows:**
+
+```
+Field                          | Namespace | Label       | Applicable collections | Required  | Purpose                           | Field type and controls | Example
+------------------------------|-----------|-------------|------------------------|-----------|-----------------------------------|-------------------------|------------------
+dcterms:identifier.moooi      | dcterms   | Identifier  | All                    | Mandatory | Unique object identifier          | Free text               | MOO-2024-001
+dcterms:title                 | dcterms   | Title       | All                    | Mandatory | Name of the object                | Free text               | Stone axe head
+dcterms:description           | dcterms   | Description | All                    | Mandatory | Detailed description              | Free text               | Aboriginal stone...
+moo:images.hero               | moo       | Hero Image  | All                    | Optional  | Primary display image             | Image                   | https://...
+dcterms:created               | dcterms   | Date Created| Core                   | Optional  | When the object was created       | ISO8601 date            | 1950
+moo:material                  | moo       | Materials   | Core, Library          | Optional  | Materials used in construction    | Comma-separated list    | Stone, wood
+```
+
+### Worksheet 2: Museum (Objects Data)
+
+The Museum worksheet contains all object records. Each row represents one object.
+
+**Structure:**
+
+- **First row**: Header row with field names (must match `Field` values from Mappings sheet)
+- **Subsequent rows**: Object data, with one object per row
+
+**Required Fields:**
+
+The following fields MUST exist as columns and MUST have values for each object:
+
+- `dcterms:identifier.moooi` - Unique identifier for the object (e.g., "MOO-2024-001")
+- `dcterms:title` - Object name/title
+- `dcterms:description` - Full description
+
+**Optional Fields:**
+
+All other fields defined in the Mappings sheet can be included as columns. Empty cells are displayed as empty in the UI.
+
+**Searchable Fields:**
+
+The following fields are searched (hardcoded with weights):
+
+- `dcterms:title` (weight: 3) - Highest priority
+- `dcterms:alternative` (weight: 2) - Alternative titles
+- `dcterms:creator` (weight: 2) - Creator/maker names  
+- `dcterms:description` (weight: 1) - Full text description
+
+**Example Object Rows:**
+
+| dcterms:identifier.moooi | dcterms:title | dcterms:description | moo:images.hero | dcterms:created | moo:material |
+|-------------------------|---------------|---------------------|-----------------|-----------------|--------------|
+| MOO-2024-001 | Stone axe head | Aboriginal stone axe head from Western Australia... | https://example.com/axe.jpg | 1850 | Stone, wood |
+| MOO-2024-002 | Ceramic vase | Blue and white ceramic vase with floral patterns... | https://example.com/vase.jpg | 1920-05 | Ceramic |
+
+**Important Notes:**
+
+- Column order doesn't matter (the app uses column headers to map data)
+- Empty cells are handled gracefully (displayed as empty in UI)
+- Rows without an identifier are skipped with a console warning
+- Column headers must exactly match field names in Mappings sheet
+- Image URLs should be publicly accessible (no authentication required)
+- Dates can be partial: YYYY, YYYY-MM, or YYYY-MM-DD
+
+### Setting Up Your Sheet
+
+1. **Create the Mappings worksheet:**
+   - Add tab named exactly "Mappings"
+   - Add the 8 required column headers
+   - Add one row per field you want to define
+   - Set field types appropriately
+
+2. **Create the Museum worksheet:**
+   - Add tab named exactly "Museum"
+   - Use field names from Mappings sheet as column headers
+   - Add one row per object
+   - Ensure required fields have values
+
+3. **Set sheet permissions:**
+   - Share → Anyone with the link can **View**
+   - Do not allow editing access
+
+4. **Test the structure:**
+   - Load the app in development mode
+   - Check browser console for any parsing errors
+   - Verify all fields display correctly on detail pages
+
+### Troubleshooting
+
+**"Missing required columns" error:**
+- Verify Mappings sheet has all 8 column headers
+- Check for typos in column names
+- Ensure first row is the header row
+
+**Objects not appearing:**
+- Check that Museum sheet has dcterms:identifier.moooi column
+- Verify each object row has a non-empty identifier value
+- Check browser console for specific object validation errors
+
+**Fields not displaying:**
+- Verify column header in Museum matches Field name in Mappings exactly
+- Check that Field Type is spelled correctly (affects rendering)
+- Ensure worksheet names are exactly "Mappings" and "Museum" (case-sensitive)
 
 ## Key Features (Planned)
 

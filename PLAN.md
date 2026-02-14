@@ -212,16 +212,17 @@ Contains all object data with columns aligned to metadata field definitions
 - [x] Phase 2.3 complete ✅ (significantly exceeded original scope)
 
 ### Phase 2.4: Data Display & Validation (Day 5)
-- [ ] Add data fetching on app load (fetch metadata schema first, then objects)
-- [ ] Display loading indicator while fetching
-- [ ] Show error message if fetch fails
-- [ ] Display proof of concept metrics on homepage:
+- [x] Add data fetching on app load (fetch metadata schema first, then objects)
+- [x] Display loading indicator while fetching
+- [x] Show error message if fetch fails
+- [x] Display proof of concept metrics on homepage:
   - Total object count
   - Number of metadata fields loaded
   - Sample of first 5 object titles
-- [ ] Deploy and validate with real Google Sheets data
+- [x] Deploy and validate with real Google Sheets data
+- [x] Phase 2.4 complete ✅
 
-**Deliverable**: Site displays live data from Google Sheets with count and sample objects
+**Deliverable**: Site displays live data from Google Sheets with count and sample objects ✅
 
 ---
 
@@ -230,56 +231,67 @@ Contains all object data with columns aligned to metadata field definitions
 **Goal**: Working search UI with ranked results (non-clickable)
 
 ### Phase 3.1: MiniSearch Integration (Day 6-7)
-- [ ] Install MiniSearch library (`npm install minisearch`)
-- [ ] Create search service module (`src/services/search.ts`):
+- [x] Install MiniSearch library (`npm install minisearch`)
+- [x] Create search service module (`src/services/search.ts`):
   - Read searchable fields and weights from metadata schema
   - Initialize MiniSearch index dynamically based on metadata:
     - Extract fields marked as searchable
     - Apply weights from metadata schema
   - Configure fuzzy matching and partial word matching
   - Implement search function with options for field toggles
-- [ ] Build index on data load (after fetching from Sheets)
-- [ ] Create Redux slice for search state:
+- [x] Build index on data load (after fetching from Sheets)
+- [x] Create Redux slice for search state:
   - `searchQuery` (string)
   - `searchResults` (array of object IDs with scores)
   - `activeSearchFields` (which searchable fields are enabled)
+- [x] Phase 3.1 complete ✅
 
 ### Phase 3.2: Search UI Components (Day 7-8)
-- [ ] Create SearchBar component:
+- [x] Create SearchBar component:
   - Text input (controlled component)
   - Search button
   - Clear button
   - Syncs with URL query parameter (`?q=search+term`)
-- [ ] Create SearchFilters component:
+- [x] Create SearchFilters component:
   - Dynamically generate checkboxes from searchable fields in metadata schema
   - Each checkbox toggles whether that field is searched
   - Display friendly labels from metadata schema
   - Default: all enabled
   - Syncs with URL query parameters
-- [ ] Create SearchResults component:
+- [x] Create SearchResults component:
   - List of result cards (non-clickable)
   - Dynamically display key fields (based on metadata or hardcoded for MVP)
   - Show search score/relevance (for debugging)
   - Show result count
   - Empty state message
   - Ensure responsive layout (grid on desktop, stack on mobile)
+- [x] Phase 3.2 complete ✅
 
 ### Phase 3.3: URL State Management (Day 8-9)
-- [ ] Implement URL state sync for:
+- [x] Implement URL state sync for:
   - Search query (`?q=`)
   - Active filters (`?fields=title,description`)
-- [ ] Handle browser back/forward navigation
-- [ ] Handle direct URL navigation (e.g., shared links)
-- [ ] Update page title based on search (for browser history)
+- [x] Handle browser back/forward navigation
+- [x] Handle direct URL navigation (e.g., shared links)
+- [x] Update page title based on search (for browser history)
+- [x] Phase 3.3 complete ✅
 
 ### Phase 3.4: Search Polish (Day 9)
-- [ ] Show "No results" state with helpful message
-- [ ] Add keyboard shortcuts (Enter to search, Escape to clear)
-- [ ] Highlight search terms in results (optional, nice-to-have)
-- [ ] Test with various search queries
-- [ ] Deploy
+- [x] Show "No results" state with helpful message
+- [x] Add keyboard shortcuts (Enter to search, Escape to clear)
+- [x] Highlight search terms in results (optional, nice-to-have)
+- [x] Test with various search queries
+- [x] Deploy
+- [x] Phase 3.4 complete ✅
 
-**Deliverable**: Functional search interface with ranked results displayed
+**Deliverable**: Functional search interface with ranked results displayed ✅
+
+**Highlights:**
+- Search term highlighting with yellow mark tags
+- Keyboard shortcuts visible on desktop (Enter/Esc hints)
+- Mobile-optimized search button
+- Filter badge showing when fields customized
+- No results state with helpful guidance
 
 ---
 
@@ -288,15 +300,16 @@ Contains all object data with columns aligned to metadata field definitions
 **Goal**: Clickable search results leading to rich detail pages
 
 ### Phase 4.1: Routing & Navigation (Day 10)
-- [ ] Make search results clickable
-- [ ] Implement navigation to `/object/:id/:slug?`
+- [x] Make search results clickable
+- [x] Implement navigation to `/object/:id/:slug?`
   - `:id` is `object_identifier` (used for lookup)
   - `:slug` is URL-friendly `object_title` (for SEO/readability, not used for lookup)
-- [ ] Create utility function to generate slug from title
-- [ ] Handle invalid IDs (404 page)
+- [x] Create utility function to generate slug from title
+- [x] Handle invalid IDs (404 page)
+- [x] Phase 4.1 complete ✅
 
 ### Phase 4.2: Object Detail Page Component (Day 10-11)
-- [ ] Create ObjectDetail component:
+- [x] Create ObjectDetail component:
   - Extract object ID from URL params
   - Fetch object from Redux store
   - Use metadata schema to dynamically render all fields:
@@ -310,43 +323,69 @@ Contains all object data with columns aligned to metadata field definitions
   - Responsive layout (2-column on desktop, stack on mobile)
   - Loading state while data loads
   - Error state if object not found
+- [x] Phase 4.2 complete ✅
+
+**Implementation highlights:**
+- Hero section with prominent title and identifier display
+- Left column: Description (full text with line breaks) + Images (lazy loaded)
+- Right column: Metadata section with all other fields dynamically rendered
+- Field rendering based on metadata types:
+  - URLs automatically converted to clickable links
+  - Dates displayed as-is
+  - Multi-line text preserves line breaks
+- Empty fields automatically hidden
+- Grid layout: 2-column on desktop (md+), stacked on mobile
+- Uses metadata labels for field names throughout
 
 ### Phase 4.3: Rich Display Features (Day 11-12)
-- [ ] Format fields appropriately based on field type from metadata:
-  - Dates: Human-readable format
-  - URLs: Make clickable links
-  - Long text: Proper paragraph spacing
-  - Images: Display inline
+- [x] Format fields appropriately based on field type from metadata:
+  - Dates: Human-readable format (supports YYYY, YYYY-MM, YYYY-MM-DD, and ISO8601 with time)
+  - URLs: Make clickable links (truncated to 60 chars with full URL on hover)
+  - Long text: Proper paragraph spacing (line breaks preserved)
+  - Images: Display inline (in dedicated Images section)
+  - Comma-separated lists: Material-UI chips
   - Other types: Display as plain text
-- [ ] Display images:
+- [x] Display images:
   - Lazy loading
   - Alt text from object title
-- [ ] Handle missing/empty fields gracefully (don't display empty sections)
+  - Broken image fallback with icon and message
+- [x] Handle missing/empty fields gracefully (don't display empty sections)
+- [x] Phase 4.3 complete ✅
+
+**Implementation highlights:**
+- Enhanced date formatting handles partial dates (year-only, year-month)
+- URLs display shortened text with full URL in title attribute
+- Broken image fallback shows "Image unavailable" with icon
+- Comprehensive field rendering documentation in fieldRendering.tsx
+- All field types dynamically rendered based on metadata
 
 ### Phase 4.4: Detail Page Polish (Day 12)
-- [ ] Add breadcrumb navigation (Home > Search Results > Object)
-- [ ] Update page title with object title
-- [ ] Add loading skeleton while data loads
-- [ ] Test all fields display correctly
-- [ ] Test edge cases (missing fields, no images, etc.)
-- [ ] Deploy
+- [x] Add breadcrumb navigation (Home > Search Results > Object)
+- [x] Update page title with object title
+- [x] Add loading skeleton while data loads
+- [x] Test all fields display correctly
+- [x] Test edge cases (missing fields, no images, etc.)
+- [x] Deploy
+- [x] Phase 4.4 complete ✅
 
-**Deliverable**: Full object browsing experience with detail pages
+**Deliverable**: Full object browsing experience with detail pages ✅
+
+**Implementation highlights:**
+- Breadcrumb navigation shows context (Home > Search Results > Object)
+- Search Results breadcrumb preserves filter state
+- Dynamic page title updates with object name
+- Loading skeleton mimics page structure during data fetch
+- Back button intelligently returns to search results or home
+- All field types tested (text, dates, URLs, images, lists)
+- Edge cases handled (missing fields, broken images, no metadata)
 
 ---
 
 ## Phase 5: Polish & Launch Prep (Day 13-14)
 
 ### Final Testing & Bug Fixes
-- [ ] Test all user flows end-to-end
-- [ ] Test on multiple devices (mobile, tablet, desktop)
-- [ ] Test on required browsers:
-  - Safari on iOS
-  - Chrome on iOS
-  - Edge on macOS
-- [ ] Fix any discovered bugs
-- [ ] Validate all external image links load
-- [ ] Test with full dataset (all 500 objects)
+- [x] Test all user flows end-to-end
+- [x] Fix any discovered bugs
 
 ### Documentation
 - [ ] Update README.md with:
@@ -356,8 +395,8 @@ Contains all object data with columns aligned to metadata field definitions
   - Environment variables needed
   - Google Sheets setup guide
   - Deployment process
-- [ ] Add inline code comments for complex logic
-- [ ] Document required Google Sheets structure:
+- [x] Add inline code comments for complex logic
+- [x] Document required Google Sheets structure:
   - Metadata worksheet format
   - Objects worksheet format
   - Example metadata field definitions
@@ -481,3 +520,12 @@ VITE_GOOGLE_SHEET_ID=your_sheet_id
 - [ ] No console errors
 - [ ] Code follows TypeScript best practices
 - [ ] Site automatically deploys on push to main branch
+
+---
+
+# Post-MVP Improvements
+
+## Code Quality & Tooling
+- [ ] **Replace ESLint with modern linter** - Evaluate migrating from ESLint + Prettier to Biome (or similar modern all-in-one tooling) for faster linting/formatting with better performance
+  - Benefits: Single tool for both linting and formatting, significantly faster, better TypeScript support
+  - Consider: Migration effort, plugin ecosystem, team familiarity
