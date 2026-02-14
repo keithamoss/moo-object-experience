@@ -9,13 +9,15 @@ This is a client-side web application that provides search and browse capabiliti
 ## Tech Stack
 
 - **Frontend Framework**: React 18 + TypeScript
-- **Build Tool**: Vite 5
+- **Build Tool**: Vite 6
 - **UI Library**: Material-UI (MUI) v5
-- **State Management**: Redux Toolkit
+- **State Management**: Redux Toolkit with RTK Query
 - **Routing**: React Router v7
-- **Search**: MiniSearch library (client-side search)
-- **Data Source**: Google Sheets API v4
-- **Hosting**: GitHub Pages (planned)
+- **Search**: MiniSearch library (client-side full-text search with fuzzy matching)
+- **Testing**: Vitest + React Testing Library + Playwright (E2E)
+- **Data Source**: Google Sheets API v4 (read-only, no backend)
+- **Hosting**: GitHub Pages with custom domain
+- **CI/CD**: GitHub Actions (automated deployment on push to main)
 
 ## Project Structure
 
@@ -43,121 +45,87 @@ moo-object-experience/
 
 ### Prerequisites
 
-- Node.js 20+ and npm
-- A Google Cloud Project with Sheets API v4 enabled
-- Google Sheets API key
-
-### Google Sheets API Setup
-
-#### 1. Create a Google Cloud Project
-
-1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
-2. Click "Select a project" at the top of the page
-3. Click "New Project" in the dialog that appears
-4. Enter a project name (e.g., "Museum Object Experience")
-5. Click "Create"
-
-#### 2. Enable Google Sheets API v4
-
-1. In your Google Cloud Project, navigate to "APIs & Services" > "Library"
-2. Search for "Google Sheets API"
-3. Click on "Google Sheets API" in the results
-4. Click the "Enable" button
-
-#### 3. Create an API Key
-
-1. Navigate to "APIs & Services" > "Credentials"
-2. Click "Create Credentials" at the top
-3. Select "API Key"
-4. Your API key will be created and displayed
-5. **Important**: Click "Edit API key" to restrict it:
-   - Under "API restrictions", select "Restrict key"
-   - Check "Google Sheets API" from the list
-   - Under "Application restrictions" (recommended):
-     - Select "HTTP referrers (web sites)"
-     - Add your domain: `moo.keithandhelenmakestuff.com/*`
-     - Add localhost for development: `localhost/*`
-6. Click "Save"
-7. Copy your API key
-
-#### 4. Prepare Your Google Sheet
-
-1. Create or open your Google Sheet containing the museum objects
-2. Make the sheet publicly viewable:
-   - Click "Share" in the top right
-   - Under "General access", select "Anyone with the link" can "View"
-   - Click "Done"
-3. Get your Sheet ID from the URL:
-   - URL format: `https://docs.google.com/spreadsheets/d/{SHEET_ID}/edit`
-   - Copy the `{SHEET_ID}` portion
-
-#### 5. Add Credentials to Config File
-
-1. Open `src/config/sheets.ts`
-2. Replace the placeholder values:
-   ```typescript
-   apiKey: 'YOUR_ACTUAL_API_KEY',
-   sheetId: 'YOUR_ACTUAL_SHEET_ID',
-   ```
-3. Commit and push to deploy
-
-**Note**: The API key and Sheet ID are intentionally public (visible in browser network requests). Security is provided by HTTP referrer restrictions on the API key, which prevent it from being used on other domains
+- **Node.js**: 20+ and npm 10+
+- **Google Cloud Project**: With Sheets API v4 enabled
+- **Google Sheets API key**: Restricted to your domain
+- **Google Sheet**: With required structure (see below)
 
 ### Installation
 
-1. Clone the repository:
+1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/keithamoss/moo-object-experience.git
    cd moo-object-experience
    ```
 
-2. Install dependencies:
+2. **Install dependencies:**
    ```bash
    npm install
    ```
 
-3. Create environment file:
-   ```bash
-   cp .env.example .env.local
+3. **Configure Google Sheets API** (one-time setup):
+   
+   See [GOOGLE_SHEETS_SETUP.md](GOOGLE_SHEETS_SETUP.md) for detailed instructions on:
+   - Creating a Google Cloud Project
+   - Enabling Google Sheets API v4
+   - Creating and restricting an API key
+   - Preparing your Google Sheet
+   
+   Once you have your API key and Sheet ID, add them to `src/config/sheets.ts`:
+   ```typescript
+   export const SHEETS_CONFIG = {
+     apiKey: 'YOUR_ACTUAL_API_KEY',
+     sheetId: 'YOUR_ACTUAL_SHEET_ID',
+     // ... other config
+   };
    ```
-
-4. Add your Google Sheets API credentials to `.env.local`:
-   ```
-   VITE_GOOGLE_SHEETS_API_KEY=your_api_key_here
-   VITE_GOOGLE_SHEET_ID=your_sheet_id_here
-   ```
+   
+   **Important**: The API key and Sheet ID are intentionally public (visible in browser network requests). Security is provided by HTTP referrer restrictions on the API key.
 
 ### Development
 
-Run the development server:
+**Run development server:**
 ```bash
 npm run dev
 ```
 
-The app will be available at `https://localhost:5173` (served over HTTPS with auto-generated certificates)
+The app will be available at `http://localhost:5173` with hot-module reloading.
 
-### Building
+**Run tests:**
+```bash
+npm test                  # Run unit tests once
+npm run test:watch        # Run tests in watch mode
+npm run test:ui           # Open Vitest UI
+npm run test:coverage     # Generate coverage report
+npm run test:report       # View test report in browser
+```
 
-Build for production:
+**Run end-to-end tests:**
+```bash
+npm run test:e2e          # Run Playwright tests headlessly
+npm run test:e2e:ui       # Open Playwright UI
+npm run test:e2e:headed   # Run with browser visible
+npm run test:e2e:report   # View test report
+```
+
+**Linting:**
+```bash
+npm run lint              # Check TypeScript and ESLint issues
+npm run lint:fix          # Auto-fix ESLint issues
+```
+
+### Building for Production
+
+**Build the app:**
 ```bash
 npm run build
 ```
 
-Preview production build:
+This compiles TypeScript and bundles with Vite to `dist/`.
+
+**Preview production build locally:**
 ```bash
 npm run preview
-```
-
-### Linting
-
-Run ESLint:
-```bash
-npm run lint
-```
-
-Fix linting issues automatically:
-```bash
-npm run lint:fix
 ```
 
 ## Google Sheets Structure
@@ -299,51 +267,163 @@ The following fields are searched (hardcoded with weights):
 - Check that Field Type is spelled correctly (affects rendering)
 - Ensure worksheet names are exactly "Mappings" and "Museum" (case-sensitive)
 
-## Key Features (Planned)
+## Features
 
-- ✅ Project scaffolding with React + TypeScript + Vite
-- ✅ Material-UI theme and component library
-- ✅ Redux Toolkit for state management
-- ✅ React Router v7 for routing
-- ✅ GitHub Pages deployment workflow
-- 🔲 Google Sheets API integration
-- 🔲 Client-side search with MiniSearch
-- 🔲 Object detail pages
-- 🔲 Mobile-responsive design
-- 🔲 URL-based state management
+### Implemented ✅
+
+- **Project Foundation**: React + TypeScript + Vite with modern tooling
+- **Material-UI Theme**: Accessible color palette (WCAG 2.1 Level AA compliant)
+- **Redux Toolkit + RTK Query**: Automatic caching, entity normalization, O(1) lookups
+- **React Router v7**: Client-side routing with URL-based state management
+- **Google Sheets API Integration**: Dynamic schema-driven data fetching
+- **Full-Text Search**: MiniSearch with fuzzy matching and field-specific weights
+- **Search UI**: 
+  - Real-time search with highlighted matches
+  - Customizable field filters (title, alternative title, creator, description)
+  - Keyboard shortcuts (Enter to search, Esc to clear)
+  - Filter badges and result counts
+- **Object Detail Pages**: 
+  - SEO-friendly URLs with slugs (`/object/:id/:slug`)
+  - Dynamic field rendering based on metadata types
+  - Image display with lazy loading and error handling
+  - Breadcrumb navigation
+  - Rich field formatting (dates, URLs, lists, images)
+- **Error Handling**: ErrorBoundary component with graceful fallbacks  
+- **Mobile-First Responsive Design**: Optimized for 320px+ screens
+- **URL State Management**: All search state in URL for shareable links
+- **GitHub Pages Deployment**: Automated CI/CD on push to main
+- **Testing Infrastructure**: 
+  - Unit tests with Vitest + React Testing Library
+  - E2E tests with Playwright
+  - Test coverage reporting
+- **TypeScript Strict Mode**: Type-safe codebase with comprehensive interfaces
+- **Accessibility**: Semantic HTML, ARIA labels, keyboard navigation
+
+### Planned Features 🔮
+
+- Advanced search (date ranges, Boolean operators)
+- Collections/grouping view
+- Timeline view for date-based browsing
+- Map view (if location data available)
+- Export functionality (PDF, citations)
+- Analytics integration (Plausible/Google Analytics)
+- Service Worker for offline support
 
 ## Deployment
 
-The site automatically deploys to GitHub Pages on every push to the `main` branch.
+The site automatically deploys to GitHub Pages on every push to the `main` branch via GitHub Actions.
 
-- **Production URL**: https://moo.keithandhelenmakestuff.com
-- **GitHub Pages URL**: https://keithamoss.github.io/moo-object-experience/
-- **DNS Provider**: Cloudflare
+### Live URLs
+
+- **Production**: https://moo.keithandhelenmakestuff.com
+- **GitHub Pages**: https://keithamoss.github.io/moo-object-experience/
 
 ### First-Time Setup
 
-See [GITHUB_PAGES_SETUP.md](GITHUB_PAGES_SETUP.md) for detailed instructions on:
-- Configuring GitHub Pages settings
-- Setting up custom domain in Cloudflare DNS
-- Adding API key secrets
-- Troubleshooting deployment issues
+For initial deployment configuration, see [GITHUB_PAGES_SETUP.md](GITHUB_PAGES_SETUP.md) for detailed instructions on:
+
+1. **GitHub Pages Configuration**:
+   - Enabling GitHub Actions as deployment source
+   - Configuring custom domain
+   - Adding repository secrets for API credentials
+
+2. **DNS Configuration** (via Cloudflare):
+   - Creating CNAME record pointing to GitHub Pages
+   - Configuring proxy settings
+   - SSL/HTTPS setup
+
+3. **Deployment Workflow**:
+   - Automatic builds on push to main
+   - Asset optimization and bundling
+   - Deployment verification
 
 ### Deployment Process
 
-1. Push changes to `main` branch
-2. GitHub Actions automatically builds the site
-3. Deploys to GitHub Pages
-4. Site is live within 1-2 minutes
+The deployment workflow (`.github/workflows/deploy.yml`) automatically:
 
-View deployment status in the **Actions** tab of the repository.
+1. **Installs dependencies** and runs type checking
+2. **Runs test suite** (unit + E2E tests) - deployment fails if tests fail
+3. **Builds production bundle** with Vite
+4. **Deploys to GitHub Pages** using official GitHub Pages action
+5. **Completes in 1-2 minutes** from push to live
+
+**Monitor deployment status**: Check the **Actions** tab in the GitHub repository.
+
+### Environment Configuration
+
+**For local development**: Edit `src/config/sheets.ts` directly.
+
+**For production**: The same configuration file is used. The API key is public but secured via HTTP referrer restrictions that only allow requests from authorized domains.
+
+**GitHub Secrets** (optional): You can optionally configure secrets in GitHub repository settings for additional security layers, though the current implementation uses public API keys with referrer restrictions.
 
 ## Development Principles
 
-1. **URL State**: All state stored in URL for shareable links and browser history
-2. **MVP Focus**: Lean implementation that can evolve over time
-3. **Mobile First**: Responsive design starting with mobile screens
-4. **No Caching**: Fetch fresh data on each visit
-5. **Minimal Dependencies**: Keep dependencies lean and purposeful
+1. **URL State**: All application state stored in URL parameters for shareable links and seamless browser history navigation
+2. **MVP Focus**: Lean, iterative implementation with room for evolution
+3. **Mobile First**: Responsive design optimized for mobile screens (320px+) first
+4. **No Caching**: Fresh data fetched on each visit (performance acceptable with loading indicators)
+5. **Minimal Dependencies**: Lean dependency tree with purposeful library choices
+6. **Type Safety**: TypeScript strict mode with comprehensive type definitions
+7. **Testing**: Comprehensive unit and E2E test coverage for reliability
+8. **Accessibility**: WCAG 2.1 Level AA compliance throughout
+
+## Architecture Highlights
+
+### State Management
+
+**RTK Query** for data fetching with automatic:
+- Caching and invalidation
+- Loading and error states
+- Entity normalization for O(1) lookups
+- Memoized selectors
+
+**Redux Toolkit** slices for:
+- Search query and results
+- Active filter state
+- UI state management
+
+### Search Implementation
+
+**MiniSearch** client-side search engine:
+- Full-text indexing of 4 configurable fields
+- Fuzzy matching with configurable tolerance
+- Prefix matching for partial words
+- Field-specific search weights (title: 3, alternative: 2, creator: 2, description: 1)
+- Real-time search with highlighted results
+
+### Dynamic Schema
+
+**Metadata-driven rendering**:
+- Field definitions fetched from Google Sheets "Mappings" worksheet
+- Dynamic field types (text, date, URL, image, list)
+- Flexible display order configurable via spreadsheet
+- No hardcoded field definitions in code
+
+### Data Flow
+
+```
+Google Sheets → RTK Query → Normalized Redux Store → Memoized Selectors → React Components
+                     ↓
+                MiniSearch Index → Search Results
+```
+
+### URL State Pattern
+
+All state serialized to URL query parameters:
+- `?q=search+term` - Search query
+- `?fields=title,creator` - Active search fields
+- Browser back/forward work seamlessly
+- Direct navigation to any state via URL
+- Shareable links preserve application state
+
+### Component Architecture
+
+- **Feature-based structure**: `features/home`, `features/objects`
+- **Reusable components**: `components/` for shared UI
+- **Type-safe utilities**: `utils/` for pure functions
+- **ErrorBoundary**: Graceful error handling at component level
+- **Custom hooks**: `useData`, `useSearchIndex`, `useSelectors` for business logic
 
 ## Timeline
 

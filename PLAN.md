@@ -388,7 +388,7 @@ Contains all object data with columns aligned to metadata field definitions
 - [x] Fix any discovered bugs
 
 ### Documentation
-- [ ] Update README.md with:
+- [x] Update README.md with:
   - Project description
   - Tech stack
   - Setup instructions
@@ -400,10 +400,6 @@ Contains all object data with columns aligned to metadata field definitions
   - Metadata worksheet format
   - Objects worksheet format
   - Example metadata field definitions
-
-### Performance Check
-- [ ] Verify search is responsive even with 500 objects
-- [ ] Confirm no console errors or warnings
 
 ### Code Quality Review
 - [ ] Evaluate ESLint vs alternative linters
