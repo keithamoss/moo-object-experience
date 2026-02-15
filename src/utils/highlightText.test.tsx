@@ -52,7 +52,8 @@ describe('highlightSearchTerms', () => {
 		const mark = container.querySelector('mark');
 
 		expect(mark).toBeInTheDocument();
-		expect(mark).toHaveStyle({ backgroundColor: '#ffeb3b' });
+		// Check inline style attribute directly (jsdom v28 compatibility)
+		expect(mark?.style.backgroundColor).toBe('rgb(255, 235, 59)');
 	});
 
 	it('should handle multiple occurrences of same term', () => {

@@ -21,15 +21,15 @@
  */
 
 import {
-	createContext,
-	type ReactNode,
-	useCallback,
-	useContext,
-	useEffect,
-	useId,
-	useMemo,
-	useRef,
-	useState,
+  createContext,
+  type ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
 
 interface PageMetadataProps {
@@ -133,7 +133,6 @@ export function PageMetadata({ title, description }: PageMetadataProps) {
 	const id = useId();
 
 	// Register this component's metadata (must be called unconditionally per React rules)
-	// biome-ignore lint/correctness/useExhaustiveDependencies: We want to register on every title/description change
 	useEffect(() => {
 		if (!context) return;
 		context.register(id, title, description);
