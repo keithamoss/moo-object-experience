@@ -1,6 +1,6 @@
 import { Box, Button, Container, Typography } from '@mui/material';
-import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
+import { PageMetadata } from './PageMetadata';
 
 export default function NotFoundPage() {
 	const navigate = useNavigate();
@@ -11,9 +11,7 @@ export default function NotFoundPage() {
 
 	return (
 		<Container maxWidth="md">
-			<Helmet>
-				<title>Page Not Found | Westralian People's Museum</title>
-			</Helmet>
+			<PageMetadata title="Page Not Found | Westralian People's Museum" />
 
 			<Box
 				sx={{

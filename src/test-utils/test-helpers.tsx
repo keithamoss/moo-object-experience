@@ -6,9 +6,9 @@
 import { configureStore } from '@reduxjs/toolkit';
 import { type RenderOptions, render } from '@testing-library/react';
 import type { PropsWithChildren, ReactElement } from 'react';
-import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
 import { MemoryRouter, type MemoryRouterProps } from 'react-router-dom';
+import { PageMetadataProvider } from '../components/PageMetadata';
 import { sheetsApi } from '../store/api';
 import searchReducer, { type SearchState } from '../store/searchSlice';
 import type { RootState } from '../store/store';
@@ -58,11 +58,11 @@ export function AllTheProviders({
 	routerProps?: MemoryRouterProps;
 }>) {
 	return (
-		<HelmetProvider>
-			<Provider store={store}>
+		<Provider store={store}>
+			<PageMetadataProvider>
 				<MemoryRouter {...routerProps}>{children}</MemoryRouter>
-			</Provider>
-		</HelmetProvider>
+			</PageMetadataProvider>
+		</Provider>
 	);
 }
 

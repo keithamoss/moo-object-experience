@@ -1,11 +1,11 @@
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { HelmetProvider } from 'react-helmet-async';
 import { Provider } from 'react-redux';
 import { createHashRouter, RouterProvider } from 'react-router-dom';
 import App from './App';
 import NotFoundPage from './components/NotFoundPage';
+import { PageMetadataProvider } from './components/PageMetadata';
 import HomePage from './features/home/HomePage';
 import ObjectDetailPage from './features/objects/ObjectDetailPage';
 import { store } from './store/store';
@@ -42,12 +42,12 @@ if (!rootElement) {
 ReactDOM.createRoot(rootElement).render(
 	<React.StrictMode>
 		<Provider store={store}>
-			<HelmetProvider>
+			<PageMetadataProvider>
 				<ThemeProvider theme={theme}>
 					<CssBaseline />
 					<RouterProvider router={router} />
 				</ThemeProvider>
-			</HelmetProvider>
+			</PageMetadataProvider>
 		</Provider>
 	</React.StrictMode>,
 );

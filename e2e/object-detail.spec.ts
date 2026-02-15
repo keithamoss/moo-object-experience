@@ -122,8 +122,8 @@ test.describe('Object Detail Page', () => {
 		const notFoundHeading = page.locator('h1:has-text("404")');
 		await expect(notFoundHeading).toBeVisible();
 
-		// Should show "Page Not Found" message
-		await expect(page.getByText(/page not found/i)).toBeVisible();
+		// Should show "Page Not Found" message in the heading
+		await expect(page.getByRole('heading', { name: /page not found/i })).toBeVisible();
 
 		// Should have a button to go back home
 		const homeButton = page.getByRole('button', { name: /go to home/i });

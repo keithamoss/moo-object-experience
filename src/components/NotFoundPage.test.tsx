@@ -33,10 +33,12 @@ describe('NotFoundPage', () => {
 		expect(homeButton).toBeInTheDocument();
 	});
 
-	it('should have proper page title in helmet', () => {
+	it('should have proper page title', () => {
 		renderWithProviders(<NotFoundPage />);
 
-		// Helmet updates document.title
-		expect(document.title).toBe("Page Not Found | Westralian People's Museum");
+		// PageMetadata renders title element which React 19 hoists to document head
+		const title = document.querySelector('title');
+		expect(title).toBeInTheDocument();
+		expect(title?.textContent).toBe("Page Not Found | Westralian People's Museum");
 	});
 });

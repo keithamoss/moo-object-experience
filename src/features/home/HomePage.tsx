@@ -1,24 +1,30 @@
 import { Alert, Box, Chip, Container, Paper, Typography } from '@mui/material';
-import { Helmet } from 'react-helmet-async';
 import LoadingIndicator from '../../components/LoadingIndicator';
+import { PageMetadata } from '../../components/PageMetadata';
 import { useData } from '../../hooks/useData';
+import { useAppSelector } from '../../store/hooks';
+import { selectSearchQuery } from '../../store/searchSlice';
 import { getErrorMessage } from '../../utils/errorUtils';
 import SearchContainer from './SearchContainer';
 
 export default function HomePage() {
 	const { metadata, objects, isLoading, error, isSuccess } = useData();
+	const searchQuery = useAppSelector(selectSearchQuery);
 
 	const isSearchDisabled = !isSuccess || !objects || objects.length === 0;
 
+	// Dynamic page title based on search state
+	const pageTitle = searchQuery.trim()
+		? `Search: ${searchQuery} - Museum Object Experience`
+		: 'Museum Object Experience';
+
 	return (
 		<Container maxWidth="md" sx={{ mt: 4 }}>
-			<Helmet>
-				<title>Westralian People's Museum Object Experience</title>
-				<meta
-					name="description"
-					content="Search and discover objects in the Westralian People's Museum of Objects of Interest and Reference Library"
-				/>
-			</Helmet>
+			{/* Page metadata - updates based on search query */}
+			<PageMetadata
+				title={pageTitle}
+				description="Search and discover objects in the Westralian People's Museum of Objects of Interest and Reference Library"
+			/>
 
 			<Box sx={{ textAlign: 'center', mb: 4 }}>
 				<Typography variant="h3" component="h1" gutterBottom>
@@ -32,10 +38,8 @@ export default function HomePage() {
 				</Typography>
 			</Box>
 
-			{/* Search UI */}
-			{isSuccess && metadata && objects && (
-				<SearchContainer metadata={metadata} objects={objects} disabled={isSearchDisabled} />
-			)}
+			{/* Search UI - Always render to maintain consistent page metadata */}
+			{metadata && objects && <SearchContainer metadata={metadata} objects={objects} disabled={isSearchDisabled} />}
 
 			{/* Loading State */}
 			{isLoading ? (

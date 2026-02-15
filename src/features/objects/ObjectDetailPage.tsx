@@ -1,12 +1,12 @@
 import BrokenImageIcon from '@mui/icons-material/BrokenImage';
 import { Box, Container, Divider, Grid, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Breadcrumbs from '../../components/Breadcrumbs';
 import InvalidObjectPage from '../../components/InvalidObjectPage';
 import NotFoundPage from '../../components/NotFoundPage';
 import ObjectDetailSkeleton from '../../components/ObjectDetailSkeleton';
+import { PageMetadata } from '../../components/PageMetadata';
 import { useMetadataFields, useObject } from '../../store';
 import { useAppSelector } from '../../store/hooks';
 import { selectSearchQuery } from '../../store/searchSlice';
@@ -103,9 +103,7 @@ export default function ObjectDetailPage() {
 
 	return (
 		<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-			<Helmet>
-				<title>{title} | Museum Object Experience</title>
-			</Helmet>
+			<PageMetadata title={`${title} | Museum Object Experience`} />
 
 			{/* Breadcrumb navigation */}
 			<Breadcrumbs items={breadcrumbItems} />

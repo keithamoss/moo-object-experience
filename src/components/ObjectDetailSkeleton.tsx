@@ -1,4 +1,5 @@
 import { Box, Container, Divider, Grid, Paper, Skeleton } from '@mui/material';
+import { PageMetadata } from './PageMetadata';
 
 /**
  * Loading skeleton for object detail page
@@ -7,6 +8,8 @@ import { Box, Container, Divider, Grid, Paper, Skeleton } from '@mui/material';
 export default function ObjectDetailSkeleton() {
 	return (
 		<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+			<PageMetadata title="Loading... | Museum Object Experience" description="Loading object details" />
+
 			{/* Breadcrumbs skeleton */}
 			<Box sx={{ mb: 2 }}>
 				<Skeleton variant="text" width={300} height={24} />
