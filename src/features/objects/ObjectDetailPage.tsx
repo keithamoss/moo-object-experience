@@ -121,7 +121,7 @@ export default function ObjectDetailPage() {
 			{/* Main Content: 2-column layout on desktop, stacked on mobile */}
 			<Grid container spacing={3}>
 				{/* Left Column: Description and Images */}
-				<Grid item xs={12} md={6}>
+				<Grid size={{ xs: 12, md: 6 }}>
 					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
 						{/* Description Section */}
 						{description && (
@@ -184,7 +184,7 @@ export default function ObjectDetailPage() {
 				</Grid>
 
 				{/* Right Column: Metadata Fields */}
-				<Grid item xs={12} md={6}>
+				<Grid size={{ xs: 12, md: 6 }}>
 					<Paper elevation={2} sx={{ p: 3 }}>
 						<Typography variant="h6" component="h2" gutterBottom>
 							Metadata

@@ -24,7 +24,7 @@ export default function ObjectDetailSkeleton() {
 			{/* Main Content: 2-column layout */}
 			<Grid container spacing={3}>
 				{/* Left Column skeleton */}
-				<Grid item xs={12} md={6}>
+				<Grid size={{ xs: 12, md: 6 }}>
 					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
 						{/* Description Section skeleton */}
 						<Paper elevation={2} sx={{ p: 3 }}>
@@ -44,7 +44,7 @@ export default function ObjectDetailSkeleton() {
 				</Grid>
 
 				{/* Right Column skeleton */}
-				<Grid item xs={12} md={6}>
+				<Grid size={{ xs: 12, md: 6 }}>
 					<Paper elevation={2} sx={{ p: 3 }}>
 						<Skeleton variant="text" width="30%" height={32} sx={{ mb: 1 }} />
 						<Divider sx={{ mb: 2 }} />

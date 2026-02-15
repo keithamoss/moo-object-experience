@@ -96,7 +96,8 @@ describe('ResultCard', () => {
 
 		const { container } = renderWithProviders(<ResultCard result={result} object={object} />);
 
-		const gridItem = container.querySelector('.MuiGrid-item');
+		// New Grid API uses .MuiGrid-root class
+		const gridItem = container.querySelector('.MuiGrid-root');
 		expect(gridItem).toBeInTheDocument();
 	});
 });

@@ -20,7 +20,17 @@
  *   />
  */
 
-import { createContext, type ReactNode, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from 'react';
+import {
+	createContext,
+	type ReactNode,
+	useCallback,
+	useContext,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+	useState,
+} from 'react';
 
 interface PageMetadataProps {
 	/** Page title - will be rendered as document title */
@@ -62,7 +72,7 @@ export function PageMetadataProvider({ children }: { children: ReactNode }) {
 			if (existing && existing.title === title && existing.description === description) {
 				return prev;
 			}
-			
+
 			const next = new Map(prev);
 			// Increment order to track this as the most recent update
 			next.set(id, { title, description, order: ++orderRef.current });
@@ -74,7 +84,7 @@ export function PageMetadataProvider({ children }: { children: ReactNode }) {
 		setRegistrations((prev) => {
 			// Optimization: skip if not registered
 			if (!prev.has(id)) return prev;
-			
+
 			const next = new Map(prev);
 			next.delete(id);
 			return next;
@@ -84,10 +94,10 @@ export function PageMetadataProvider({ children }: { children: ReactNode }) {
 	// Find the metadata entry with the highest order (most recently updated)
 	const activeMetadata = useMemo(() => {
 		if (registrations.size === 0) return null;
-		
+
 		// Find entry with maximum order value
 		return Array.from(registrations.values()).reduce((latest, current) =>
-			current.order > latest.order ? current : latest
+			current.order > latest.order ? current : latest,
 		);
 	}, [registrations]);
 
@@ -136,10 +146,10 @@ export function PageMetadata({ title, description }: PageMetadataProps) {
 		if (import.meta.env.DEV) {
 			console.error(
 				'PageMetadata: Provider missing! This will cause duplicate title elements. ' +
-				'Wrap your app with <PageMetadataProvider>.'
+					'Wrap your app with <PageMetadataProvider>.',
 			);
 		}
-		
+
 		// Fail safe: Don't render in production to avoid duplicate titles
 		// Better to have no dynamic title than multiple title elements
 		return null;

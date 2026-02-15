@@ -74,9 +74,7 @@ describe('PageMetadata', () => {
 
 			// Should log error if in development
 			if (import.meta.env.DEV) {
-				expect(consoleError).toHaveBeenCalledWith(
-					expect.stringContaining('PageMetadata: Provider missing')
-				);
+				expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('PageMetadata: Provider missing'));
 			}
 
 			consoleError.mockRestore();
@@ -555,7 +553,7 @@ describe('PageMetadata', () => {
 		it('CRITICAL: earlier component update should become active (Map order bug)', async () => {
 			// This test demonstrates the Map.set() order behavior bug
 			// When component A mounts, then B mounts, then A updates -> B stays active (WRONG!)
-			
+
 			let component1RenderCount = 0;
 			let component2RenderCount = 0;
 
@@ -614,7 +612,7 @@ describe('PageMetadata', () => {
 					console.log('Current title after Component 1 update:', currentTitle);
 					console.log('Component 1 render count:', component1RenderCount);
 					console.log('Component 2 render count:', component2RenderCount);
-					
+
 					// This SHOULD pass but likely WON'T with current implementation
 					expect(currentTitle).toBe('Component 1 UPDATED');
 				},
@@ -722,9 +720,7 @@ describe('PageMetadata', () => {
 
 			// Should log error in development mode
 			if (import.meta.env.DEV) {
-				expect(consoleError).toHaveBeenCalledWith(
-					expect.stringContaining('PageMetadata: Provider missing')
-				);
+				expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('PageMetadata: Provider missing'));
 			}
 
 			consoleError.mockRestore();
