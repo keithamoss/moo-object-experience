@@ -7,15 +7,15 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import {
-	Autocomplete,
-	Badge,
-	Box,
-	Collapse,
-	IconButton,
-	InputAdornment,
-	Paper,
-	TextField,
-	Typography,
+  Autocomplete,
+  Badge,
+  Box,
+  Collapse,
+  IconButton,
+  InputAdornment,
+  Paper,
+  TextField,
+  Typography,
 } from '@mui/material';
 import { useMemo, useRef, useState } from 'react';
 import KeyboardKey from '../../components/KeyboardKey';
@@ -130,6 +130,11 @@ export default function SearchBar({
 
 			// Mark that we're committing (prevents double-commit if Enter was pressed)
 			justCommittedRef.current = true;
+
+			// Blur input to dismiss keyboard on mobile
+			if (inputRef.current) {
+				inputRef.current.blur();
+			}
 
 			// Commit the search with the updated query
 			if (onCommitWithQuery) {

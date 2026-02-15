@@ -1,6 +1,6 @@
 import BrokenImageIcon from '@mui/icons-material/BrokenImage';
 import { Box, Container, Divider, Grid, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Breadcrumbs from '../../components/Breadcrumbs';
@@ -24,6 +24,12 @@ export default function ObjectDetailPage() {
 
 	// Decode the ID from the URL (in case it was URL-encoded)
 	const decodedId = id ? decodeURIComponent(id) : '';
+
+	// Scroll to top when navigating to a new object
+	// biome-ignore lint/correctness/useExhaustiveDependencies: We intentionally trigger this effect when decodedId changes to scroll to top on navigation
+	useEffect(() => {
+		window.scrollTo(0, 0);
+	}, [decodedId]);
 
 	// Fetch metadata first (required for objects query)
 	const { fields: metadata, isLoading: isLoadingMetadata, isFetching: isFetchingMetadata } = useMetadataFields();
