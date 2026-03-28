@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { OBJECT_FIELDS, toFieldKey } from '../constants/objectFields';
+import { OBJECT_FIELDS } from '../constants/objectFields';
 import type { ObjectData } from '../types/metadata';
 import { SearchService } from './search';
 
@@ -15,21 +15,21 @@ describe('SearchService', () => {
 				[OBJECT_FIELDS.TITLE]: 'Aboriginal Stone Axe',
 				[OBJECT_FIELDS.DESCRIPTION]: 'Ancient stone cutting tool',
 				[OBJECT_FIELDS.CREATOR]: 'Aboriginal peoples',
-				[toFieldKey('dcterms:date')]: '1800',
+				[OBJECT_FIELDS.DATE_ACCEPTED]: '1800',
 			},
 			{
 				[OBJECT_FIELDS.IDENTIFIER]: 'OBJ-002',
 				[OBJECT_FIELDS.TITLE]: 'Metal Tool Collection',
 				[OBJECT_FIELDS.DESCRIPTION]: 'Collection of metal implements',
 				[OBJECT_FIELDS.CREATOR]: 'Various craftsmen',
-				[toFieldKey('dcterms:date')]: '1900-1950',
+				[OBJECT_FIELDS.DATE_ACCEPTED]: '1900-1950',
 			},
 			{
 				[OBJECT_FIELDS.IDENTIFIER]: 'OBJ-003',
 				[OBJECT_FIELDS.TITLE]: 'Wooden Spear',
 				[OBJECT_FIELDS.DESCRIPTION]: 'Traditional hunting weapon',
 				[OBJECT_FIELDS.CREATOR]: 'Aboriginal peoples',
-				[toFieldKey('dcterms:date')]: '1750',
+				[OBJECT_FIELDS.DATE_ACCEPTED]: '1750',
 			},
 		];
 	});

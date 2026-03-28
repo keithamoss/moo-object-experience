@@ -9,6 +9,7 @@ import type { PropsWithChildren, ReactElement } from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, type MemoryRouterProps } from 'react-router-dom';
 import { PageMetadataProvider } from '../components/PageMetadata';
+import { OBJECT_FIELDS } from '../constants/objectFields';
 import { sheetsApi } from '../store/api';
 import searchReducer, { type SearchState } from '../store/searchSlice';
 import type { RootState } from '../store/store';
@@ -111,11 +112,11 @@ export function createMockSearchState(overrides: Partial<SearchState> = {}): Sea
  */
 export function createMockObjectData(overrides = {}) {
 	return {
-		'dcterms:identifier.moooi': 'TEST-001',
-		'dcterms:title': 'Test Object',
-		'dcterms:description': 'Test Description',
-		'dcterms:creator': 'Test Creator',
-		'dcterms:date': '2024-01-01',
+		[OBJECT_FIELDS.IDENTIFIER]: 'TEST-001',
+		[OBJECT_FIELDS.TITLE]: 'Test Object',
+		[OBJECT_FIELDS.DESCRIPTION]: 'Test Description',
+		[OBJECT_FIELDS.CREATOR]: 'Test Creator',
+		[OBJECT_FIELDS.DATE_ACCEPTED]: '2024-01-01',
 		...overrides,
 	};
 }
@@ -140,3 +141,4 @@ export const waitForAsync = () => new Promise((resolve) => setTimeout(resolve, 0
 // Re-export everything from testing library
 export * from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
+

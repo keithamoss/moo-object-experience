@@ -116,13 +116,29 @@ export function parseMetadataSchema(rows: string[][]): MetadataSchema {
 			example: row[columnIndices.example] || '',
 		}));
 
+	// §1 — Validate that all critical application fields are present in the schema
+	// All field names present in the parsed schema
+	const allFieldNames = new Set(schema.map((f) => f.field));
+
+	// Every OBJECT_FIELDS value must be present
+	const criticalFields = Object.values(OBJECT_FIELDS);
+	const missingCritical = criticalFields.filter((f) => !allFieldNames.has(f));
+
+	if (missingCritical.length > 0) {
+		throw new Error(
+			`Mappings sheet is missing critical application fields: ${missingCritical.join(', ')}. ` +
+				'These fields are used in application logic (see OBJECT_FIELDS in objectFields.ts). ' +
+				'If a field was intentionally renamed, update OBJECT_FIELDS to match.',
+		);
+	}
+
 	return schema;
 }
 
 /**
  * Parse the Museum (objects) worksheet into structured object data
  */
-export function parseObjectsData(rows: string[][], _schema: MetadataSchema): ObjectData[] {
+export function parseObjectsData(rows: string[][], schema: MetadataSchema): ObjectData[] {
 	if (rows.length < 2) {
 		throw new Error('Museum sheet must have at least a header row and one data row');
 	}
@@ -133,8 +149,46 @@ export function parseObjectsData(rows: string[][], _schema: MetadataSchema): Obj
 	// (SHEETSAPI_IMPROVEMENTS.md) will guard these before this point is reached.
 	const fieldNames = rows[0].map(toFieldKey);
 
-	// Find the index of the identifier field
+	// §3 — Find the index of the identifier field
 	const identifierIndex = fieldNames.indexOf(OBJECT_FIELDS.IDENTIFIER);
+
+	if (identifierIndex === -1) {
+		throw new Error(
+			`Museum sheet header row is missing required field "${OBJECT_FIELDS.IDENTIFIER}". ` +
+				'This field must be present as a column header. Check that the Museum sheet uses the same field names as the Mappings sheet.',
+		);
+	}
+
+	// Compute both field sets once — used by both §4 and §5 below.
+	const museumFieldSet = new Set(fieldNames);
+	const schemaFieldSet = new Set(schema.map((f) => f.field));
+
+	// §4 — Validate that every OBJECT_FIELDS entry that is present in the Mappings schema is
+	// also present as a Museum column. Non-critical Mappings fields (e.g. dwc.higherGeography)
+	// may legitimately be absent from the Museum sheet and do not trigger this check.
+	// Note: §1 in parseMetadataSchema guarantees all OBJECT_FIELDS are in the schema in
+	// production; the intersection here keeps tests that use minimal schemas working correctly.
+	const criticalFieldsInSchema = Object.values(OBJECT_FIELDS).filter((f) => schemaFieldSet.has(f));
+	const missingCriticalInMuseum = criticalFieldsInSchema.filter((f) => !museumFieldSet.has(f));
+
+	if (missingCriticalInMuseum.length > 0) {
+		throw new Error(
+			`Museum sheet is missing critical columns: ${missingCriticalInMuseum.join(', ')}. ` +
+				'These fields are required by the application. Check that the Museum sheet uses the same field names as the Mappings sheet.',
+		);
+	}
+
+	// §5 — Validate that every Museum column is described in Mappings.
+	// An undocumented column would be imported into the store but never displayed
+	// (the detail page iterates schema fields, not object keys). Fail loudly instead.
+	const undocumentedInMuseum = [...museumFieldSet].filter((f) => !schemaFieldSet.has(f));
+
+	if (undocumentedInMuseum.length > 0) {
+		throw new Error(
+			`Museum sheet has columns not described in Mappings: ${undocumentedInMuseum.join(', ')}. ` +
+				'Either add those fields to the Mappings sheet, or remove those columns from the Museum sheet.',
+		);
+	}
 
 	// Parse data rows (skip header)
 	const objects: ObjectData[] = rows
@@ -168,6 +222,26 @@ export function parseObjectsData(rows: string[][], _schema: MetadataSchema): Obj
 
 			return obj;
 		});
+
+	// §2 — Check for duplicate identifiers
+	const seen = new Set<string>();
+	const duplicates: string[] = [];
+
+	for (const obj of objects) {
+		const id = obj[OBJECT_FIELDS.IDENTIFIER] as string;
+		if (seen.has(id)) {
+			duplicates.push(id);
+		} else {
+			seen.add(id);
+		}
+	}
+
+	if (duplicates.length > 0) {
+		throw new Error(
+			`Museum sheet contains duplicate object identifiers: ${duplicates.join(', ')}. ` +
+				'Each object must have a unique identifier. Fix the source data and reload.',
+		);
+	}
 
 	return objects;
 }

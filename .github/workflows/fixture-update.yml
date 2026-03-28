@@ -1,0 +1,64 @@
+name: Nightly Fixture Update
+
+on:
+  schedule:
+    - cron: '0 2 * * *' # 2am UTC every night
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  fixture-update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update fixtures from live Google Sheet
+        run: npm run fixtures:update
+
+      - name: Check for fixture changes
+        id: diff
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No fixture changes detected."
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Fixture changes detected — opening PR."
+            git diff --stat
+          fi
+
+      - name: Open PR if fixtures changed
+        if: steps.diff.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update fixtures from live Google Sheet'
+          branch: chore/fixture-snapshot-update
+          delete-branch: true
+          title: '🔄 Schema drift detected — fixture update required'
+          assignees: ${{ github.repository_owner }}
+          labels: schema-drift
+          body: |
+            The nightly fixture update job detected changes in the live Google Sheet.
+
+            **Review the diff carefully before merging:**
+            - Check `e2e/fixtures/mappings.snapshot.ts` for field additions, removals, or renames
+            - Update `src/test-utils/fixtureSchema.test.ts` → `expectedSchema` to match
+            - If a renamed field was used in `OBJECT_FIELDS`, update `src/constants/objectFields.ts`
+            - Update pre-baked objects in `e2e/fixtures/factory.ts` if field names changed
+
+            > ⚠️ The unit tests on this PR will fail intentionally until `expectedSchema` is updated —
+            > that is by design (see the contract test comment in `fixtureSchema.test.ts`).

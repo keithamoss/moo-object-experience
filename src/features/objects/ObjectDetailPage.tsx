@@ -1,5 +1,5 @@
 import BrokenImageIcon from '@mui/icons-material/BrokenImage';
-import { Box, Container, Divider, Grid, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
+import { Alert, AlertTitle, Box, Container, Divider, Grid, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Breadcrumbs from '../../components/Breadcrumbs';
@@ -10,6 +10,7 @@ import { PageMetadata } from '../../components/PageMetadata';
 import { useMetadataFields, useObject } from '../../store';
 import { useAppSelector } from '../../store/hooks';
 import { selectSearchQuery } from '../../store/searchSlice';
+import { getErrorMessage } from '../../utils/errorUtils';
 import { buildSearchURL } from '../../utils/urlUtils';
 import { FieldValue } from './FieldValue';
 import { extractObjectDisplayData } from './useObjectDisplay';
@@ -32,7 +33,13 @@ export default function ObjectDetailPage() {
 	}, [decodedId]);
 
 	// Fetch metadata first (required for objects query)
-	const { fields: metadata, isLoading: isLoadingMetadata, isFetching: isFetchingMetadata } = useMetadataFields();
+	const {
+		fields: metadata,
+		isLoading: isLoadingMetadata,
+		isFetching: isFetchingMetadata,
+		isError: isErrorMetadata,
+		error: metadataError,
+	} = useMetadataFields();
 
 	// Only fetch object if we have valid ID and metadata is loaded
 	const hasMetadata = metadata && metadata.length > 0;
@@ -44,6 +51,8 @@ export default function ObjectDetailPage() {
 		isLoading: isLoadingObject,
 		isFetching: isFetchingObject,
 		isSuccess: isSuccessObject,
+		isError: isErrorObject,
+		error: objectError,
 	} = useObject(decodedId, shouldFetchObject ? metadata : []);
 
 	// Extract display data (must be called before conditional returns)
@@ -68,6 +77,19 @@ export default function ObjectDetailPage() {
 	// Show loading skeleton while data is being fetched
 	if (isLoading) {
 		return <ObjectDetailSkeleton />;
+	}
+
+	// Show error if data fetching failed (e.g. schema drift detected by §4/§5 checks)
+	const dataError = isErrorMetadata ? metadataError : isErrorObject ? objectError : null;
+	if (dataError) {
+		return (
+			<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+				<Alert severity="error">
+					<AlertTitle>Error loading object</AlertTitle>
+					<Typography variant="body2">{getErrorMessage(dataError)}</Typography>
+				</Alert>
+			</Container>
+		);
 	}
 
 	// Only show 404 if the query has completed successfully but returned no object
