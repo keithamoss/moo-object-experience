@@ -51,7 +51,7 @@ export const mockSchemaDriftMuseumResponse: SheetsApiResponse = {
 	range: 'Museum!A1:AV2',
 	majorDimension: 'ROWS',
 	values: [
-		[...schemaFieldOrder, 'dwc:higherGeography', 'dwc:higherGeographyID'],
+		[...schemaFieldOrder, 'test:undocumentedFieldA', 'test:undocumentedFieldB'],
 		[...createObject({ 'dcterms:identifier.moooi': 'DRIFT.001', 'dcterms:title': 'Drift Test Object' }), '', ''],
 	],
 };

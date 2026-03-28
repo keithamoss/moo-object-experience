@@ -93,6 +93,10 @@ test.describe('PageMetadata - Document Title', () => {
 
 		for (const query of searches) {
 			await searchBox.fill(query);
+			// Wait for the controlled MUI input to reflect the filled value before
+			// pressing Enter — React's batched state updates can otherwise leave a
+			// stale closure in onCommit that submits the previous query instead.
+			await expect(searchBox).toHaveValue(query);
 			await searchBox.press('Enter');
 			// Don't wait for each to fully complete - test rapid transitions
 			await page.waitForTimeout(100);
