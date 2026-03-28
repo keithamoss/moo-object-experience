@@ -57,14 +57,14 @@ export function parseMetadataSchema(rows: string[][]): MetadataSchema {
 
 	// Required headers with flexible matching patterns
 	const requiredHeaders = [
-		{ key: 'field', patterns: ['field'] },
-		{ key: 'namespace', patterns: ['namespace'] },
-		{ key: 'label', patterns: ['label'] },
-		{ key: 'applicableCollections', patterns: ['applicable collections'] },
-		{ key: 'required', patterns: ['required'] },
-		{ key: 'purpose', patterns: ['purpose'] },
-		{ key: 'fieldTypeAndControls', patterns: ['field type'] },
-		{ key: 'example', patterns: ['example'] },
+		{ key: 'field', pattern: 'field' },
+		{ key: 'namespace', pattern: 'namespace' },
+		{ key: 'label', pattern: 'label' },
+		{ key: 'applicableCollections', pattern: 'applicable collections' },
+		{ key: 'required', pattern: 'required' },
+		{ key: 'purpose', pattern: 'purpose' },
+		{ key: 'fieldTypeAndControls', pattern: 'field type' },
+		{ key: 'example', pattern: 'example' },
 	];
 
 	// Find column indices for each required header
@@ -73,20 +73,12 @@ export function parseMetadataSchema(rows: string[][]): MetadataSchema {
 	const columnIndices: Record<string, number> = {};
 	const missingHeaders: string[] = [];
 
-	for (const { key, patterns } of requiredHeaders) {
-		let found = false;
-		// Try each pattern variation until we find a match
-		for (const pattern of patterns) {
-			// Look for headers that contain the pattern (partial match)
-			const matchingHeader = Array.from(headerMap.entries()).find(([header]) => header.includes(pattern));
-			if (matchingHeader) {
-				columnIndices[key] = matchingHeader[1]; // Store the column index
-				found = true;
-				break; // Stop searching once we find a match
-			}
-		}
-		if (!found) {
-			missingHeaders.push(patterns[0]); // Track first pattern name for error reporting
+	for (const { key, pattern } of requiredHeaders) {
+		const matchingHeader = Array.from(headerMap.entries()).find(([header]) => header.includes(pattern));
+		if (matchingHeader) {
+			columnIndices[key] = matchingHeader[1];
+		} else {
+			missingHeaders.push(pattern);
 		}
 	}
 
@@ -101,11 +93,9 @@ export function parseMetadataSchema(rows: string[][]): MetadataSchema {
 	// Parse data rows using the column mapping
 	// This approach makes the code resilient to column reordering in the sheet
 	const schema: MetadataSchema = rows
-		.slice(1) // Skip header row
-		.filter((row) => row[columnIndices.field] && row[columnIndices.field].trim() !== '') // Filter out empty rows (rows without a field name)
+		.slice(1)
+		.filter((row) => row[columnIndices.field] && row[columnIndices.field].trim() !== '')
 		.map((row) => ({
-			// Use columnIndices lookup for each field, defaulting to empty string if missing
-			// This handles sparse data gracefully (missing cells show as empty string)
 			field: toFieldKey(row[columnIndices.field] || ''),
 			namespace: row[columnIndices.namespace] || '',
 			label: row[columnIndices.label] || '',
@@ -192,10 +182,8 @@ export function parseObjectsData(rows: string[][], schema: MetadataSchema): Obje
 
 	// Parse data rows (skip header)
 	const objects: ObjectData[] = rows
-		.slice(1) // Skip header row
+		.slice(1)
 		.filter((row) => {
-			// Only include rows that have a non-empty identifier (required field)
-			// This filters out template rows, divider rows, or incomplete entries
 			const identifier = row[identifierIndex];
 			if (!identifier || identifier.trim() === '') {
 				return false;
@@ -206,11 +194,9 @@ export function parseObjectsData(rows: string[][], schema: MetadataSchema): Obje
 			// Build object dynamically from row data
 			const obj: ObjectData = {};
 
-			// Map each column to its field name from the header
 			fieldNames.forEach((fieldName, index) => {
-				// Skip columns with empty/missing headers (shouldn't happen but be defensive)
 				if (fieldName && fieldName.trim() !== '') {
-					obj[fieldName] = row[index] || ''; // Store cell value, or empty string if cell is missing
+					obj[fieldName] = row[index] || '';
 				}
 			});
 

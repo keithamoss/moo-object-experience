@@ -40,7 +40,7 @@ export function useMetadataField(fieldName: string) {
  */
 export function useObjects(metadata?: MetadataField[]) {
 	return useGetObjectsQuery(metadata ?? [], {
-		skip: !metadata,
+		skip: !metadata || metadata.length === 0,
 		selectFromResult: ({ data, ...rest }) => ({
 			objects: data ? objectsSelectors.selectAll(data) : [],
 			...rest,
@@ -53,7 +53,7 @@ export function useObjects(metadata?: MetadataField[]) {
  */
 export function useObject(objectId: string, metadata?: MetadataField[]) {
 	return useGetObjectsQuery(metadata ?? [], {
-		skip: !metadata,
+		skip: !metadata || metadata.length === 0,
 		selectFromResult: ({ data, ...rest }) => ({
 			object: data ? objectsSelectors.selectById(data, objectId) : undefined,
 			...rest,
@@ -66,7 +66,7 @@ export function useObject(objectId: string, metadata?: MetadataField[]) {
  */
 export function useObjectCount(metadata?: MetadataField[]) {
 	return useGetObjectsQuery(metadata ?? [], {
-		skip: !metadata,
+		skip: !metadata || metadata.length === 0,
 		selectFromResult: ({ data, ...rest }) => ({
 			count: data ? objectsSelectors.selectTotal(data) : 0,
 			...rest,
@@ -79,7 +79,7 @@ export function useObjectCount(metadata?: MetadataField[]) {
  */
 export function useObjectsSample(count: number = 5, metadata?: MetadataField[]) {
 	return useGetObjectsQuery(metadata ?? [], {
-		skip: !metadata,
+		skip: !metadata || metadata.length === 0,
 		selectFromResult: ({ data, ...rest }) => ({
 			sample: data ? objectsSelectors.selectAll(data).slice(0, count) : [],
 			...rest,
@@ -92,7 +92,7 @@ export function useObjectsSample(count: number = 5, metadata?: MetadataField[]) 
  */
 export function useFilteredObjects(predicate: (object: ObjectData) => boolean, metadata?: MetadataField[]) {
 	return useGetObjectsQuery(metadata ?? [], {
-		skip: !metadata,
+		skip: !metadata || metadata.length === 0,
 		selectFromResult: ({ data, ...rest }) => ({
 			objects: data ? objectsSelectors.selectAll(data).filter(predicate) : [],
 			...rest,

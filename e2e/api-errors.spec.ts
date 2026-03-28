@@ -141,4 +141,20 @@ test.describe('Schema drift detection', () => {
 		const errorText = await errorAlert.textContent();
 		expect(errorText).toMatch(/not described in Mappings/i);
 	});
+
+	test('should show metadata error on object detail page without staying on loading skeleton', async ({ page }) => {
+		// Force Mappings failure. The page should render error promptly and
+		// must not remain stuck behind the loading skeleton.
+		await mockApiError(page, 'rate-limit');
+
+		await page.goto('/#/object/2021.0001');
+
+		const errorAlert = page.locator('[role="alert"]');
+		await expect(errorAlert).toBeVisible({ timeout: 10000 });
+
+		await expect(page).not.toHaveTitle(/Loading\.\.\./i);
+
+		const errorText = await errorAlert.textContent();
+		expect(errorText).toMatch(/failed to fetch mappings|429|error/i);
+	});
 });

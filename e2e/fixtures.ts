@@ -4,10 +4,10 @@
  */
 
 import { test as base, type Page } from '@playwright/test';
+import { SHEETS_CONFIG } from '../src/config/sheets';
 import { mockMappingsResponse, mockMuseumResponse } from './fixtures/sheetsData';
 
-const SHEETS_BASE_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
-const SHEET_ID = '1jarQ6R_kCPABkjqX6bM1OD5xsl0TCpMEwlc29ItqSp8';
+const { baseUrl: SHEETS_BASE_URL, sheetId: SHEET_ID } = SHEETS_CONFIG;
 
 /**
  * Setup API mocking for a page

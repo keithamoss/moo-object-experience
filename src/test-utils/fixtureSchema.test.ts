@@ -75,6 +75,8 @@ describe('Mappings snapshot schema contract', () => {
 	});
 
 	it('includes all OBJECT_FIELDS constants (update objectFields.ts if a field was renamed)', () => {
+		// Contract-layer check for committed fixtures in CI. The corresponding §5 guard
+		// in parseObjectsData catches the same drift at runtime; both are intentional.
 		for (const [key, field] of Object.entries(OBJECT_FIELDS)) {
 			expect(schemaFieldOrder, `OBJECT_FIELDS.${key} ("${field}") missing from schema`).toContain(field);
 		}

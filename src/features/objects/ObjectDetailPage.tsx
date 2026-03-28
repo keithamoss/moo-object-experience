@@ -53,7 +53,7 @@ export default function ObjectDetailPage() {
 		isSuccess: isSuccessObject,
 		isError: isErrorObject,
 		error: objectError,
-	} = useObject(decodedId, shouldFetchObject ? metadata : []);
+	} = useObject(decodedId, shouldFetchObject ? metadata : undefined);
 
 	// Extract display data (must be called before conditional returns)
 	const { title, identifier, description, identifierLabel, descriptionLabel, imageUrls, fieldsToDisplay } =
@@ -74,12 +74,8 @@ export default function ObjectDetailPage() {
 		return <NotFoundPage />;
 	}
 
-	// Show loading skeleton while data is being fetched
-	if (isLoading) {
-		return <ObjectDetailSkeleton />;
-	}
-
-	// Show error if data fetching failed (e.g. schema drift detected by §4/§5 checks)
+	// Show error before the loading guard so a known failure (e.g. schema drift)
+	// surfaces immediately rather than waiting behind a skeleton.
 	const dataError = isErrorMetadata ? metadataError : isErrorObject ? objectError : null;
 	if (dataError) {
 		return (
@@ -90,6 +86,11 @@ export default function ObjectDetailPage() {
 				</Alert>
 			</Container>
 		);
+	}
+
+	// Show loading skeleton while data is being fetched
+	if (isLoading) {
+		return <ObjectDetailSkeleton />;
 	}
 
 	// Only show 404 if the query has completed successfully but returned no object

@@ -4,6 +4,7 @@
  */
 
 import { HttpResponse, http } from 'msw';
+import { SHEETS_CONFIG } from '../../src/config/sheets';
 import {
 	mockEmptyMuseumResponse,
 	mockMalformedMappingsResponse,
@@ -12,8 +13,7 @@ import {
 } from '../fixtures/sheetsData';
 
 // Google Sheets API configuration
-const SHEETS_BASE_URL = 'https://sheets.googleapis.com/v4/spreadsheets';
-const SHEET_ID = '1jarQ6R_kCPABkjqX6bM1OD5xsl0TCpMEwlc29ItqSp8';
+const { baseUrl: SHEETS_BASE_URL, sheetId: SHEET_ID } = SHEETS_CONFIG;
 
 /**
  * Default handlers - happy path with successful responses

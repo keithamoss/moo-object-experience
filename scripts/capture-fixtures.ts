@@ -25,6 +25,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const OUTPUT_PATH = resolve(__dirname, '../e2e/fixtures/mappings.snapshot.ts');
 const MUSEUM_OUTPUT_PATH = resolve(__dirname, '../e2e/fixtures/museum.snapshot.ts');
+const isDirectExecution = import.meta.url === `file://${process.argv[1]}`;
 
 // ---------------------------------------------------------------------------
 // Types (mirror SheetsApiResponse to avoid pulling in the whole src tree)
@@ -34,6 +35,17 @@ interface SheetsApiResponse {
 	range: string;
 	majorDimension: string;
 	values: string[][];
+}
+
+interface MappingsCaptureResult {
+	data: SheetsApiResponse;
+	schemaFieldOrder: string[];
+	timestamp: string;
+}
+
+interface MuseumCaptureResult {
+	museumFields: string[];
+	undocumented: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -72,13 +84,26 @@ async function fetchWorksheet(url: string): Promise<SheetsApiResponse> {
 	return (await response.json()) as SheetsApiResponse;
 }
 
-async function main(): Promise<void> {
-	const { apiKey, sheetId, baseUrl, worksheets } = SHEETS_CONFIG;
+/**
+ * Returns OBJECT_FIELDS constants missing from the captured schema.
+ */
+export function findMissingObjectFields(schemaFieldOrder: string[]): string[] {
+	const knownFields = Object.values(OBJECT_FIELDS);
+	return knownFields.filter((f) => !schemaFieldOrder.includes(f));
+}
 
-	// -------------------------------------------------------------------------
-	// Step A — Fetch Mappings worksheet
-	// -------------------------------------------------------------------------
+/**
+ * Returns Museum columns that are not described in Mappings.
+ */
+export function findUndocumentedMuseumFields(museumFields: string[], schemaFieldOrder: string[]): string[] {
+	const mappingsFieldSet = new Set(schemaFieldOrder);
+	return museumFields.filter((f) => !mappingsFieldSet.has(f));
+}
+
+async function fetchMappingsSnapshot(): Promise<MappingsCaptureResult> {
+	const { apiKey, sheetId, baseUrl, worksheets } = SHEETS_CONFIG;
 	const mappingsUrl = `${baseUrl}/${sheetId}/values/${worksheets.metadata}?key=${apiKey}`;
+
 	console.log(`Fetching ${worksheets.metadata} worksheet from Google Sheets…`);
 	const data = await fetchWorksheet(mappingsUrl);
 
@@ -98,31 +123,34 @@ async function main(): Promise<void> {
 		console.log(`  • ${field}`);
 	}
 
-	// Validate: confirm all OBJECT_FIELDS constants appear in the captured schema
-	const knownFields = Object.values(OBJECT_FIELDS);
-	const missing = knownFields.filter((f) => !schemaFieldOrder.includes(f));
-
+	const missing = findMissingObjectFields(schemaFieldOrder);
 	if (missing.length > 0) {
-		console.warn('\nWarning: the following OBJECT_FIELDS constants were NOT found in the captured schema:');
+		console.error('\nError: the following OBJECT_FIELDS constants were NOT found in the captured schema:');
 		for (const f of missing) {
-			console.warn(`  ✗ ${f}`);
+			console.error(`  ✗ ${f}`);
 		}
-		console.warn('Update src/constants/objectFields.ts to match the real schema if field names have changed.');
-	} else {
-		console.log('\nAll OBJECT_FIELDS constants confirmed present in captured schema. ✓');
+		console.error(
+			'Update src/constants/objectFields.ts to match the real schema if field names have changed. ' +
+				'Aborting fixture update to avoid committing an invalid snapshot.',
+		);
+		process.exit(1);
 	}
 
-	// Write Mappings snapshot
+	console.log('\nAll OBJECT_FIELDS constants confirmed present in captured schema. ✓');
+
 	const timestamp = new Date().toISOString();
 	const content = generateSnapshotFile(data, timestamp);
 	writeFileSync(OUTPUT_PATH, content, 'utf-8');
 	console.log(`\nMappings snapshot written to e2e/fixtures/mappings.snapshot.ts`);
 	console.log(`Captured at: ${timestamp}`);
 
-	// -------------------------------------------------------------------------
-	// Step B — Fetch Museum header row only (no object data leaves the sheet)
-	// -------------------------------------------------------------------------
+	return { data, schemaFieldOrder, timestamp };
+}
+
+async function fetchMuseumSnapshot(schemaFieldOrder: string[], timestamp: string): Promise<MuseumCaptureResult> {
+	const { apiKey, sheetId, baseUrl, worksheets } = SHEETS_CONFIG;
 	const museumHeaderUrl = `${baseUrl}/${sheetId}/values/${encodeURIComponent(`${worksheets.objects}!1:1`)}?key=${apiKey}`;
+
 	console.log(`\nFetching ${worksheets.objects} header row from Google Sheets…`);
 	const museumData = await fetchWorksheet(museumHeaderUrl);
 
@@ -130,40 +158,41 @@ async function main(): Promise<void> {
 		museumData.values && museumData.values.length > 0 ? museumData.values[0].filter((f) => f.trim() !== '') : [];
 
 	if (museumFields.length === 0) {
-		console.warn('Warning: Museum header row returned no fields — snapshot not updated.');
-	} else {
-		console.log(`\nCaptured ${museumFields.length} Museum columns:`);
-		for (const field of museumFields) {
-			console.log(`  • ${field}`);
-		}
-
-		// -----------------------------------------------------------------------
-		// §5 cross-sheet check — warn if Museum has columns not in Mappings
-		// (same pattern as the app's parseObjectsData §5 check)
-		// We write the snapshot regardless and let PR + red CI checks surface it.
-		// -----------------------------------------------------------------------
-		const mappingsFieldSet = new Set(schemaFieldOrder);
-		const undocumented = museumFields.filter((f) => !mappingsFieldSet.has(f));
-
-		if (undocumented.length > 0) {
-			console.warn('\n⚠️  Warning: Museum has columns not described in Mappings:');
-			for (const f of undocumented) {
-				console.warn(`  ✗ ${f}`);
-			}
-			console.warn(
-				'The app will throw a §5 error in production until this is resolved.\n' +
-					'Either add these fields to the Mappings sheet, or remove them from Museum.\n' +
-					'The snapshot has been written — red CI checks on the PR will flag this.',
-			);
-		} else {
-			console.log('\nAll Museum columns are described in Mappings. ✓');
-		}
-
-		// Write Museum snapshot
-		const museumContent = generateMuseumSnapshotFile(museumFields, timestamp);
-		writeFileSync(MUSEUM_OUTPUT_PATH, museumContent, 'utf-8');
-		console.log(`\nMuseum snapshot written to e2e/fixtures/museum.snapshot.ts`);
+		console.error('Error: Museum header row returned no fields. Aborting fixture update.');
+		process.exit(1);
 	}
+
+	console.log(`\nCaptured ${museumFields.length} Museum columns:`);
+	for (const field of museumFields) {
+		console.log(`  • ${field}`);
+	}
+
+	const undocumented = findUndocumentedMuseumFields(museumFields, schemaFieldOrder);
+
+	if (undocumented.length > 0) {
+		console.warn('\n⚠️  Warning: Museum has columns not described in Mappings:');
+		for (const f of undocumented) {
+			console.warn(`  ✗ ${f}`);
+		}
+		console.warn(
+			'The app will throw a §5 error in production until this is resolved.\n' +
+				'Either add these fields to the Mappings sheet, or remove them from Museum.\n' +
+				'The snapshot has been written — red CI checks on the PR will flag this.',
+		);
+	} else {
+		console.log('\nAll Museum columns are described in Mappings. ✓');
+	}
+
+	const museumContent = generateMuseumSnapshotFile(museumFields, timestamp);
+	writeFileSync(MUSEUM_OUTPUT_PATH, museumContent, 'utf-8');
+	console.log(`\nMuseum snapshot written to e2e/fixtures/museum.snapshot.ts`);
+
+	return { museumFields, undocumented };
+}
+
+async function main(): Promise<void> {
+	const { schemaFieldOrder, timestamp } = await fetchMappingsSnapshot();
+	await fetchMuseumSnapshot(schemaFieldOrder, timestamp);
 }
 
 // ---------------------------------------------------------------------------
@@ -253,4 +282,6 @@ function generateMuseumSnapshotFile(fields: string[], timestamp: string): string
 	);
 }
 
-main();
+if (isDirectExecution) {
+	void main();
+}
