@@ -16,6 +16,7 @@
  */
 
 import { schemaFieldOrder } from '../../e2e/fixtures/mappings.snapshot';
+import { museumFieldOrder } from '../../e2e/fixtures/museum.snapshot';
 import { OBJECT_FIELDS } from '../constants/objectFields';
 
 const expectedSchema = [
@@ -77,5 +78,17 @@ describe('Mappings snapshot schema contract', () => {
 		for (const [key, field] of Object.entries(OBJECT_FIELDS)) {
 			expect(schemaFieldOrder, `OBJECT_FIELDS.${key} ("${field}") missing from schema`).toContain(field);
 		}
+	});
+});
+
+describe('Museum snapshot schema contract', () => {
+	it('every Museum column is described in the Mappings schema (run fixtures:update if this fails)', () => {
+		const schemaFieldSet = new Set(schemaFieldOrder);
+		const undocumented = museumFieldOrder.filter((f) => !schemaFieldSet.has(f));
+		expect(
+			undocumented,
+			`Museum has columns not in Mappings: ${undocumented.join(', ')}. ` +
+				'Either add these fields to the Mappings sheet or remove them from Museum.',
+		).toEqual([]);
 	});
 });

@@ -47,6 +47,22 @@ export const test = base.extend({
 });
 
 /**
+ * Override just the Museum route with a custom response.
+ * Because Playwright evaluates routes newest-first, calling this after the
+ * base fixture has already registered the default Museum mock is enough to
+ * take precedence — no need to tear down and re-register all routes.
+ */
+export async function mockMuseumWith(page: Page, response: unknown) {
+	await page.route(`${SHEETS_BASE_URL}/${SHEET_ID}/values/Museum*`, async (route) => {
+		await route.fulfill({
+			status: 200,
+			contentType: 'application/json',
+			body: JSON.stringify(response),
+		});
+	});
+}
+
+/**
  * Helper to mock API error responses for specific tests
  */
 export async function mockApiError(

@@ -56,6 +56,8 @@ jobs:
 
             **Review the diff carefully before merging:**
             - Check `e2e/fixtures/mappings.snapshot.ts` for field additions, removals, or renames
+            - Check `e2e/fixtures/museum.snapshot.ts` for column additions or removals in the Museum sheet
+            - If `museum.snapshot.ts` has columns not in `mappings.snapshot.ts`, the CI checks will be red — this means §5 drift is active in production (fix by updating the Mappings sheet or removing the column from Museum)
             - Update `src/test-utils/fixtureSchema.test.ts` → `expectedSchema` to match
             - If a renamed field was used in `OBJECT_FIELDS`, update `src/constants/objectFields.ts`
             - Update pre-baked objects in `e2e/fixtures/factory.ts` if field names changed

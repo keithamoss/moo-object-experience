@@ -9,7 +9,7 @@
  */
 
 import type { SheetsApiResponse } from '../../src/types/metadata';
-import { buildMuseumResponse, defaultObjects } from './factory';
+import { buildMuseumResponse, createObject, defaultObjects } from './factory';
 import { mappingsSnapshot, schemaFieldOrder } from './mappings.snapshot';
 
 // Re-export factory utilities so test files can import from one place.
@@ -38,5 +38,20 @@ export const mockMalformedMappingsResponse: SheetsApiResponse = {
 	values: [
 		['field', 'namespace', 'label'],
 		['dcterms:identifier.moooi', 'Dublin Core', 'Identifier'],
+	],
+};
+
+/**
+ * Museum worksheet with columns not described in the Mappings snapshot (§5 drift).
+ * Simulates the real scenario where someone adds columns to the Museum sheet without
+ * updating the Mappings sheet.
+ * Used only in explicit schema-drift e2e tests.
+ */
+export const mockSchemaDriftMuseumResponse: SheetsApiResponse = {
+	range: 'Museum!A1:AV2',
+	majorDimension: 'ROWS',
+	values: [
+		[...schemaFieldOrder, 'dwc:higherGeography', 'dwc:higherGeographyID'],
+		[...createObject({ 'dcterms:identifier.moooi': 'DRIFT.001', 'dcterms:title': 'Drift Test Object' }), '', ''],
 	],
 };

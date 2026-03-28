@@ -3,7 +3,8 @@
  * Tests how the application handles various API failures
  */
 
-import { expect, mockApiError, test } from './fixtures';
+import { expect, mockApiError, mockMuseumWith, test } from './fixtures';
+import { mockSchemaDriftMuseumResponse } from './fixtures/sheetsData';
 
 test.describe('API Error Handling', () => {
 	test('should show error message when API returns 429 (rate limit)', async ({ page }) => {
@@ -103,5 +104,41 @@ test.describe('API Error Handling', () => {
 		// And the app should be ready
 		const homePage = page.locator('[data-testid="home-page"]');
 		await expect(homePage).toHaveAttribute('data-ready', 'true', { timeout: 10000 });
+	});
+});
+
+test.describe('Schema drift detection', () => {
+	test('should show error on homepage when Museum has undocumented columns', async ({ page }) => {
+		// Override the Museum route with the drifted fixture.
+		// Playwright evaluates routes newest-first, so this takes precedence
+		// over the base fixture's healthy Museum mock.
+		await mockMuseumWith(page, mockSchemaDriftMuseumResponse);
+
+		await page.goto('/#/');
+
+		const errorAlert = page.locator('[role="alert"]');
+		await expect(errorAlert).toBeVisible({ timeout: 10000 });
+
+		const errorText = await errorAlert.textContent();
+		expect(errorText).toMatch(/not described in Mappings/i);
+
+		// Search box should NOT be available
+		const searchBox = page.locator('input[data-testid="search-box"]');
+		await expect(searchBox).not.toBeVisible();
+	});
+
+	test('should show error on object detail page when Museum has undocumented columns', async ({ page }) => {
+		// Same drift setup — verifies the object detail page shows the error
+		// rather than freezing on the loading skeleton (regression test for
+		// the bug where isError was not captured from useObject/useMetadataFields).
+		await mockMuseumWith(page, mockSchemaDriftMuseumResponse);
+
+		await page.goto('/#/object/DRIFT.001');
+
+		const errorAlert = page.locator('[role="alert"]');
+		await expect(errorAlert).toBeVisible({ timeout: 10000 });
+
+		const errorText = await errorAlert.textContent();
+		expect(errorText).toMatch(/not described in Mappings/i);
 	});
 });

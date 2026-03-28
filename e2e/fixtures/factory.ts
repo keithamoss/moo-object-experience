@@ -24,6 +24,7 @@
 import type { SheetsApiResponse } from '../../src/types/metadata';
 import type { SchemaRecord } from './mappings.snapshot';
 import { schemaFieldOrder } from './mappings.snapshot';
+import { museumFieldOrder } from './museum.snapshot';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -100,7 +101,7 @@ export function buildMuseumResponse(objectRows: string[][]): SheetsApiResponse {
 	return {
 		range: 'Museum!A1:AV100',
 		majorDimension: 'ROWS',
-		values: [schemaFieldOrder, ...objectRows],
+		values: [museumFieldOrder, ...objectRows],
 	};
 }
 
