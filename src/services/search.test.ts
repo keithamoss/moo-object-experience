@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { OBJECT_FIELDS } from '../constants/objectFields';
 import type { ObjectData } from '../types/metadata';

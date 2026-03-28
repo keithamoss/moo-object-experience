@@ -1,3 +1,4 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { ALL_SEARCHABLE_FIELD_NAMES, type SearchableFieldName } from '../config/searchConfig';
 import { OBJECT_FIELDS } from '../constants/objectFields';
