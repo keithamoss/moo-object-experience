@@ -36,8 +36,8 @@ test.describe('Homepage', () => {
 		const resultsHeading = page.locator('h6:has-text("result")');
 		await expect(resultsHeading).toBeVisible();
 
-		// Should show at least one result card (MUI Card component)
-		const resultCards = page.locator('.MuiCard-root');
+		// Should show at least one result card
+		const resultCards = page.getByTestId('result-card');
 		await expect(resultCards.first()).toBeVisible();
 
 		// Results count should be greater than 0
@@ -62,7 +62,7 @@ test.describe('Homepage', () => {
 		await expect(resultsHeading).toBeVisible();
 
 		// Click first result
-		const firstResult = page.locator('.MuiCard-root').first();
+		const firstResult = page.getByTestId('result-card').first();
 		await expect(firstResult).toBeVisible();
 		await firstResult.click();
 

@@ -68,6 +68,7 @@ export default function ResultCard({ result, object, query = '' }: ResultCardPro
 	return (
 		<Grid size={{ xs: 12, sm: 12, md: 6 }} key={result.id}>
 			<Card
+				data-testid="result-card"
 				elevation={2}
 				sx={{
 					height: '100%',

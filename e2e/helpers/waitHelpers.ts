@@ -127,6 +127,6 @@ export async function waitForSearchResults(page: Page, timeout = 5000): Promise<
 	await expect(resultsHeading).toBeVisible({ timeout });
 
 	// Wait for at least one result card
-	const resultCards = page.locator('.MuiCard-root');
+	const resultCards = page.getByTestId('result-card');
 	await expect(resultCards.first()).toBeVisible({ timeout });
 }

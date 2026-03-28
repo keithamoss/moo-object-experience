@@ -21,7 +21,7 @@ test.describe('Object Detail Page', () => {
 		await expect(resultsHeading).toBeVisible();
 
 		// Click first result
-		const firstResult = page.locator('.MuiCard-root').first();
+		const firstResult = page.getByTestId('result-card').first();
 		await expect(firstResult).toBeVisible();
 		await firstResult.click();
 
@@ -52,7 +52,7 @@ test.describe('Object Detail Page', () => {
 		await expect(resultsHeading).toBeVisible();
 
 		// Click first result
-		const firstResult = page.locator('.MuiCard-root').first();
+		const firstResult = page.getByTestId('result-card').first();
 		await expect(firstResult).toBeVisible();
 		await firstResult.click();
 
@@ -85,7 +85,7 @@ test.describe('Object Detail Page', () => {
 		await expect(resultsHeading).toBeVisible();
 
 		// Click first result
-		const firstResult = page.locator('.MuiCard-root').first();
+		const firstResult = page.getByTestId('result-card').first();
 		await expect(firstResult).toBeVisible();
 		await firstResult.click();
 
@@ -117,5 +117,62 @@ test.describe('Object Detail Page', () => {
 		// Should have a button to go back home
 		const homeButton = page.getByRole('button', { name: /go to home/i });
 		await expect(homeButton).toBeVisible();
+	});
+
+	test('should display object title, identifier and description', async ({ page }) => {
+		const searchBox = await setupSearchTest(page);
+
+		await searchBox.fill('department');
+		await searchBox.press('Enter');
+		await page.waitForURL(/\?q=department/, { timeout: 3000 });
+
+		const firstResult = page.getByTestId('result-card').first();
+		await expect(firstResult).toBeVisible();
+		await firstResult.click();
+
+		await page.waitForURL(/\/object\/.+/);
+
+		// Object title renders as the page-level heading
+		const title = page.getByRole('heading', { level: 1 }).first();
+		await expect(title).toBeVisible();
+		expect(await title.textContent()).toBeTruthy();
+
+		// Identifier value should appear on the page
+		await expect(page.locator('text=/2021\\./').first()).toBeVisible();
+	});
+
+	test('should show the metadata fields section', async ({ page }) => {
+		const searchBox = await setupSearchTest(page);
+
+		await searchBox.fill('department');
+		await searchBox.press('Enter');
+		await page.waitForURL(/\?q=department/, { timeout: 3000 });
+
+		const firstResult = page.getByTestId('result-card').first();
+		await firstResult.click();
+		await page.waitForURL(/\/object\/.+/);
+
+		// The detail page renders metadata in a two-column grid layout.
+		// At least one Paper section with a heading should be visible.
+		const papers = page.locator('.MuiPaper-root');
+		await expect(papers.first()).toBeVisible();
+	});
+
+	test('should show Home link in breadcrumb that navigates to homepage', async ({ page }) => {
+		const searchBox = await setupSearchTest(page);
+
+		await searchBox.fill('department');
+		await searchBox.press('Enter');
+		await page.waitForURL(/\?q=department/, { timeout: 3000 });
+
+		const firstResult = page.getByTestId('result-card').first();
+		await firstResult.click();
+		await page.waitForURL(/\/object\/.+/);
+
+		const homeLink = page.getByRole('link', { name: /home/i });
+		await expect(homeLink).toBeVisible();
+		await homeLink.click();
+
+		await expect(page).toHaveURL(/#\/$/);
 	});
 });

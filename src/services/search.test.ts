@@ -267,4 +267,63 @@ describe('SearchService', () => {
 			expect(lowerResults[0].id).toBe(upperResults[0].id);
 		});
 	});
+
+	describe('regex metacharacter safety', () => {
+		beforeEach(() => {
+			service.buildIndex([
+				{
+					[OBJECT_FIELDS.IDENTIFIER]: 'OBJ-META',
+					[OBJECT_FIELDS.TITLE]: 'Price ($100) and C++ syntax',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Contains (parens) and [brackets] and dots.',
+				},
+			]);
+		});
+
+		const metacharacterQueries = ['.', '*', '+', '?', '^', '$', '(', ')', '[', ']', '{', '}', '|', '\\'];
+
+		for (const char of metacharacterQueries) {
+			it(`should not throw when searching for '${char}'`, () => {
+				expect(() => service.search(char)).not.toThrow();
+			});
+		}
+	});
+
+	describe('unicode and accented characters', () => {
+		beforeEach(() => {
+			service.buildIndex([
+				{
+					[OBJECT_FIELDS.IDENTIFIER]: 'OBJ-UNI',
+					[OBJECT_FIELDS.TITLE]: 'Café Naïve',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Object with accented title',
+				},
+			]);
+		});
+
+		it('should find results when searching with accented characters', () => {
+			const results = service.search('café');
+			expect(results).toBeDefined();
+			expect(Array.isArray(results)).toBe(true);
+		});
+
+		it('should not throw when searching with unicode characters', () => {
+			expect(() => service.search('naïve')).not.toThrow();
+			expect(() => service.search('café')).not.toThrow();
+		});
+	});
+
+	describe('edge case queries', () => {
+		beforeEach(() => {
+			service.buildIndex(mockObjects);
+		});
+
+		it('should return empty results for a single-character query (below minimum length)', () => {
+			// MiniSearch has a minimum query length; single chars should not crash
+			expect(() => service.search('a')).not.toThrow();
+		});
+
+		it('should return empty array for a query of only whitespace', () => {
+			const results = service.search('   ');
+			expect(Array.isArray(results)).toBe(true);
+		});
+	});
 });

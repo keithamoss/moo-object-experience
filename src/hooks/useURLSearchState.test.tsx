@@ -88,4 +88,50 @@ describe('useURLSearchState', () => {
 		const setFieldsCalls = dispatchSpy.mock.calls.filter((call) => call[0].type === setActiveFields.type);
 		expect(setFieldsCalls.length).toBe(0);
 	});
+
+	it('should decode percent-encoded query parameter', () => {
+		const dispatchSpy = vi.spyOn(store, 'dispatch');
+
+		// URLSearchParams automatically decodes percent-encoding when you call .get()
+		const searchParams = new URLSearchParams('q=ancient%20egypt');
+
+		renderHook(() => useURLSearchState(searchParams, '', ALL_SEARCHABLE_FIELD_NAMES), {
+			wrapper: ({ children }) => <AllTheProviders store={store}>{children}</AllTheProviders>,
+		});
+
+		// The dispatched query should be the decoded value, not the raw encoded string
+		expect(dispatchSpy).toHaveBeenCalledWith(setQuery('ancient egypt'));
+	});
+
+	it('should silently ignore invalid field names present in the URL', () => {
+		const dispatchSpy = vi.spyOn(store, 'dispatch');
+
+		// Mix one valid field with one entirely invalid field name
+		const searchParams = new URLSearchParams(`fields=${OBJECT_FIELDS.TITLE},not:a:real:field`);
+
+		renderHook(() => useURLSearchState(searchParams, '', []), {
+			wrapper: ({ children }) => <AllTheProviders store={store}>{children}</AllTheProviders>,
+		});
+
+		// Only the valid field should be dispatched; invalid ones are dropped by parseFieldsFromURL
+		const setFieldsCalls = dispatchSpy.mock.calls.filter((call) => call[0].type === setActiveFields.type);
+		expect(setFieldsCalls.length).toBeGreaterThan(0);
+		const dispatchedFields = setFieldsCalls[0][0].payload as string[];
+		expect(dispatchedFields).toContain(OBJECT_FIELDS.TITLE);
+		expect(dispatchedFields).not.toContain('not:a:real:field');
+	});
+
+	it('should handle a query parameter with special characters that URLSearchParams decodes', () => {
+		const dispatchSpy = vi.spyOn(store, 'dispatch');
+
+		// Parentheses and plus sign are common in museum object names
+		const searchParams = new URLSearchParams('q=map+of+WA+(1950s)');
+
+		renderHook(() => useURLSearchState(searchParams, '', ALL_SEARCHABLE_FIELD_NAMES), {
+			wrapper: ({ children }) => <AllTheProviders store={store}>{children}</AllTheProviders>,
+		});
+
+		// URLSearchParams decodes + as space
+		expect(dispatchSpy).toHaveBeenCalledWith(setQuery('map of WA (1950s)'));
+	});
 });

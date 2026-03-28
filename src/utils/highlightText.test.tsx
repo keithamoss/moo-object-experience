@@ -46,14 +46,41 @@ describe('highlightSearchTerms', () => {
 		expect(result).toBeDefined();
 	});
 
-	it('should render mark elements with correct styling', () => {
+	it('should render mark elements for matched terms', () => {
 		const result = highlightSearchTerms('stone axe', 'stone');
 		const { container } = render(<div>{result}</div>);
 		const mark = container.querySelector('mark');
 
+		// The mark element exists and wraps the matched text — colour is a theme
+		// concern and should not be hardcoded in tests.
 		expect(mark).toBeInTheDocument();
-		// Check inline style attribute directly (jsdom v28 compatibility)
-		expect(mark?.style.backgroundColor).toBe('rgb(255, 235, 59)');
+		expect(mark?.textContent).toBe('stone');
+	});
+
+	it('should escape query terms that contain regex metacharacters', () => {
+		const result = highlightSearchTerms('Price ($100) and C++', '$100');
+		const { container } = render(<div>{result}</div>);
+		const mark = container.querySelector('mark');
+
+		expect(mark).toBeInTheDocument();
+		expect(mark?.textContent).toBe('$100');
+	});
+
+	it('should not throw when query contains regex special characters', () => {
+		// Each of these would throw if not escaped
+		const specialChars = ['.', '*', '+', '?', '^', '$', '{', '}', '(', ')', '[', ']', '|', '\\'];
+		for (const char of specialChars) {
+			expect(() => highlightSearchTerms('some text', char)).not.toThrow();
+		}
+	});
+
+	it('should highlight unicode / accented characters', () => {
+		const result = highlightSearchTerms('Café au lait', 'café');
+		const { container } = render(<div>{result}</div>);
+		const mark = container.querySelector('mark');
+
+		expect(mark).toBeInTheDocument();
+		expect(mark?.textContent?.toLowerCase()).toBe('café');
 	});
 
 	it('should handle multiple occurrences of same term', () => {
