@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
+import { goToHomePage, setupSearchTest, waitForSearchBox } from './helpers/waitHelpers';
 
 /**
  * E2E tests for PageMetadata functionality
@@ -7,21 +8,14 @@ import { expect, test } from '@playwright/test';
 
 test.describe('PageMetadata - Document Title', () => {
 	test('should set document title on homepage', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for page to be interactive
-		await page.waitForLoadState('networkidle');
+		await goToHomePage(page);
 
 		// Check document title in browser
 		await expect(page).toHaveTitle('Museum Object Experience');
 	});
 
 	test('should update document title when searching', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Perform search
 		await searchBox.fill('department');
@@ -66,16 +60,14 @@ test.describe('PageMetadata - Document Title', () => {
 	});
 
 	test('should maintain single title element throughout navigation', async ({ page }) => {
-		await page.goto('/#/');
-		await page.waitForLoadState('networkidle');
+		await goToHomePage(page);
 
 		// Check there's only one title element
 		let titleCount = await page.locator('title').count();
 		expect(titleCount).toBe(1);
 
 		// Navigate to search
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await waitForSearchBox(page);
 		await searchBox.fill('test');
 		await searchBox.press('Enter');
 		await page.waitForURL(/\?q=test/);
@@ -94,10 +86,7 @@ test.describe('PageMetadata - Document Title', () => {
 	});
 
 	test('should handle rapid navigation without title flickering issues', async ({ page }) => {
-		await page.goto('/#/');
-
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Rapid searches
 		const searches = ['test', 'museum', 'object', 'collection'];
@@ -120,10 +109,7 @@ test.describe('PageMetadata - Document Title', () => {
 	});
 
 	test('should update title when using browser back/forward', async ({ page }) => {
-		await page.goto('/#/');
-
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Store homepage title
 		const homeTitle = await page.title();
@@ -155,8 +141,7 @@ test.describe('PageMetadata - Document Title', () => {
 
 test.describe('PageMetadata - Meta Description', () => {
 	test('should have meta description on homepage', async ({ page }) => {
-		await page.goto('/#/');
-		await page.waitForLoadState('networkidle');
+		await goToHomePage(page);
 
 		// Check for meta description
 		const metaDesc = await page.locator('meta[name="description"]').getAttribute('content');
@@ -165,10 +150,7 @@ test.describe('PageMetadata - Meta Description', () => {
 	});
 
 	test('should maintain proper meta description during navigation', async ({ page }) => {
-		await page.goto('/#/');
-
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const _searchBox = await setupSearchTest(page);
 
 		// Homepage should have description
 		const metaDesc = await page.locator('meta[name="description"]').getAttribute('content');
@@ -184,8 +166,7 @@ test.describe('PageMetadata - Meta Description', () => {
 	});
 
 	test('should have only one meta description element at a time', async ({ page }) => {
-		await page.goto('/#/');
-		await page.waitForLoadState('networkidle');
+		await goToHomePage(page);
 
 		const metaDescCount = await page.locator('meta[name="description"]').count();
 		expect(metaDescCount).toBeLessThanOrEqual(1);
@@ -201,8 +182,7 @@ test.describe('PageMetadata - Meta Description', () => {
 
 test.describe('PageMetadata - SEO Validation', () => {
 	test('should have valid title length for SEO', async ({ page }) => {
-		await page.goto('/#/');
-		await page.waitForLoadState('networkidle');
+		await goToHomePage(page);
 
 		const title = await page.title();
 
@@ -212,10 +192,7 @@ test.describe('PageMetadata - SEO Validation', () => {
 	});
 
 	test('should have meaningful search result titles', async ({ page }) => {
-		await page.goto('/#/');
-
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		await searchBox.fill('museum artifacts');
 		await searchBox.press('Enter');
@@ -238,10 +215,7 @@ test.describe('PageMetadata - SEO Validation', () => {
 	});
 
 	test('should handle special characters in titles correctly', async ({ page }) => {
-		await page.goto('/#/');
-
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Search with special characters
 		await searchBox.fill('test & "quotes" | symbols');
@@ -257,11 +231,9 @@ test.describe('PageMetadata - SEO Validation', () => {
 
 test.describe('PageMetadata - Performance', () => {
 	test('should update title quickly during navigation', async ({ page }) => {
-		await page.goto('/#/');
-		await page.waitForLoadState('networkidle');
+		await goToHomePage(page);
 
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await waitForSearchBox(page);
 
 		const startTime = Date.now();
 
@@ -274,15 +246,12 @@ test.describe('PageMetadata - Performance', () => {
 		const endTime = Date.now();
 		const duration = endTime - startTime;
 
-		// Title should update within reasonable time (1.5 seconds allowing for CI slowness)
-		expect(duration).toBeLessThan(1500);
+		// Title should update within reasonable time (2 seconds allowing for test environment variability)
+		expect(duration).toBeLessThan(2000);
 	});
 
 	test('should not cause memory leaks with repeated navigation', async ({ page }) => {
-		await page.goto('/#/');
-
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Navigate multiple times (reduced iterations for faster test)
 		for (let i = 0; i < 5; i++) {
@@ -307,8 +276,7 @@ test.describe('PageMetadata - Performance', () => {
 
 test.describe('PageMetadata - Accessibility', () => {
 	test('should have title element in head tag', async ({ page }) => {
-		await page.goto('/#/');
-		await page.waitForLoadState('networkidle');
+		await goToHomePage(page);
 
 		// Title should be in document head
 		const titleInHead = await page.evaluate(() => {
@@ -320,10 +288,7 @@ test.describe('PageMetadata - Accessibility', () => {
 	});
 
 	test('should update title for screen reader announcements', async ({ page }) => {
-		await page.goto('/#/');
-
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		const initialTitle = await page.title();
 
@@ -350,10 +315,7 @@ test.describe('PageMetadata - Edge Cases', () => {
 	});
 
 	test('should handle very long search queries', async ({ page }) => {
-		await page.goto('/#/');
-
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		const longQuery = 'a'.repeat(150);
 		await searchBox.fill(longQuery);

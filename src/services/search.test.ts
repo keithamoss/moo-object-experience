@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { OBJECT_FIELDS, toFieldKey } from '../constants/objectFields';
 import type { ObjectData } from '../types/metadata';
 import { SearchService } from './search';
 
@@ -10,25 +11,25 @@ describe('SearchService', () => {
 		service = new SearchService();
 		mockObjects = [
 			{
-				'dcterms:identifier.moooi': 'OBJ-001',
-				'dcterms:title': 'Aboriginal Stone Axe',
-				'dcterms:description': 'Ancient stone cutting tool',
-				'dcterms:creator': 'Aboriginal peoples',
-				'dcterms:date': '1800',
+				[OBJECT_FIELDS.IDENTIFIER]: 'OBJ-001',
+				[OBJECT_FIELDS.TITLE]: 'Aboriginal Stone Axe',
+				[OBJECT_FIELDS.DESCRIPTION]: 'Ancient stone cutting tool',
+				[OBJECT_FIELDS.CREATOR]: 'Aboriginal peoples',
+				[toFieldKey('dcterms:date')]: '1800',
 			},
 			{
-				'dcterms:identifier.moooi': 'OBJ-002',
-				'dcterms:title': 'Metal Tool Collection',
-				'dcterms:description': 'Collection of metal implements',
-				'dcterms:creator': 'Various craftsmen',
-				'dcterms:date': '1900-1950',
+				[OBJECT_FIELDS.IDENTIFIER]: 'OBJ-002',
+				[OBJECT_FIELDS.TITLE]: 'Metal Tool Collection',
+				[OBJECT_FIELDS.DESCRIPTION]: 'Collection of metal implements',
+				[OBJECT_FIELDS.CREATOR]: 'Various craftsmen',
+				[toFieldKey('dcterms:date')]: '1900-1950',
 			},
 			{
-				'dcterms:identifier.moooi': 'OBJ-003',
-				'dcterms:title': 'Wooden Spear',
-				'dcterms:description': 'Traditional hunting weapon',
-				'dcterms:creator': 'Aboriginal peoples',
-				'dcterms:date': '1750',
+				[OBJECT_FIELDS.IDENTIFIER]: 'OBJ-003',
+				[OBJECT_FIELDS.TITLE]: 'Wooden Spear',
+				[OBJECT_FIELDS.DESCRIPTION]: 'Traditional hunting weapon',
+				[OBJECT_FIELDS.CREATOR]: 'Aboriginal peoples',
+				[toFieldKey('dcterms:date')]: '1750',
 			},
 		];
 	});
@@ -125,7 +126,7 @@ describe('SearchService', () => {
 		it('should search only in active fields', () => {
 			// Search only in title field
 			const results = service.search('hunting', {
-				activeFields: ['dcterms:title'],
+				activeFields: [OBJECT_FIELDS.TITLE],
 			});
 
 			// 'hunting' only appears in description, not title
@@ -134,7 +135,7 @@ describe('SearchService', () => {
 
 		it('should respect multiple active fields', () => {
 			const results = service.search('stone', {
-				activeFields: ['dcterms:title', 'dcterms:description'],
+				activeFields: [OBJECT_FIELDS.TITLE, OBJECT_FIELDS.DESCRIPTION],
 			});
 
 			expect(results.length).toBeGreaterThan(0);
@@ -188,8 +189,8 @@ describe('SearchService', () => {
 			const obj = service.getObjectById('OBJ-001');
 
 			expect(obj).toBeDefined();
-			expect(obj?.['dcterms:identifier.moooi']).toBe('OBJ-001');
-			expect(obj?.['dcterms:title']).toBe('Aboriginal Stone Axe');
+			expect(obj?.[OBJECT_FIELDS.IDENTIFIER]).toBe('OBJ-001');
+			expect(obj?.[OBJECT_FIELDS.TITLE]).toBe('Aboriginal Stone Axe');
 		});
 
 		it('should return undefined for non-existent ID', () => {

@@ -7,6 +7,7 @@
 import { Alert, Box, CircularProgress, Grid, Typography } from '@mui/material';
 import { useMemo } from 'react';
 import ResultCard from '../../components/ResultCard';
+import { OBJECT_FIELDS } from '../../constants/objectFields';
 import type { SearchResult } from '../../services/search';
 import type { ObjectData } from '../../types/metadata';
 
@@ -27,8 +28,8 @@ export default function SearchResults({ results, objects, query, isSearching = f
 		() =>
 			new Map<string, ObjectData>(
 				objects
-					.filter((obj) => obj['dcterms:identifier.moooi'] !== undefined)
-					.map((obj) => [obj['dcterms:identifier.moooi'] as string, obj]),
+					.filter((obj) => obj[OBJECT_FIELDS.IDENTIFIER] !== undefined)
+					.map((obj) => [obj[OBJECT_FIELDS.IDENTIFIER] as string, obj]),
 			),
 		[objects],
 	);

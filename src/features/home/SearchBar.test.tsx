@@ -5,6 +5,7 @@
 import { act } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ALL_SEARCHABLE_FIELD_NAMES } from '../../config/searchConfig';
+import { OBJECT_FIELDS } from '../../constants/objectFields';
 import { termsService } from '../../services/terms';
 import { createMockObjectData, renderWithProviders, screen, userEvent } from '../../test-utils/test-helpers';
 import type { MetadataField } from '../../types/metadata';
@@ -13,7 +14,7 @@ import SearchBar from './SearchBar';
 describe('SearchBar', () => {
 	const mockMetadataFields: MetadataField[] = [
 		{
-			field: 'dcterms:title',
+			field: OBJECT_FIELDS.TITLE,
 			namespace: 'Dublin Core',
 			label: 'Title',
 			applicableCollections: 'All',
@@ -23,7 +24,7 @@ describe('SearchBar', () => {
 			example: 'Stone Axe',
 		},
 		{
-			field: 'dcterms:description',
+			field: OBJECT_FIELDS.DESCRIPTION,
 			namespace: 'Dublin Core',
 			label: 'Description',
 			applicableCollections: 'All',

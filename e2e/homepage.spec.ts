@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
+import { goToHomePage, setupSearchTest, waitForSearchBox } from './helpers/waitHelpers';
 
 /**
  * E2E tests for the homepage and search functionality
@@ -6,23 +7,18 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Homepage', () => {
 	test('should load the homepage', async ({ page }) => {
-		await page.goto('/#/');
+		await goToHomePage(page);
 
 		// Check page title
 		await expect(page).toHaveTitle(/Museum Object Experience/);
 
 		// Check search bar is visible and enabled (data loaded)
-		const searchBox = page.getByPlaceholder(/search/i);
+		const searchBox = await waitForSearchBox(page);
 		await expect(searchBox).toBeVisible();
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
 	});
 
 	test('should perform a search and show appropriate feedback', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Search for a term that should return results
 		await searchBox.fill('department');
@@ -50,11 +46,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should navigate to object detail page when clicking a result', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Search for a term that should return results
 		await searchBox.fill('department');
@@ -82,11 +74,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should update URL with search parameters', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Perform a search
 		await searchBox.fill('pottery');
@@ -101,11 +89,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should search for the clicked suggestion from dropdown, not the partial typed text', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type a partial word to trigger autocomplete (e.g., "depar" for "department")
 		const partialText = 'depar';
@@ -147,11 +131,7 @@ test.describe('Homepage', () => {
 	test('should search for the keyboard-selected suggestion from dropdown, not the partial typed text', async ({
 		page,
 	}) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type a partial word to trigger autocomplete (e.g., "snif" for "sniff")
 		const partialText = 'snif';
@@ -204,11 +184,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should not show suggestions when typing less than 2 characters', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type a single character
 		await searchBox.fill('a');
@@ -228,11 +204,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should show no suggestions when text has no matches', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type text that is unlikely to match any terms
 		await searchBox.fill('xyzqweasd');
@@ -246,11 +218,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should dismiss suggestions dropdown when pressing Escape', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type to trigger suggestions
 		await searchBox.fill('depar');
@@ -277,11 +245,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should handle multi-word query and replace only the last word with suggestion', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type first word and space
 		await searchBox.type('ancient ');
@@ -315,11 +279,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should navigate through multiple suggestions with arrow keys', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type to trigger suggestions that should have multiple matches
 		await searchBox.fill('st');
@@ -365,11 +325,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should be case-insensitive when matching suggestions', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type lowercase
 		await searchBox.fill('depar');
@@ -396,11 +352,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should clear input and suggestions using clear functionality', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type to trigger suggestions
 		await searchBox.fill('depar');
@@ -424,11 +376,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should select highlighted suggestion when pressing Tab', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type to trigger suggestions
 		await searchBox.fill('depar');
@@ -459,11 +407,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should dismiss dropdown when clicking outside', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Type to trigger suggestions
 		await searchBox.fill('depar');
@@ -486,11 +430,7 @@ test.describe('Homepage', () => {
 	});
 
 	test('should handle multiple suggestion selections in sequence', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		let searchBox = await setupSearchTest(page);
 
 		// First suggestion selection using "depar"
 		await searchBox.type('depar', { delay: 50 });
@@ -513,8 +453,7 @@ test.describe('Homepage', () => {
 		await expect(page).toHaveURL(/\?q=/);
 
 		// Clear search by going back to homepage
-		await page.goto('/#/');
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		searchBox = await setupSearchTest(page);
 		await expect(searchBox).toHaveValue('');
 
 		// Second suggestion selection with "snif"

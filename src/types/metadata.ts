@@ -2,6 +2,8 @@
  * Type definitions for metadata schema and object data
  */
 
+import type { FieldKey } from '../constants/objectFields';
+
 /**
  * Field requirement levels (with fallback to any string for flexibility)
  */
@@ -17,7 +19,7 @@ export type FieldTypeControl = 'Free text' | 'ISO8601 compliant date' | 'Image' 
  */
 export interface MetadataField {
 	/** The field name (e.g., "moo:workingNotes", "dcterms:Collection") */
-	readonly field: string;
+	readonly field: FieldKey;
 
 	/** The namespace/standard (e.g., "Dublin Core", "Darwin Core", "Museum of Objects of Interest") */
 	readonly namespace: string;
@@ -47,36 +49,12 @@ export interface MetadataField {
 export type MetadataSchema = MetadataField[];
 
 /**
- * Represents a single object from the Museum sheet
- * Uses an index signature to allow dynamic fields based on metadata schema
+ * Represents a single object from the Museum sheet.
+ * Keys are FieldKey values — raw string literals cannot be used to index
+ * into an ObjectData; access must go through OBJECT_FIELDS constants or
+ * a MetadataField.field value sourced from the parsed schema.
  */
-export interface ObjectData {
-	/** Dynamic fields from the metadata schema */
-	[fieldName: string]: string | undefined;
-}
-
-/**
- * Helper type to extract specific well-known fields with type safety
- */
-export interface ObjectDataTyped extends ObjectData {
-	/** Object identifier (mandatory) */
-	'dcterms:identifier.moooi': string;
-
-	/** Object title (mandatory) */
-	'dcterms:title': string;
-
-	/** Object description (mandatory) */
-	'dcterms:description': string;
-
-	/** Collection name (mandatory) */
-	'dcterms:Collection': string;
-
-	/** Date accessioned (mandatory) */
-	'dcterms:dateAccepted': string;
-
-	/** Photograph/image (optional) */
-	'dcterms:image'?: string;
-}
+export type ObjectData = Partial<Record<FieldKey, string>>;
 
 /**
  * Response from Google Sheets API
@@ -117,7 +95,7 @@ export class ParsedMetadataSchema {
 	/**
 	 * Get all field names in the order they appear in the schema
 	 */
-	getAllFieldNames(): string[] {
+	getAllFieldNames(): FieldKey[] {
 		return this.schema.map((field) => field.field);
 	}
 

@@ -34,3 +34,5 @@ lerna-debug.log*
 
 # Testing
 testing/
+# Snyk Security Extension - AI Rules (auto-generated)
+.github/instructions/snyk_rules.instructions.md

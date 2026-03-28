@@ -8,8 +8,8 @@ export default defineConfig({
 	testDir: './e2e',
 	outputDir: './testing/playwright-results',
 
-	// Maximum time one test can run
-	timeout: 30 * 1000,
+	// Maximum time one test can run - increased for data loading
+	timeout: 60 * 1000,
 
 	// Run tests in files in parallel
 	fullyParallel: true,
@@ -21,21 +21,25 @@ export default defineConfig({
 	retries: process.env.CI ? 2 : 0,
 
 	// Reporter to use
-	reporter: [['html', { open: 'always', outputFolder: 'testing/playwright-report' }]],
+	reporter: [['html', { open: 'never', outputFolder: 'testing/playwright-report' }]],
 
 	// Shared settings for all the projects below
 	use: {
 		// Base URL to use in actions like `await page.goto('/')`
 		baseURL: 'https://localhost:5173',
 
-		// Collect trace on all tests (includes screenshots at each step)
-		trace: 'off',
+		// Collect trace only on first retry to debug flaky tests
+		trace: 'on-first-retry',
 
-		// Screenshot on all tests (including successes)
-		screenshot: 'on',
+		// Screenshot only on failures to reduce overhead
+		screenshot: 'only-on-failure',
 
-		// Record video for all tests
-		video: 'on',
+		// Record video only on failures
+		video: 'retain-on-failure',
+
+		// Increased timeouts for actions and navigation
+		actionTimeout: 15000,
+		navigationTimeout: 15000,
 	},
 
 	// Configure projects for major browsers

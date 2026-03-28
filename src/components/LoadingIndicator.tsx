@@ -7,6 +7,7 @@ interface LoadingIndicatorProps {
 export default function LoadingIndicator({ message = 'Loading...' }: LoadingIndicatorProps) {
 	return (
 		<Box
+			data-testid="loading-indicator"
 			role="status"
 			aria-live="polite"
 			aria-label={message}

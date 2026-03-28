@@ -1,4 +1,5 @@
-import { expect, test } from '@playwright/test';
+import { expect, test } from './fixtures';
+import { setupSearchTest } from './helpers/waitHelpers';
 
 /**
  * E2E tests for object detail pages
@@ -6,11 +7,7 @@ import { expect, test } from '@playwright/test';
 
 test.describe('Object Detail Page', () => {
 	test('should load object detail page directly via URL', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load (search input should be enabled)
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Search for results
 		await searchBox.fill('department');
@@ -41,11 +38,7 @@ test.describe('Object Detail Page', () => {
 	});
 
 	test('should show breadcrumbs navigation', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Perform search
 		await searchBox.fill('department');
@@ -78,11 +71,7 @@ test.describe('Object Detail Page', () => {
 	});
 
 	test('should navigate back to search results using browser back', async ({ page }) => {
-		await page.goto('/#/');
-
-		// Wait for data to load
-		const searchBox = page.getByPlaceholder(/search/i);
-		await expect(searchBox).toBeEnabled({ timeout: 5000 });
+		const searchBox = await setupSearchTest(page);
 
 		// Perform search
 		await searchBox.fill('department');

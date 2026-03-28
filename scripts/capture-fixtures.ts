@@ -1,0 +1,171 @@
+#!/usr/bin/env node
+/**
+ * Capture script — fetches the live Mappings worksheet from the Google Sheets API
+ * and writes a frozen snapshot to e2e/fixtures/mappings.snapshot.ts.
+ *
+ * Usage:
+ *   npm run fixtures:update
+ *   npx tsx scripts/capture-fixtures.ts
+ *
+ * If you get a 403 error:
+ *   The API key is restricted by HTTP referrer. Temporarily set the restriction
+ *   to "None" in Google Cloud Console (APIs & Services → Credentials → your key),
+ *   run this script, then restore the restriction.
+ */
+
+import { writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { SHEETS_CONFIG } from '../src/config/sheets.ts';
+import { OBJECT_FIELDS } from '../src/constants/objectFields.ts';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const OUTPUT_PATH = resolve(__dirname, '../e2e/fixtures/mappings.snapshot.ts');
+
+// ---------------------------------------------------------------------------
+// Types (mirror SheetsApiResponse to avoid pulling in the whole src tree)
+// ---------------------------------------------------------------------------
+
+interface SheetsApiResponse {
+	range: string;
+	majorDimension: string;
+	values: string[][];
+}
+
+// ---------------------------------------------------------------------------
+// Main
+// ---------------------------------------------------------------------------
+
+async function main(): Promise<void> {
+	const { apiKey, sheetId, baseUrl, worksheets } = SHEETS_CONFIG;
+	const url = `${baseUrl}/${sheetId}/values/${worksheets.metadata}?key=${apiKey}`;
+
+	console.log(`Fetching ${worksheets.metadata} worksheet from Google Sheets…`);
+
+	// Spoof the Referer header so the Google Sheets API key's HTTP referrer
+	// restriction is satisfied when running locally. The restriction only checks
+	// this header — no need to remove the restriction for the script to work.
+	let response: Response;
+	try {
+		response = await fetch(url, {
+			headers: { Referer: 'https://moo.keithandhelenmakestuff.com/' },
+		});
+	} catch (err) {
+		console.error('Network error:', err instanceof Error ? err.message : String(err));
+		process.exit(1);
+	}
+
+	if (!response.ok) {
+		if (response.status === 403) {
+			console.error(
+				'\nError: 403 Forbidden.\n' +
+					'The Referer header did not satisfy the API key restriction.\n' +
+					'Check that the allowed domain in Google Cloud Console still matches:\n' +
+					'  https://moo.keithandhelenmakestuff.com/',
+			);
+		} else {
+			console.error(`Error: HTTP ${response.status} ${response.statusText}`);
+		}
+		process.exit(1);
+	}
+
+	const data = (await response.json()) as SheetsApiResponse;
+
+	if (!data.values || data.values.length < 2) {
+		console.error('Error: Mappings sheet returned no data rows.');
+		process.exit(1);
+	}
+
+	// Strip trailing/empty rows (e.g. spreadsheet returns blank rows at end)
+	data.values = data.values.filter((row) => row[0]?.trim());
+
+	// Field names are in column 0 of each data row (skip the header row)
+	const schemaFieldOrder = data.values.slice(1).map((row) => row[0]);
+
+	console.log(`\nCaptured ${schemaFieldOrder.length} fields:`);
+	for (const field of schemaFieldOrder) {
+		console.log(`  • ${field}`);
+	}
+
+	// Validate: confirm all OBJECT_FIELDS constants appear in the captured schema
+	const knownFields = Object.values(OBJECT_FIELDS);
+	const missing = knownFields.filter((f) => !schemaFieldOrder.includes(f));
+
+	if (missing.length > 0) {
+		console.warn('\nWarning: the following OBJECT_FIELDS constants were NOT found in the captured schema:');
+		for (const f of missing) {
+			console.warn(`  ✗ ${f}`);
+		}
+		console.warn('Update src/constants/objectFields.ts to match the real schema if field names have changed.');
+	} else {
+		console.log('\nAll OBJECT_FIELDS constants confirmed present in captured schema. ✓');
+	}
+
+	// Write snapshot
+	const timestamp = new Date().toISOString();
+	const content = generateSnapshotFile(data, timestamp);
+	writeFileSync(OUTPUT_PATH, content, 'utf-8');
+
+	console.log(`\nSnapshot written to e2e/fixtures/mappings.snapshot.ts`);
+	console.log(`Captured at: ${timestamp}`);
+}
+
+// ---------------------------------------------------------------------------
+// File generation
+// ---------------------------------------------------------------------------
+
+function generateSnapshotFile(data: SheetsApiResponse, timestamp: string): string {
+	// Each row on its own line for readable diffs when values change
+	const rowLines = data.values.map((row) => `\t\t${JSON.stringify(row)},`).join('\n');
+
+	// Field names (data rows only, skip header)
+	const fieldNames = data.values.slice(1).map((row) => row[0]);
+	const fieldLines = fieldNames.map((f) => `\t${JSON.stringify(f)},`).join('\n');
+
+	return (
+		`// biome-ignore format: generated file — run \`npm run fixtures:update\` to refresh\n` +
+		`// Auto-generated by scripts/capture-fixtures.ts\n` +
+		`// Last captured: ${timestamp}\n` +
+		`// Run \`npm run fixtures:update\` to replace with real Mappings data\n` +
+		`\n` +
+		`import type { SheetsApiResponse } from '../../src/types/metadata';\n` +
+		`\n` +
+		`export const CAPTURED_AT = '${timestamp}';\n` +
+		`\n` +
+		`/**\n` +
+		` * Frozen snapshot of the real Mappings worksheet API response.\n` +
+		` * Used as the mock response for all E2E and unit tests.\n` +
+		` */\n` +
+		`export const mappingsSnapshot: SheetsApiResponse = {\n` +
+		`\trange: ${JSON.stringify(data.range)},\n` +
+		`\tmajorDimension: ${JSON.stringify(data.majorDimension)},\n` +
+		`\tvalues: [\n` +
+		`${rowLines}\n` +
+		`\t],\n` +
+		`};\n` +
+		`\n` +
+		`/**\n` +
+		` * Ordered tuple of all field names in schema order, as const.\n` +
+		` * Provides literal types for SchemaField and SchemaRecord.\n` +
+		` * Auto-generated by scripts/capture-fixtures.ts — do not edit manually.\n` +
+		` */\n` +
+		`export const SCHEMA_FIELDS = [\n` +
+		`${fieldLines}\n` +
+		`] as const;\n` +
+		`\n` +
+		`/** Union of all schema field name literals. */\n` +
+		`export type SchemaField = (typeof SCHEMA_FIELDS)[number];\n` +
+		`\n` +
+		`/** A record with every schema field mapped to a string value. */\n` +
+		`export type SchemaRecord = Record<SchemaField, string>;\n` +
+		`\n` +
+		`/**\n` +
+		` * Field names extracted from the Mappings sheet, in schema order.\n` +
+		` * This drives the factory: column order in Museum sheet rows must match this.\n` +
+		` */\n` +
+		`export const schemaFieldOrder: string[] = [...SCHEMA_FIELDS];\n`
+	);
+}
+
+main();

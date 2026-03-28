@@ -1,6 +1,7 @@
 import { Alert, Box, Chip, Container, Paper, Typography } from '@mui/material';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { PageMetadata } from '../../components/PageMetadata';
+import { OBJECT_FIELDS } from '../../constants/objectFields';
 import { useData } from '../../hooks/useData';
 import { useAppSelector } from '../../store/hooks';
 import { selectSearchQuery } from '../../store/searchSlice';
@@ -19,7 +20,7 @@ export default function HomePage() {
 		: 'Museum Object Experience';
 
 	return (
-		<Container maxWidth="md" sx={{ mt: 4 }}>
+		<Container maxWidth="md" sx={{ mt: 4 }} data-testid="home-page" data-loading={isLoading} data-ready={isSuccess}>
 			{/* Page metadata - updates based on search query */}
 			<PageMetadata
 				title={pageTitle}
@@ -85,10 +86,10 @@ export default function HomePage() {
 										<Typography
 											component="li"
 											variant="body2"
-											key={object['dcterms:identifier.moooi']}
+											key={object[OBJECT_FIELDS.IDENTIFIER]}
 											sx={{ mb: 0.5 }}
 										>
-											{object['dcterms:title'] || 'Untitled'}
+											{object[OBJECT_FIELDS.TITLE] || 'Untitled'}
 										</Typography>
 									))}
 								</Box>

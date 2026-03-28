@@ -4,6 +4,7 @@
 
 import { createEntityAdapter, type EntityState } from '@reduxjs/toolkit';
 import { createApi, fakeBaseQuery } from '@reduxjs/toolkit/query/react';
+import { OBJECT_FIELDS } from '../constants/objectFields';
 import { fetchMetadataSchema, fetchObjects } from '../services/sheetsApi';
 import type { MetadataField, ObjectData } from '../types/metadata';
 
@@ -19,8 +20,8 @@ export const metadataAdapter = createEntityAdapter<MetadataField, string>({
  * Entity adapter for normalized objects storage
  */
 export const objectsAdapter = createEntityAdapter<ObjectData, string>({
-	selectId: (object) => object['dcterms:identifier.moooi'] as string,
-	sortComparer: (a, b) => (a['dcterms:title'] || '').localeCompare(b['dcterms:title'] || ''),
+	selectId: (object) => object[OBJECT_FIELDS.IDENTIFIER] as string,
+	sortComparer: (a, b) => (a[OBJECT_FIELDS.TITLE] || '').localeCompare(b[OBJECT_FIELDS.TITLE] || ''),
 });
 
 export const sheetsApi = createApi({

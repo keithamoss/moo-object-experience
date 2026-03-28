@@ -58,7 +58,7 @@ describe('objectUtils', () => {
 					example: '12345',
 				},
 				{
-					field: 'dcterms:creator',
+					field: OBJECT_FIELDS.CREATOR,
 					label: 'Creator',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
@@ -70,7 +70,7 @@ describe('objectUtils', () => {
 			]);
 			const object: ObjectData = {
 				[OBJECT_FIELDS.IDENTIFIER]: 'OBJ-001',
-				'dcterms:creator': 'Test Creator',
+				[OBJECT_FIELDS.CREATOR]: 'Test Creator',
 			};
 
 			const result = getFieldsToDisplay(mockSchema, object);
@@ -91,7 +91,7 @@ describe('objectUtils', () => {
 					example: 'Example Description',
 				},
 				{
-					field: 'dcterms:creator',
+					field: OBJECT_FIELDS.CREATOR,
 					label: 'Creator',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
@@ -103,7 +103,7 @@ describe('objectUtils', () => {
 			]);
 			const object: ObjectData = {
 				[OBJECT_FIELDS.DESCRIPTION]: 'Test Description',
-				'dcterms:creator': 'Test Creator',
+				[OBJECT_FIELDS.CREATOR]: 'Test Creator',
 			};
 
 			const result = getFieldsToDisplay(mockSchema, object);
@@ -114,7 +114,7 @@ describe('objectUtils', () => {
 		it('should exclude fields with empty values', () => {
 			const mockSchema = new ParsedMetadataSchema([
 				{
-					field: 'dcterms:creator',
+					field: OBJECT_FIELDS.CREATOR,
 					label: 'Creator',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
@@ -124,31 +124,31 @@ describe('objectUtils', () => {
 					example: 'John Doe',
 				},
 				{
-					field: 'dcterms:date',
-					label: 'Date',
+					field: OBJECT_FIELDS.DATE_ACCEPTED,
+					label: 'Date Accepted',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
 					required: 'Optional',
-					purpose: 'Date',
+					purpose: 'Date accepted into collection',
 					fieldTypeAndControls: 'ISO8601 compliant date',
 					example: '2024-01-01',
 				},
 			]);
 			const object: ObjectData = {
-				'dcterms:creator': 'Test Creator',
-				'dcterms:date': '',
+				[OBJECT_FIELDS.CREATOR]: 'Test Creator',
+				[OBJECT_FIELDS.DATE_ACCEPTED]: '',
 			};
 
 			const result = getFieldsToDisplay(mockSchema, object);
 
 			expect(result.length).toBe(1);
-			expect(result[0].field).toBe('dcterms:creator');
+			expect(result[0].field).toBe(OBJECT_FIELDS.CREATOR);
 		});
 
 		it('should exclude fields with whitespace-only values', () => {
 			const mockSchema = new ParsedMetadataSchema([
 				{
-					field: 'dcterms:creator',
+					field: OBJECT_FIELDS.CREATOR,
 					label: 'Creator',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
@@ -158,25 +158,25 @@ describe('objectUtils', () => {
 					example: 'John Doe',
 				},
 				{
-					field: 'dcterms:date',
-					label: 'Date',
+					field: OBJECT_FIELDS.DATE_ACCEPTED,
+					label: 'Date Accepted',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
 					required: 'Optional',
-					purpose: 'Date',
+					purpose: 'Date accepted into collection',
 					fieldTypeAndControls: 'ISO8601 compliant date',
 					example: '2024-01-01',
 				},
 			]);
 			const object: ObjectData = {
-				'dcterms:creator': 'Test Creator',
-				'dcterms:date': '   ',
+				[OBJECT_FIELDS.CREATOR]: 'Test Creator',
+				[OBJECT_FIELDS.DATE_ACCEPTED]: '   ',
 			};
 
 			const result = getFieldsToDisplay(mockSchema, object);
 
 			expect(result.length).toBe(1);
-			expect(result[0].field).toBe('dcterms:creator');
+			expect(result[0].field).toBe(OBJECT_FIELDS.CREATOR);
 		});
 
 		it('should return all valid fields', () => {
@@ -192,7 +192,7 @@ describe('objectUtils', () => {
 					example: 'Example Title',
 				},
 				{
-					field: 'dcterms:creator',
+					field: OBJECT_FIELDS.CREATOR,
 					label: 'Creator',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
@@ -202,44 +202,48 @@ describe('objectUtils', () => {
 					example: 'John Doe',
 				},
 				{
-					field: 'dcterms:date',
-					label: 'Date',
+					field: OBJECT_FIELDS.DATE_ACCEPTED,
+					label: 'Date Accepted',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
 					required: 'Optional',
-					purpose: 'Date',
+					purpose: 'Date accepted into collection',
 					fieldTypeAndControls: 'ISO8601 compliant date',
 					example: '2024-01-01',
 				},
 				{
-					field: 'dcterms:subject',
-					label: 'Subject',
+					field: OBJECT_FIELDS.FORMAT,
+					label: 'Format',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
 					required: 'Optional',
-					purpose: 'Subject',
+					purpose: 'Format',
 					fieldTypeAndControls: 'Free text',
-					example: 'Art',
+					example: 'Patch',
 				},
 			]);
 			const object: ObjectData = {
 				[OBJECT_FIELDS.TITLE]: 'Test Title',
-				'dcterms:creator': 'Test Creator',
-				'dcterms:date': '2024',
-				'dcterms:subject': 'Test Subject',
+				[OBJECT_FIELDS.CREATOR]: 'Test Creator',
+				[OBJECT_FIELDS.DATE_ACCEPTED]: '2024',
+				[OBJECT_FIELDS.FORMAT]: 'Sticker',
 			};
 
 			const result = getFieldsToDisplay(mockSchema, object);
 
 			// Should exclude title but include other populated fields
 			expect(result.length).toBe(3);
-			expect(result.map((f) => f.field)).toEqual(['dcterms:creator', 'dcterms:date', 'dcterms:subject']);
+			expect(result.map((f) => f.field)).toEqual([
+				OBJECT_FIELDS.CREATOR,
+				OBJECT_FIELDS.DATE_ACCEPTED,
+				OBJECT_FIELDS.FORMAT,
+			]);
 		});
 
 		it('should handle objects with missing fields', () => {
 			const mockSchema = new ParsedMetadataSchema([
 				{
-					field: 'dcterms:creator',
+					field: OBJECT_FIELDS.CREATOR,
 					label: 'Creator',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
@@ -249,41 +253,41 @@ describe('objectUtils', () => {
 					example: 'John Doe',
 				},
 				{
-					field: 'dcterms:date',
-					label: 'Date',
+					field: OBJECT_FIELDS.DATE_ACCEPTED,
+					label: 'Date Accepted',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
 					required: 'Optional',
-					purpose: 'Date',
+					purpose: 'Date accepted into collection',
 					fieldTypeAndControls: 'ISO8601 compliant date',
 					example: '2024-01-01',
 				},
 			]);
 			const object: ObjectData = {
-				'dcterms:creator': 'Test Creator',
-				// dcterms:date is missing
+				[OBJECT_FIELDS.CREATOR]: 'Test Creator',
+				// dcterms:dateAccepted is missing
 			};
 
 			const result = getFieldsToDisplay(mockSchema, object);
 
 			expect(result.length).toBe(1);
-			expect(result[0].field).toBe('dcterms:creator');
+			expect(result[0].field).toBe(OBJECT_FIELDS.CREATOR);
 		});
 
 		it('should maintain field order from schema', () => {
 			const mockSchema = new ParsedMetadataSchema([
 				{
-					field: 'dcterms:date',
-					label: 'Date',
+					field: OBJECT_FIELDS.DATE_ACCEPTED,
+					label: 'Date Accepted',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
 					required: 'Optional',
-					purpose: 'Date',
+					purpose: 'Date accepted into collection',
 					fieldTypeAndControls: 'ISO8601 compliant date',
 					example: '2024-01-01',
 				},
 				{
-					field: 'dcterms:creator',
+					field: OBJECT_FIELDS.CREATOR,
 					label: 'Creator',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
@@ -293,27 +297,27 @@ describe('objectUtils', () => {
 					example: 'John Doe',
 				},
 				{
-					field: 'dcterms:subject',
-					label: 'Subject',
+					field: OBJECT_FIELDS.FORMAT,
+					label: 'Format',
 					namespace: 'Dublin Core',
 					applicableCollections: 'All',
 					required: 'Optional',
-					purpose: 'Subject',
+					purpose: 'Format',
 					fieldTypeAndControls: 'Free text',
-					example: 'Art',
+					example: 'Patch',
 				},
 			]);
 			const object: ObjectData = {
-				'dcterms:date': '2024',
-				'dcterms:creator': 'Test Creator',
-				'dcterms:subject': 'Test Subject',
+				[OBJECT_FIELDS.DATE_ACCEPTED]: '2024',
+				[OBJECT_FIELDS.CREATOR]: 'Test Creator',
+				[OBJECT_FIELDS.FORMAT]: 'Sticker',
 			};
 
 			const result = getFieldsToDisplay(mockSchema, object);
 
-			expect(result[0].field).toBe('dcterms:date');
-			expect(result[1].field).toBe('dcterms:creator');
-			expect(result[2].field).toBe('dcterms:subject');
+			expect(result[0].field).toBe(OBJECT_FIELDS.DATE_ACCEPTED);
+			expect(result[1].field).toBe(OBJECT_FIELDS.CREATOR);
+			expect(result[2].field).toBe(OBJECT_FIELDS.FORMAT);
 		});
 	});
 });

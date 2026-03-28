@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Unit tests
+        run: npm test
+
+      - name: Enforce FieldKey encapsulation
+        run: |
+          if grep -rn "as FieldKey" src/ --include="*.ts" --include="*.tsx" | grep -v "src/constants/objectFields.ts"; then
+            echo "Error: 'as FieldKey' cast found outside objectFields.ts. Use toFieldKey() instead."
+            exit 1
+          fi

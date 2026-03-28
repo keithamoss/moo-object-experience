@@ -3,6 +3,7 @@
  */
 
 import { beforeEach, describe, expect, it } from 'vitest';
+import { OBJECT_FIELDS } from '../constants/objectFields';
 import type { ObjectData } from '../types/metadata';
 import { TermsService } from './terms';
 
@@ -17,14 +18,14 @@ describe('TermsService', () => {
 		it('should extract terms from searchable fields', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'Ancient Stone Bowl',
-					'dcterms:description': 'A beautiful stone artifact',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'Ancient Stone Bowl',
+					[OBJECT_FIELDS.DESCRIPTION]: 'A beautiful stone artifact',
 				},
 				{
-					'dcterms:identifier.moooi': 'obj-2',
-					'dcterms:title': 'Modern Glass Sculpture',
-					'dcterms:description': 'Contemporary glass art piece',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-2',
+					[OBJECT_FIELDS.TITLE]: 'Modern Glass Sculpture',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Contemporary glass art piece',
 				},
 			];
 
@@ -45,13 +46,13 @@ describe('TermsService', () => {
 		it('should handle objects with null and undefined field values', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': null as any,
-					'dcterms:description': undefined as any,
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: null as any,
+					[OBJECT_FIELDS.DESCRIPTION]: undefined as any,
 				},
 				{
-					'dcterms:identifier.moooi': 'obj-2',
-					'dcterms:title': 'Valid Title',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-2',
+					[OBJECT_FIELDS.TITLE]: 'Valid Title',
 				},
 			];
 
@@ -66,10 +67,10 @@ describe('TermsService', () => {
 		it('should handle non-string field values', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 123 as any,
-					'dcterms:description': { text: 'object' } as any,
-					'dcterms:creator': ['array'] as any,
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 123 as any,
+					[OBJECT_FIELDS.DESCRIPTION]: { text: 'object' } as any,
+					[OBJECT_FIELDS.CREATOR]: ['array'] as any,
 				},
 			];
 
@@ -82,8 +83,8 @@ describe('TermsService', () => {
 		it('should rebuild index when called multiple times', () => {
 			const objects1: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'First Build',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'First Build',
 				},
 			];
 
@@ -93,8 +94,8 @@ describe('TermsService', () => {
 
 			const objects2: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-2',
-					'dcterms:title': 'Second Build',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-2',
+					[OBJECT_FIELDS.TITLE]: 'Second Build',
 				},
 			];
 
@@ -108,9 +109,9 @@ describe('TermsService', () => {
 		it('should handle unicode and special characters', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'Café naïve résumé 日本語',
-					'dcterms:description': 'Müller über',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'Café naïve résumé 日本語',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Müller über',
 				},
 			];
 
@@ -128,8 +129,8 @@ describe('TermsService', () => {
 		it('should normalize terms to lowercase', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'Ancient STONE Bowl',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'Ancient STONE Bowl',
 				},
 			];
 
@@ -142,8 +143,8 @@ describe('TermsService', () => {
 		it('should skip short terms (less than 2 characters)', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'A B C Ancient Bowl',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'A B C Ancient Bowl',
 				},
 			];
 
@@ -158,14 +159,14 @@ describe('TermsService', () => {
 		it('should track term frequency', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'Stone Bowl',
-					'dcterms:description': 'Ancient stone artifact',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'Stone Bowl',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Ancient stone artifact',
 				},
 				{
-					'dcterms:identifier.moooi': 'obj-2',
-					'dcterms:title': 'Stone Sculpture',
-					'dcterms:description': 'Modern stone art',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-2',
+					[OBJECT_FIELDS.TITLE]: 'Stone Sculpture',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Modern stone art',
 				},
 			];
 
@@ -181,19 +182,19 @@ describe('TermsService', () => {
 		beforeEach(() => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'Stone Bowl Ancient Artifact',
-					'dcterms:description': 'Beautiful stone piece',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'Stone Bowl Ancient Artifact',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Beautiful stone piece',
 				},
 				{
-					'dcterms:identifier.moooi': 'obj-2',
-					'dcterms:title': 'Glass Sculpture',
-					'dcterms:description': 'Modern glass art',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-2',
+					[OBJECT_FIELDS.TITLE]: 'Glass Sculpture',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Modern glass art',
 				},
 				{
-					'dcterms:identifier.moooi': 'obj-3',
-					'dcterms:title': 'Steel Container',
-					'dcterms:description': 'Industrial steel box',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-3',
+					[OBJECT_FIELDS.TITLE]: 'Steel Container',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Industrial steel box',
 				},
 			];
 
@@ -251,16 +252,16 @@ describe('TermsService', () => {
 		it('should return terms sorted by frequency then alphabetically', () => {
 			const manyObjects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'apple apple apple',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'apple apple apple',
 				},
 				{
-					'dcterms:identifier.moooi': 'obj-2',
-					'dcterms:title': 'apricot apricot',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-2',
+					[OBJECT_FIELDS.TITLE]: 'apricot apricot',
 				},
 				{
-					'dcterms:identifier.moooi': 'obj-3',
-					'dcterms:title': 'avocado',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-3',
+					[OBJECT_FIELDS.TITLE]: 'avocado',
 				},
 			];
 
@@ -281,8 +282,8 @@ describe('TermsService', () => {
 		it('should clear the index', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'Test Object',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'Test Object',
 				},
 			];
 
@@ -299,10 +300,10 @@ describe('TermsService', () => {
 		beforeEach(() => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'pottery bowl',
-					'dcterms:description': 'Ancient pottery artifact',
-					'dcterms:creator': 'pottery master',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'pottery bowl',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Ancient pottery artifact',
+					[OBJECT_FIELDS.CREATOR]: 'pottery master',
 				},
 			];
 
@@ -336,9 +337,9 @@ describe('TermsService', () => {
 			const details = service.getTermDetails('pottery');
 
 			expect(details?.fields).toBeDefined();
-			expect(details?.fields.has('dcterms:title')).toBe(true);
-			expect(details?.fields.has('dcterms:description')).toBe(true);
-			expect(details?.fields.has('dcterms:creator')).toBe(true);
+			expect(details?.fields.has(OBJECT_FIELDS.TITLE)).toBe(true);
+			expect(details?.fields.has(OBJECT_FIELDS.DESCRIPTION)).toBe(true);
+			expect(details?.fields.has(OBJECT_FIELDS.CREATOR)).toBe(true);
 		});
 
 		it('should have immutable fields set', () => {
@@ -352,8 +353,8 @@ describe('TermsService', () => {
 		it('should return all terms sorted by frequency', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'zebra apple apple banana',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'zebra apple apple banana',
 				},
 			];
 
@@ -374,8 +375,8 @@ describe('TermsService', () => {
 		it('should return a copy of the terms array', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'test',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'test',
 				},
 			];
 
@@ -401,8 +402,8 @@ describe('TermsService', () => {
 		it('should return correct count of unique terms', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'apple banana cherry apple',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'apple banana cherry apple',
 				},
 			];
 
@@ -419,8 +420,8 @@ describe('TermsService', () => {
 		it('should update after rebuilding index', () => {
 			const objects1: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'word',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'word',
 				},
 			];
 
@@ -429,8 +430,8 @@ describe('TermsService', () => {
 
 			const objects2: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-2',
-					'dcterms:title': 'first second third',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-2',
+					[OBJECT_FIELDS.TITLE]: 'first second third',
 				},
 			];
 
@@ -447,8 +448,8 @@ describe('TermsService', () => {
 		it('should return true after building index with data', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'test',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'test',
 				},
 			];
 
@@ -459,8 +460,8 @@ describe('TermsService', () => {
 		it('should return false after clearing', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'test',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'test',
 				},
 			];
 
@@ -474,8 +475,8 @@ describe('TermsService', () => {
 		beforeEach(() => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'Multi-word hyphenated-term with punctuation',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'Multi-word hyphenated-term with punctuation',
 				},
 			];
 
@@ -493,8 +494,8 @@ describe('TermsService', () => {
 		it('should handle multiple consecutive punctuation marks', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'word1...word2!!!word3???word4',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'word1...word2!!!word3???word4',
 				},
 			];
 
@@ -510,8 +511,8 @@ describe('TermsService', () => {
 		it('should handle strings with only punctuation', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': '...!!!???',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: '...!!!???',
 				},
 			];
 
@@ -523,8 +524,8 @@ describe('TermsService', () => {
 		it('should handle empty strings', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': '',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: '',
 				},
 			];
 
@@ -536,8 +537,8 @@ describe('TermsService', () => {
 		it('should handle whitespace-only strings', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': '   \t\n   ',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: '   \t\n   ',
 				},
 			];
 
@@ -549,8 +550,8 @@ describe('TermsService', () => {
 		it('should remove leading and trailing punctuation', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': '!!!word??? ...another.',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: '!!!word??? ...another.',
 				},
 			];
 
@@ -566,8 +567,8 @@ describe('TermsService', () => {
 		it('should handle mixed delimiters', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': 'word1,word2;word3.word4(word5)word6[word7]word8{word9}',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: 'word1,word2;word3.word4(word5)word6[word7]word8{word9}',
 				},
 			];
 
@@ -588,8 +589,8 @@ describe('TermsService', () => {
 		it('should handle quoted strings', () => {
 			const objects: ObjectData[] = [
 				{
-					'dcterms:identifier.moooi': 'obj-1',
-					'dcterms:title': '"quoted text" and \'single quotes\'',
+					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
+					[OBJECT_FIELDS.TITLE]: '"quoted text" and \'single quotes\'',
 				},
 			];
 

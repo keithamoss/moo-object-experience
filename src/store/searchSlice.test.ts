@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { ALL_SEARCHABLE_FIELD_NAMES, MIN_QUERY_LENGTH } from '../config/searchConfig';
+import { OBJECT_FIELDS } from '../constants/objectFields';
 import { searchService } from '../services/search';
 import { createTestStore } from '../test-utils/test-helpers';
 import searchReducer, {
@@ -39,21 +40,21 @@ describe('searchSlice', () => {
 		});
 
 		it('should handle toggleSearchField to remove field', () => {
-			const state = searchReducer(initialState, toggleSearchField('dcterms:title'));
-			expect(state.activeSearchFields).not.toContain('dcterms:title');
+			const state = searchReducer(initialState, toggleSearchField(OBJECT_FIELDS.TITLE));
+			expect(state.activeSearchFields).not.toContain(OBJECT_FIELDS.TITLE);
 		});
 
 		it('should handle toggleSearchField to add field', () => {
 			const stateWithoutField: SearchState = {
 				...initialState,
-				activeSearchFields: ['dcterms:description'],
+				activeSearchFields: [OBJECT_FIELDS.DESCRIPTION],
 			};
-			const state = searchReducer(stateWithoutField, toggleSearchField('dcterms:title'));
-			expect(state.activeSearchFields).toContain('dcterms:title');
+			const state = searchReducer(stateWithoutField, toggleSearchField(OBJECT_FIELDS.TITLE));
+			expect(state.activeSearchFields).toContain(OBJECT_FIELDS.TITLE);
 		});
 
 		it('should handle setActiveFields', () => {
-			const fields: SearchState['activeSearchFields'] = ['dcterms:title', 'dcterms:description'];
+			const fields: SearchState['activeSearchFields'] = [OBJECT_FIELDS.TITLE, OBJECT_FIELDS.DESCRIPTION];
 			const state = searchReducer(initialState, setActiveFields(fields));
 			expect(state.activeSearchFields).toEqual(fields);
 		});
@@ -78,7 +79,7 @@ describe('searchSlice', () => {
 			const modifiedState: SearchState = {
 				query: 'test',
 				results: [{ id: '1', score: 1, match: {} }],
-				activeSearchFields: ['dcterms:title'],
+				activeSearchFields: [OBJECT_FIELDS.TITLE],
 				indexReady: true,
 			};
 			const state = searchReducer(modifiedState, resetSearch());
@@ -146,9 +147,9 @@ describe('searchSlice', () => {
 			// Build index first so setQuery can perform search
 			searchService.buildIndex([
 				{
-					'dcterms:identifier.moooi': 'TEST-001',
-					'dcterms:title': 'Test Object',
-					'dcterms:description': 'Test Description',
+					[OBJECT_FIELDS.IDENTIFIER]: 'TEST-001',
+					[OBJECT_FIELDS.TITLE]: 'Test Object',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Test Description',
 				},
 			]);
 
@@ -162,9 +163,9 @@ describe('searchSlice', () => {
 			// Build index first so setQuery can perform search
 			searchService.buildIndex([
 				{
-					'dcterms:identifier.moooi': 'TEST-001',
-					'dcterms:title': 'Test Object',
-					'dcterms:description': 'Test Description',
+					[OBJECT_FIELDS.IDENTIFIER]: 'TEST-001',
+					[OBJECT_FIELDS.TITLE]: 'Test Object',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Test Description',
 				},
 			]);
 
@@ -188,14 +189,14 @@ describe('searchSlice', () => {
 			// Build search index
 			searchService.buildIndex([
 				{
-					'dcterms:identifier.moooi': 'OBJ-001',
-					'dcterms:title': 'Stone Axe',
-					'dcterms:description': 'Ancient tool',
+					[OBJECT_FIELDS.IDENTIFIER]: 'OBJ-001',
+					[OBJECT_FIELDS.TITLE]: 'Stone Axe',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Ancient tool',
 				},
 				{
-					'dcterms:identifier.moooi': 'OBJ-002',
-					'dcterms:title': 'Metal Tool',
-					'dcterms:description': 'Modern implement',
+					[OBJECT_FIELDS.IDENTIFIER]: 'OBJ-002',
+					[OBJECT_FIELDS.TITLE]: 'Metal Tool',
+					[OBJECT_FIELDS.DESCRIPTION]: 'Modern implement',
 				},
 			]);
 
@@ -216,7 +217,7 @@ describe('searchSlice', () => {
 
 		it('should filter results by active fields', () => {
 			// Search only in title field
-			store.dispatch(setActiveFields(['dcterms:title']));
+			store.dispatch(setActiveFields([OBJECT_FIELDS.TITLE]));
 			store.dispatch(setQuery('ancient'));
 
 			// 'ancient' only appears in description, not title
@@ -231,7 +232,7 @@ describe('searchSlice', () => {
 			expect(initialResults.length).toBeGreaterThan(0);
 
 			// Remove title field (where 'stone' appears)
-			store.dispatch(toggleSearchField('dcterms:title'));
+			store.dispatch(toggleSearchField(OBJECT_FIELDS.TITLE));
 
 			const updatedResults = selectSearchResults(store.getState());
 			expect(updatedResults.length).toBe(0);

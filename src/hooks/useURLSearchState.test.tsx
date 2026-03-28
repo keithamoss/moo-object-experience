@@ -1,6 +1,7 @@
 import { renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ALL_SEARCHABLE_FIELD_NAMES } from '../config/searchConfig';
+import { OBJECT_FIELDS } from '../constants/objectFields';
 import { setActiveFields, setQuery } from '../store/searchSlice';
 import { AllTheProviders, createTestStore } from '../test-utils/test-helpers';
 import { useURLSearchState } from './useURLSearchState';
@@ -46,7 +47,7 @@ describe('useURLSearchState', () => {
 			wrapper: ({ children }) => <AllTheProviders store={store}>{children}</AllTheProviders>,
 		});
 
-		expect(dispatchSpy).toHaveBeenCalledWith(setActiveFields(['dcterms:title']));
+		expect(dispatchSpy).toHaveBeenCalledWith(setActiveFields([OBJECT_FIELDS.TITLE]));
 	});
 
 	it('should handle empty query parameter', () => {

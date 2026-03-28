@@ -3,9 +3,11 @@
  * Defines searchable fields, weights, and search parameters
  */
 
+import { type FieldKey, OBJECT_FIELDS } from '../constants/objectFields';
+
 export interface SearchableField {
 	/** The field name from the metadata schema */
-	fieldName: string;
+	fieldName: FieldKey;
 	/** Weight for search ranking (higher = more important) */
 	weight: number;
 }
@@ -20,19 +22,19 @@ export interface SearchableField {
  */
 export const SEARCHABLE_FIELDS = [
 	{
-		fieldName: 'dcterms:title',
+		fieldName: OBJECT_FIELDS.TITLE,
 		weight: 3,
 	},
 	{
-		fieldName: 'dcterms:alternative',
+		fieldName: OBJECT_FIELDS.ALTERNATIVE,
 		weight: 2,
 	},
 	{
-		fieldName: 'dcterms:creator',
+		fieldName: OBJECT_FIELDS.CREATOR,
 		weight: 2,
 	},
 	{
-		fieldName: 'dcterms:description',
+		fieldName: OBJECT_FIELDS.DESCRIPTION,
 		weight: 1,
 	},
 ] as const;

@@ -11,6 +11,7 @@ import {
 	SEARCH_COMBINE_MODE,
 	type SearchableFieldName,
 } from '../config/searchConfig';
+import { OBJECT_FIELDS } from '../constants/objectFields';
 import type { ObjectData } from '../types/metadata';
 
 /**
@@ -55,8 +56,8 @@ export class SearchService {
 		// Initialize MiniSearch with dynamic fields
 		this.miniSearch = new MiniSearch({
 			fields: ALL_SEARCHABLE_FIELD_NAMES, // Fields to index
-			storeFields: ['dcterms:identifier.moooi', 'dcterms:title'], // Fields to return in results
-			idField: 'dcterms:identifier.moooi', // Use object identifier as ID
+			storeFields: [OBJECT_FIELDS.IDENTIFIER, OBJECT_FIELDS.TITLE], // Fields to return in results
+			idField: OBJECT_FIELDS.IDENTIFIER, // Use object identifier as ID
 			searchOptions: {
 				boost: FIELD_WEIGHTS, // Apply field weights
 				fuzzy: FUZZY_TOLERANCE, // Fuzzy matching tolerance (0-1)
@@ -116,7 +117,7 @@ export class SearchService {
 	 * Get object by ID from indexed objects
 	 */
 	getObjectById(id: string): ObjectData | undefined {
-		return this.indexedObjects.find((obj) => obj['dcterms:identifier.moooi'] === id);
+		return this.indexedObjects.find((obj) => obj[OBJECT_FIELDS.IDENTIFIER] === id);
 	}
 
 	/**

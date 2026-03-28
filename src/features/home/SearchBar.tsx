@@ -7,15 +7,15 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import {
-	Autocomplete,
-	Badge,
-	Box,
-	Collapse,
-	IconButton,
-	InputAdornment,
-	Paper,
-	TextField,
-	Typography,
+  Autocomplete,
+  Badge,
+  Box,
+  Collapse,
+  IconButton,
+  InputAdornment,
+  Paper,
+  TextField,
+  Typography,
 } from '@mui/material';
 import { useMemo, useRef, useState } from 'react';
 import KeyboardKey from '../../components/KeyboardKey';
@@ -245,6 +245,8 @@ export default function SearchBar({
 						inputProps={{
 							...params.inputProps,
 							'aria-label': 'Search the collection',
+							'data-testid': 'search-box',
+							'data-ready': !disabled,
 							enterKeyHint: 'search', // Mobile keyboard shows "Search" button
 							spellCheck: false,
 							autoComplete: 'off',

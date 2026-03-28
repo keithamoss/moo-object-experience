@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ALL_SEARCHABLE_FIELD_NAMES, type SearchableFieldName } from '../config/searchConfig';
+import { OBJECT_FIELDS } from '../constants/objectFields';
 import { areAllFieldsSelected, areFieldArraysEqual, parseFieldsFromURL } from './searchUtils';
 
 describe('parseFieldsFromURL', () => {
@@ -15,36 +16,36 @@ describe('parseFieldsFromURL', () => {
 
 	it('should parse valid comma-separated fields', () => {
 		const result = parseFieldsFromURL('dcterms:title,dcterms:description');
-		expect(result).toEqual(['dcterms:title', 'dcterms:description']);
+		expect(result).toEqual([OBJECT_FIELDS.TITLE, OBJECT_FIELDS.DESCRIPTION]);
 	});
 
 	it('should filter out invalid field names', () => {
 		const result = parseFieldsFromURL('dcterms:title,invalid,dcterms:description,fake');
-		expect(result).toEqual(['dcterms:title', 'dcterms:description']);
+		expect(result).toEqual([OBJECT_FIELDS.TITLE, OBJECT_FIELDS.DESCRIPTION]);
 	});
 
 	it('should handle single field', () => {
 		const result = parseFieldsFromURL('dcterms:title');
-		expect(result).toEqual(['dcterms:title']);
+		expect(result).toEqual([OBJECT_FIELDS.TITLE]);
 	});
 });
 
 describe('areFieldArraysEqual', () => {
 	it('should return true for identical arrays', () => {
-		const fields1: SearchableFieldName[] = ['dcterms:title', 'dcterms:description'];
-		const fields2: SearchableFieldName[] = ['dcterms:title', 'dcterms:description'];
+		const fields1: SearchableFieldName[] = [OBJECT_FIELDS.TITLE, OBJECT_FIELDS.DESCRIPTION];
+		const fields2: SearchableFieldName[] = [OBJECT_FIELDS.TITLE, OBJECT_FIELDS.DESCRIPTION];
 		expect(areFieldArraysEqual(fields1, fields2)).toBe(true);
 	});
 
 	it('should return false for arrays with different lengths', () => {
-		const fields1: SearchableFieldName[] = ['dcterms:title', 'dcterms:description'];
-		const fields2: SearchableFieldName[] = ['dcterms:title'];
+		const fields1: SearchableFieldName[] = [OBJECT_FIELDS.TITLE, OBJECT_FIELDS.DESCRIPTION];
+		const fields2: SearchableFieldName[] = [OBJECT_FIELDS.TITLE];
 		expect(areFieldArraysEqual(fields1, fields2)).toBe(false);
 	});
 
 	it('should return false for arrays with different order', () => {
-		const fields1: SearchableFieldName[] = ['dcterms:title', 'dcterms:description'];
-		const fields2: SearchableFieldName[] = ['dcterms:description', 'dcterms:title'];
+		const fields1: SearchableFieldName[] = [OBJECT_FIELDS.TITLE, OBJECT_FIELDS.DESCRIPTION];
+		const fields2: SearchableFieldName[] = [OBJECT_FIELDS.DESCRIPTION, OBJECT_FIELDS.TITLE];
 		expect(areFieldArraysEqual(fields1, fields2)).toBe(false);
 	});
 
@@ -59,7 +60,7 @@ describe('areAllFieldsSelected', () => {
 	});
 
 	it('should return false when only some fields are selected', () => {
-		expect(areAllFieldsSelected(['dcterms:title', 'dcterms:description'])).toBe(false);
+		expect(areAllFieldsSelected([OBJECT_FIELDS.TITLE, OBJECT_FIELDS.DESCRIPTION])).toBe(false);
 	});
 
 	it('should return false when no fields are selected', () => {

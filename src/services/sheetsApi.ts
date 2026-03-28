@@ -3,6 +3,7 @@
  */
 
 import { SHEETS_CONFIG } from '../config/sheets';
+import { OBJECT_FIELDS, toFieldKey } from '../constants/objectFields';
 import type { MetadataSchema, ObjectData, SheetsApiResponse } from '../types/metadata';
 
 /**
@@ -105,7 +106,7 @@ export function parseMetadataSchema(rows: string[][]): MetadataSchema {
 		.map((row) => ({
 			// Use columnIndices lookup for each field, defaulting to empty string if missing
 			// This handles sparse data gracefully (missing cells show as empty string)
-			field: row[columnIndices.field] || '',
+			field: toFieldKey(row[columnIndices.field] || ''),
 			namespace: row[columnIndices.namespace] || '',
 			label: row[columnIndices.label] || '',
 			applicableCollections: row[columnIndices.applicableCollections] || '',
@@ -126,11 +127,14 @@ export function parseObjectsData(rows: string[][], _schema: MetadataSchema): Obj
 		throw new Error('Museum sheet must have at least a header row and one data row');
 	}
 
-	// First row contains field names (should match schema field names)
-	const fieldNames = rows[0];
+	// First row contains field names (should match schema field names).
+	// toFieldKey() is the sole authorized boundary where raw sheet strings
+	// become typed field keys. The §1 validation in parseMetadataSchema
+	// (SHEETSAPI_IMPROVEMENTS.md) will guard these before this point is reached.
+	const fieldNames = rows[0].map(toFieldKey);
 
 	// Find the index of the identifier field
-	const identifierIndex = fieldNames.indexOf('dcterms:identifier.moooi');
+	const identifierIndex = fieldNames.indexOf(OBJECT_FIELDS.IDENTIFIER);
 
 	// Parse data rows (skip header)
 	const objects: ObjectData[] = rows
@@ -157,7 +161,7 @@ export function parseObjectsData(rows: string[][], _schema: MetadataSchema): Obj
 			});
 
 			// Validate required fields exist
-			const identifier = obj['dcterms:identifier.moooi'];
+			const identifier = obj[OBJECT_FIELDS.IDENTIFIER];
 			if (!identifier || typeof identifier !== 'string' || identifier.trim() === '') {
 				throw new Error(`Object missing required identifier field`);
 			}
