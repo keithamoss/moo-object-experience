@@ -171,7 +171,21 @@ export default function SearchBar({
 				comboboxProps={{ position: 'bottom-start' }}
 				mb="sm"
 				rightSection={
-					<Group gap={4} wrap="nowrap" pr={32}>
+					<Group gap={4} wrap="nowrap" pr={12} justify="flex-end" w="100%">
+						{showClearButton && (
+							<ActionIcon
+								aria-label="Clear search"
+								onClick={onClear}
+								variant="filled"
+								radius="xl"
+								size="lg"
+								disabled={disabled}
+								color="gray.5"
+								mr={4}
+							>
+								<IconX size={16} />
+							</ActionIcon>
+						)}
 						<Indicator disabled={!hasCustomFields} color="red" size={8} offset={4}>
 							<ActionIcon
 								aria-label="Toggle search filters"
@@ -186,23 +200,9 @@ export default function SearchBar({
 								<IconFilter size={18} stroke={1.5} />
 							</ActionIcon>
 						</Indicator>
-						{showClearButton && (
-							<ActionIcon
-								aria-label="Clear search"
-								onClick={onClear}
-								variant="filled"
-								radius="xl"
-								size="lg"
-								disabled={disabled}
-								color="gray.5"
-								ml={4}
-							>
-								<IconX size={16} />
-							</ActionIcon>
-						)}
 					</Group>
 				}
-				rightSectionWidth={showClearButton ? 64 : 36}
+				rightSectionWidth={72}
 			/>
 
 			{/* Keyboard shortcut hints (desktop only) */}
