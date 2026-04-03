@@ -191,7 +191,7 @@ export default function SearchContainer({ metadata, objects, disabled = false }:
 				onCommitWithQuery={handleCommitWithQuery}
 				onClear={handleClear}
 				disabled={disabled}
-				committedQuery={committedQuery}
+
 				metadataFields={metadata}
 				activeFields={activeFields}
 				onToggleField={handleToggleField}

@@ -41,7 +41,6 @@ describe('SearchBar', () => {
 		onCommit: vi.fn(),
 		onClear: vi.fn(),
 		disabled: false,
-		committedQuery: '',
 		metadataFields: mockMetadataFields,
 		activeFields: ALL_SEARCHABLE_FIELD_NAMES,
 		onToggleField: vi.fn(),
@@ -148,47 +147,6 @@ describe('SearchBar', () => {
 			expect(onClear).toHaveBeenCalledTimes(1);
 		});
 
-		it('should call onCommit on blur if query changed', async () => {
-			const onCommit = vi.fn();
-			const user = userEvent.setup();
-
-			renderWithProviders(
-				<>
-					<SearchBar {...defaultProps} query="new query" committedQuery="old query" onCommit={onCommit} />
-					<button type="button">Outside</button>
-				</>,
-			);
-
-			const input = screen.getByLabelText('Search the collection');
-			await user.click(input);
-
-			// Focus something else to trigger blur
-			const outsideButton = screen.getByText('Outside');
-			await user.click(outsideButton);
-
-			expect(onCommit).toHaveBeenCalledTimes(1);
-		});
-
-		it('should NOT call onCommit on blur if query has not changed', async () => {
-			const onCommit = vi.fn();
-			const user = userEvent.setup();
-
-			renderWithProviders(
-				<>
-					<SearchBar {...defaultProps} query="same query" committedQuery="same query" onCommit={onCommit} />
-					<button type="button">Outside</button>
-				</>,
-			);
-
-			const input = screen.getByLabelText('Search the collection');
-			await user.click(input);
-
-			// Focus something else to trigger blur
-			const outsideButton = screen.getByText('Outside');
-			await user.click(outsideButton);
-
-			expect(onCommit).not.toHaveBeenCalled();
-		});
 	});
 
 	describe('double history entry bug fix', () => {
@@ -198,7 +156,7 @@ describe('SearchBar', () => {
 
 			renderWithProviders(
 				<>
-					<SearchBar {...defaultProps} query="test query" committedQuery="old query" onCommit={onCommit} />
+					<SearchBar {...defaultProps} query="test query" onCommit={onCommit} />
 					<button type="button">Outside</button>
 				</>,
 			);
@@ -228,7 +186,7 @@ describe('SearchBar', () => {
 					<SearchBar
 						{...defaultProps}
 						query="sto"
-						committedQuery=""
+
 						onCommit={onCommit}
 						onQueryChange={onQueryChange}
 					/>
@@ -264,7 +222,7 @@ describe('SearchBar', () => {
 			const onCommit = vi.fn();
 			const user = userEvent.setup();
 
-			renderWithProviders(<SearchBar {...defaultProps} query="test" committedQuery="" onCommit={onCommit} />);
+			renderWithProviders(<SearchBar {...defaultProps} query="test" onCommit={onCommit} />);
 
 			const input = screen.getByLabelText('Search the collection');
 

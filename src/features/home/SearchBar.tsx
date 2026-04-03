@@ -7,15 +7,15 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import {
-  Autocomplete,
-  Badge,
-  Box,
-  Collapse,
-  IconButton,
-  InputAdornment,
-  Paper,
-  TextField,
-  Typography,
+    Autocomplete,
+    Badge,
+    Box,
+    Collapse,
+    IconButton,
+    InputAdornment,
+    Paper,
+    TextField,
+    Typography,
 } from '@mui/material';
 import { useMemo, useRef, useState } from 'react';
 import KeyboardKey from '../../components/KeyboardKey';
@@ -38,8 +38,7 @@ export interface SearchBarProps {
 	readonly onClear: () => void;
 	/** Whether search is disabled */
 	readonly disabled?: boolean;
-	/** Current committed query from URL (for blur comparison) */
-	readonly committedQuery?: string;
+
 	/** Metadata schema for field labels */
 	readonly metadataFields: MetadataField[];
 	/** Currently active search fields */
@@ -55,7 +54,6 @@ export default function SearchBar({
 	onCommitWithQuery,
 	onClear,
 	disabled = false,
-	committedQuery = '',
 	metadataFields,
 	activeFields,
 	onToggleField,
@@ -65,9 +63,6 @@ export default function SearchBar({
 
 	// Ref to access the input element directly
 	const inputRef = useRef<HTMLInputElement>(null);
-
-	// Ref to track if we just committed (to avoid double-commit on blur)
-	const justCommittedRef = useRef(false);
 
 	// Ref to track if user is navigating suggestions with keyboard
 	const isNavigatingSuggestionsRef = useRef(false);
@@ -128,9 +123,6 @@ export default function SearchBar({
 			setSuggestions([]);
 			isNavigatingSuggestionsRef.current = false;
 
-			// Mark that we're committing (prevents double-commit if Enter was pressed)
-			justCommittedRef.current = true;
-
 			// Blur input to dismiss keyboard on mobile
 			if (inputRef.current) {
 				inputRef.current.blur();
@@ -147,10 +139,6 @@ export default function SearchBar({
 				}, 0);
 			}
 
-			// Reset the flag after a short delay
-			setTimeout(() => {
-				justCommittedRef.current = false;
-			}, 100);
 		}
 	};
 
@@ -167,19 +155,10 @@ export default function SearchBar({
 			// If user is navigating suggestions with keyboard, let Autocomplete's onChange handle it
 			// This prevents double-commit when selecting with ArrowDown + Enter
 			if (isNavigatingSuggestionsRef.current && suggestions.length > 0) {
-				// Mark that we're committing to prevent handleBlur from also committing
-				justCommittedRef.current = true;
-				// onChange will fire with the selected value
-				// Don't reset isNavigatingSuggestionsRef here - let onChange do it
-				// Reset the just committed flag after a short delay
-				setTimeout(() => {
-					justCommittedRef.current = false;
-				}, 100);
+				// onChange will fire with the selected value via handleChange
 				return;
 			}
 
-			// Mark that we're committing via Enter
-			justCommittedRef.current = true;
 			// Blur to dismiss keyboard on mobile
 			if (inputRef.current) {
 				inputRef.current.blur();
@@ -187,10 +166,6 @@ export default function SearchBar({
 			onCommit();
 			setSuggestions([]);
 			isNavigatingSuggestionsRef.current = false;
-			// Reset the flag after a short delay
-			setTimeout(() => {
-				justCommittedRef.current = false;
-			}, 100);
 		} else if (event.key === 'Escape') {
 			onClear();
 			setSuggestions([]);
@@ -199,19 +174,6 @@ export default function SearchBar({
 	};
 
 	const handleBlur = () => {
-		// Don't commit on blur if we just committed via Enter
-		if (justCommittedRef.current) {
-			setSuggestions([]);
-			isNavigatingSuggestionsRef.current = false;
-			return;
-		}
-
-		// Only commit if query actually changed from committed value
-		if (query.trim() !== committedQuery) {
-			onCommit();
-		}
-		// Clear suggestions and navigation flag on blur
-		setSuggestions([]);
 		isNavigatingSuggestionsRef.current = false;
 	};
 
