@@ -29,6 +29,7 @@
  * - Local state: UI state only (uncommitted typing in localQuery)
  */
 
+import { useForm } from '@mantine/form';
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import type { SearchableFieldName } from '../../config/searchConfig';
@@ -55,8 +56,8 @@ export default function SearchContainer({ metadata, objects, disabled = false }:
 	const _dispatch = useAppDispatch();
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	// Local state for typing experience (not committed until Enter/blur)
-	const [localQuery, setLocalQuery] = useState('');
+	// @mantine/form owns the uncommitted (live) query value
+	const form = useForm({ initialValues: { query: '' } });
 	const [isSearching, setIsSearching] = useState(false);
 
 	// Redux search state (committed search)
@@ -65,110 +66,94 @@ export default function SearchContainer({ metadata, objects, disabled = false }:
 	const activeFields = useAppSelector(selectActiveSearchFields);
 
 	// Sync URL to Redux using custom hook
-	// This is unidirectional: URL → Redux (no reverse sync needed)
 	useURLSearchState(searchParams, committedQuery, activeFields);
 
 	// Build search index when objects are loaded
 	useSearchIndex(objects);
 
-	// Update local query when URL changes (for committed searches)
+	// Update form query when URL changes (browser back/forward)
+	// biome-ignore lint/correctness/useExhaustiveDependencies: form.setFieldValue is excluded intentionally — in Mantine v9 it is recreated every render (unstable reference), so including it would cause an infinite update loop. searchParams is the only meaningful trigger.
 	useEffect(() => {
 		const urlQuery = searchParams.get(URL_PARAMS.QUERY) || '';
-		setLocalQuery(urlQuery);
+		form.setFieldValue('query', urlQuery);
 	}, [searchParams]);
 
-	// Clear loading state when search completes (when committedQuery updates)
-	// biome-ignore lint/correctness/useExhaustiveDependencies: We intentionally depend on committedQuery to trigger when search completes, even though we don't use the value
+	// Clear loading state when search completes
+	// biome-ignore lint/correctness/useExhaustiveDependencies: We intentionally depend on committedQuery to trigger when search completes
 	useEffect(() => {
 		setIsSearching(false);
 	}, [committedQuery]);
 
-	// Consolidated URL update function (memoized to prevent recreation)
-	// Builds URL params from current state and updates browser URL
 	const updateURL = useCallback(
 		(newQuery?: string, newFields?: SearchableFieldName[]) => {
 			const params = new URLSearchParams();
 
-			const queryToUse = newQuery ?? localQuery;
+			const queryToUse = newQuery ?? form.values.query;
 			if (queryToUse.trim()) {
 				params.set(URL_PARAMS.QUERY, queryToUse);
 			}
 
 			const fieldsToUse = newFields ?? activeFields;
-			// Only set fields param if not all fields (for cleaner URLs)
-			// - No param = all fields selected (default)
-			// - Empty string = no fields selected
-			// - Comma list = specific fields selected
 			if (!areAllFieldsSelected(fieldsToUse)) {
 				params.set(URL_PARAMS.FIELDS, fieldsToUse.join(','));
 			}
 
 			setSearchParams(params);
 		},
-		[localQuery, activeFields, setSearchParams],
+		[form.values.query, activeFields, setSearchParams],
 	);
 
-	// Handlers - typing doesn't commit, only Enter/blur/filter-toggle commits
+	// Handlers
+	// biome-ignore lint/correctness/useExhaustiveDependencies: form.setFieldValue excluded — Mantine v9 recreates it every render, making it an unstable dep
 	const handleQueryChange = useCallback((newQuery: string) => {
-		setLocalQuery(newQuery);
+		form.setFieldValue('query', newQuery);
 	}, []);
 
 	const handleCommit = useCallback(() => {
-		const trimmedQuery = localQuery.trim();
-
+		const trimmedQuery = form.values.query.trim();
 		if (trimmedQuery) {
-			// Only set loading state if query actually changed
 			if (trimmedQuery !== committedQuery) {
 				setIsSearching(true);
 			}
 			updateURL(trimmedQuery, activeFields);
 		} else {
-			// Empty query - clear everything
 			setSearchParams(new URLSearchParams());
 		}
-	}, [localQuery, committedQuery, activeFields, updateURL, setSearchParams]);
+	}, [form.values.query, committedQuery, activeFields, updateURL, setSearchParams]);
 
-	// Handler for immediate commit with a specific query (e.g., when selecting from autocomplete)
 	const handleCommitWithQuery = useCallback(
 		(query: string) => {
 			const trimmedQuery = query.trim();
-
 			if (trimmedQuery) {
-				// Update local state
-				setLocalQuery(trimmedQuery);
-				// Only set loading state if query actually changed
+				form.setFieldValue('query', trimmedQuery);
 				if (trimmedQuery !== committedQuery) {
 					setIsSearching(true);
 				}
 				updateURL(trimmedQuery, activeFields);
 			} else {
-				// Empty query - clear everything
 				setSearchParams(new URLSearchParams());
 			}
 		},
-		[committedQuery, activeFields, updateURL, setSearchParams],
+		[committedQuery, activeFields, updateURL, setSearchParams, form.setFieldValue],
 	);
 
+	// biome-ignore lint/correctness/useExhaustiveDependencies: form.reset excluded — Mantine v9 recreates it every render, making it an unstable dep
 	const handleClear = useCallback(() => {
-		setLocalQuery('');
-		setSearchParams(new URLSearchParams()); // Commits empty state immediately
+		form.reset();
+		setSearchParams(new URLSearchParams());
 	}, [setSearchParams]);
 
 	const handleToggleField = useCallback(
 		(fieldName: SearchableFieldName) => {
-			// Read current state from URL (source of truth) to avoid race conditions
 			const fieldsParam = searchParams.get(URL_PARAMS.FIELDS);
 			const currentFields = parseFieldsFromURL(fieldsParam);
 
-			// Calculate new field list
 			const newFields = currentFields.includes(fieldName)
 				? currentFields.filter((f) => f !== fieldName)
 				: [...currentFields, fieldName];
 
-			// Use committed query from Redux
 			const trimmedQuery = committedQuery.trim();
 
-			// Only set loading if there's a query and fields actually changed
 			const fieldsChanged =
 				newFields.length !== currentFields.length || !newFields.every((field, index) => field === currentFields[index]);
 
@@ -183,21 +168,18 @@ export default function SearchContainer({ metadata, objects, disabled = false }:
 
 	return (
 		<>
-			{/* Search Bar with integrated filters */}
 			<SearchBar
-				query={localQuery}
+				query={form.values.query}
 				onQueryChange={handleQueryChange}
 				onCommit={handleCommit}
 				onCommitWithQuery={handleCommitWithQuery}
 				onClear={handleClear}
 				disabled={disabled}
-
 				metadataFields={metadata}
 				activeFields={activeFields}
 				onToggleField={handleToggleField}
 			/>
 
-			{/* Search Results */}
 			<SearchResults results={results} objects={objects} query={committedQuery} isSearching={isSearching} />
 		</>
 	);

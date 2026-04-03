@@ -67,14 +67,24 @@ describe('ResultCard', () => {
 		expect(marks.length).toBeGreaterThan(0);
 	});
 
-	it('should be clickable', () => {
+	it('should render as a link when identifier is present', () => {
 		const result = createMockSearchResult();
 		const object = createMockObjectData();
 
-		const { container } = renderWithProviders(<ResultCard result={result} object={object} />);
+		renderWithProviders(<ResultCard result={result} object={object} />);
 
-		const actionArea = container.querySelector('.MuiCardActionArea-root');
-		expect(actionArea).toBeInTheDocument();
+		const link = screen.getByRole('link');
+		expect(link).toBeInTheDocument();
+	});
+
+	it('should render as a card (non-link) when identifier is missing', () => {
+		const result = createMockSearchResult();
+		const object = createMockObjectData({ 'dcterms:identifier.moooi': '' });
+
+		renderWithProviders(<ResultCard result={result} object={object} />);
+
+		expect(screen.queryByRole('link')).not.toBeInTheDocument();
+		expect(screen.getByTestId('result-card')).toBeInTheDocument();
 	});
 
 	it('should handle missing identifier gracefully', () => {
@@ -88,16 +98,5 @@ describe('ResultCard', () => {
 		expect(screen.getByText('Test Object')).toBeInTheDocument();
 
 		consoleSpy.mockRestore();
-	});
-
-	it('should render inside a Grid item', () => {
-		const result = createMockSearchResult();
-		const object = createMockObjectData();
-
-		const { container } = renderWithProviders(<ResultCard result={result} object={object} />);
-
-		// New Grid API uses .MuiGrid-root class
-		const gridItem = container.querySelector('.MuiGrid-root');
-		expect(gridItem).toBeInTheDocument();
 	});
 });

@@ -1,33 +1,40 @@
-import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { render, screen } from '../../test-utils/test-helpers';
 import { FieldValue } from './FieldValue';
 
 describe('FieldValue', () => {
 	describe('empty / missing values', () => {
 		it('should return null for undefined value', () => {
-			const { container } = render(<FieldValue value={undefined} fieldTypeAndControls="Free text" />);
-			expect(container.firstChild).toBeNull();
+			render(
+				<div data-testid="w">
+					<FieldValue value={undefined} fieldTypeAndControls="Free text" />
+				</div>,
+			);
+			expect(screen.getByTestId('w')).toBeEmptyDOMElement();
 		});
 
 		it('should return null for empty string', () => {
-			const { container } = render(<FieldValue value="" fieldTypeAndControls="Free text" />);
-			expect(container.firstChild).toBeNull();
+			render(
+				<div data-testid="w">
+					<FieldValue value="" fieldTypeAndControls="Free text" />
+				</div>,
+			);
+			expect(screen.getByTestId('w')).toBeEmptyDOMElement();
 		});
 
 		it('should return null for whitespace-only string', () => {
-			const { container } = render(<FieldValue value="   " fieldTypeAndControls="Free text" />);
-			expect(container.firstChild).toBeNull();
+			render(
+				<div data-testid="w">
+					<FieldValue value="   " fieldTypeAndControls="Free text" />
+				</div>,
+			);
+			expect(screen.getByTestId('w')).toBeEmptyDOMElement();
 		});
 	});
 
 	describe('URL fields', () => {
 		it('should render a clickable anchor for URL type', () => {
-			render(
-				<FieldValue
-					value="https://example.com/resource"
-					fieldTypeAndControls="URL"
-				/>,
-			);
+			render(<FieldValue value="https://example.com/resource" fieldTypeAndControls="URL" />);
 
 			const link = screen.getByRole('link');
 			expect(link).toBeInTheDocument();
@@ -35,9 +42,7 @@ describe('FieldValue', () => {
 		});
 
 		it('should open URL in a new tab with security attributes', () => {
-			render(
-				<FieldValue value="https://example.com" fieldTypeAndControls="URL" />,
-			);
+			render(<FieldValue value="https://example.com" fieldTypeAndControls="URL" />);
 
 			const link = screen.getByRole('link');
 			expect(link).toHaveAttribute('target', '_blank');
@@ -65,9 +70,7 @@ describe('FieldValue', () => {
 
 	describe('date fields', () => {
 		it('should format a full ISO date into human-readable form', () => {
-			render(
-				<FieldValue value="2024-03-15" fieldTypeAndControls="ISO8601 compliant date" />,
-			);
+			render(<FieldValue value="2024-03-15" fieldTypeAndControls="ISO8601 compliant date" />);
 
 			expect(screen.getByText('15 March 2024')).toBeInTheDocument();
 		});
@@ -87,12 +90,7 @@ describe('FieldValue', () => {
 
 	describe('comma-separated fields', () => {
 		it('should render each item as a chip', () => {
-			render(
-				<FieldValue
-					value="Ceramics, Pottery, Sculpture"
-					fieldTypeAndControls="Comma-separated list"
-				/>,
-			);
+			render(<FieldValue value="Ceramics, Pottery, Sculpture" fieldTypeAndControls="Comma-separated list" />);
 
 			expect(screen.getByText('Ceramics')).toBeInTheDocument();
 			expect(screen.getByText('Pottery')).toBeInTheDocument();
@@ -100,9 +98,7 @@ describe('FieldValue', () => {
 		});
 
 		it('should filter out empty items after splitting', () => {
-			render(
-				<FieldValue value="Alpha, , Beta" fieldTypeAndControls="Comma separated" />,
-			);
+			render(<FieldValue value="Alpha, , Beta" fieldTypeAndControls="Comma separated" />);
 
 			expect(screen.getByText('Alpha')).toBeInTheDocument();
 			expect(screen.getByText('Beta')).toBeInTheDocument();
@@ -119,9 +115,7 @@ describe('FieldValue', () => {
 		});
 
 		it('should preserve line breaks as <br> elements', () => {
-			const { container } = render(
-				<FieldValue value={'Line one\nLine two'} fieldTypeAndControls="Free text" />,
-			);
+			const { container } = render(<FieldValue value={'Line one\nLine two'} fieldTypeAndControls="Free text" />);
 
 			expect(container.querySelector('br')).toBeInTheDocument();
 			expect(container.textContent).toContain('Line one');

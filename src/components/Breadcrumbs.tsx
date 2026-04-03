@@ -1,5 +1,4 @@
-import NavigateNextIcon from '@mui/icons-material/NavigateNext';
-import { Link, Breadcrumbs as MuiBreadcrumbs, Typography } from '@mui/material';
+import { Anchor, Breadcrumbs as MantineBreadcrumbs, Text } from '@mantine/core';
 import { Link as RouterLink } from 'react-router-dom';
 
 interface BreadcrumbItem {
@@ -17,26 +16,26 @@ interface BreadcrumbsProps {
  */
 export default function Breadcrumbs({ items }: BreadcrumbsProps) {
 	return (
-		<MuiBreadcrumbs separator={<NavigateNextIcon fontSize="small" />} aria-label="breadcrumb" sx={{ mb: 2 }}>
+		<MantineBreadcrumbs component="nav" aria-label="breadcrumb" mb="md">
 			{items.map((item, index) => {
 				const isLast = index === items.length - 1;
 
 				// Last item is not clickable (current page)
 				if (isLast) {
 					return (
-						<Typography key={item.label} color="text.primary" sx={{ fontWeight: 500 }}>
+						<Text key={item.label} fw={500} component="span">
 							{item.label}
-						</Typography>
+						</Text>
 					);
 				}
 
 				// All other items are links
 				return (
-					<Link key={item.label} component={RouterLink} to={item.path || '/'} underline="hover" color="inherit">
+					<Anchor key={item.label} component={RouterLink} to={item.path || '/'} c="inherit" underline="hover">
 						{item.label}
-					</Link>
+					</Anchor>
 				);
 			})}
-		</MuiBreadcrumbs>
+		</MantineBreadcrumbs>
 	);
 }

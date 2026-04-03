@@ -19,8 +19,8 @@
  * ```
  */
 
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import { Box, Button, Paper, Typography } from '@mui/material';
+import { Button, Center, Group, Paper, Text, Title } from '@mantine/core';
+import { IconAlertCircle } from '@tabler/icons-react';
 import { Component, type ErrorInfo, type ReactNode } from 'react';
 
 interface Props {
@@ -63,38 +63,29 @@ export class ErrorBoundary extends Component<Props, State> {
 
 			// Default error UI
 			return (
-				<Box
-					sx={{
-						display: 'flex',
-						justifyContent: 'center',
-						alignItems: 'center',
-						minHeight: '50vh',
-						p: 3,
-					}}
-				>
-					<Paper
-						elevation={3}
-						sx={{
-							p: 4,
-							maxWidth: 600,
-							textAlign: 'center',
-						}}
-					>
-						<ErrorOutlineIcon sx={{ fontSize: 64, color: 'error.main', mb: 2 }} />
-						<Typography variant="h5" gutterBottom>
+				<Center style={{ minHeight: '50vh', padding: 'var(--mantine-spacing-xl)' }}>
+					<Paper withBorder p="xl" radius="md" style={{ maxWidth: 600, textAlign: 'center' }}>
+						<IconAlertCircle
+							size={64}
+							color="var(--mantine-color-red-6)"
+							style={{ marginBottom: 'var(--mantine-spacing-md)' }}
+						/>
+						<Title order={2} mb="sm">
 							Something went wrong
-						</Typography>
-						<Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
+						</Title>
+						<Text c="dimmed" mb="lg">
 							{this.state.error?.message || 'An unexpected error occurred'}
-						</Typography>
-						<Button variant="contained" onClick={this.handleReset} sx={{ mr: 2 }}>
-							Try Again
-						</Button>
-						<Button variant="outlined" onClick={() => (window.location.href = '/')}>
-							Go Home
-						</Button>
+						</Text>
+						<Group justify="center">
+							<Button variant="filled" onClick={this.handleReset}>
+								Try Again
+							</Button>
+							<Button variant="outline" onClick={() => (window.location.href = '/')}>
+								Go Home
+							</Button>
+						</Group>
 					</Paper>
-				</Box>
+				</Center>
 			);
 		}
 

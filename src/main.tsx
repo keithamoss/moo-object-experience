@@ -1,4 +1,6 @@
-import { CssBaseline, ThemeProvider } from '@mui/material';
+import '@gfazioli/mantine-parallax/styles.css';
+import { MantineProvider } from '@mantine/core';
+import '@mantine/core/styles.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
@@ -43,10 +45,9 @@ ReactDOM.createRoot(rootElement).render(
 	<React.StrictMode>
 		<Provider store={store}>
 			<PageMetadataProvider>
-				<ThemeProvider theme={theme}>
-					<CssBaseline />
+				<MantineProvider theme={theme}>
 					<RouterProvider router={router} />
-				</ThemeProvider>
+				</MantineProvider>
 			</PageMetadataProvider>
 		</Provider>
 	</React.StrictMode>,

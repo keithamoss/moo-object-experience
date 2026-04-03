@@ -1,20 +1,11 @@
 /**
  * SearchFilters component
- * Dynamically generated checkboxes for searchable fields
+ * Checkbox group for toggling searchable fields
  * Syncs with URL query parameters
  */
 
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import {
-	Accordion,
-	AccordionDetails,
-	AccordionSummary,
-	Box,
-	Checkbox,
-	FormControlLabel,
-	FormGroup,
-	Typography,
-} from '@mui/material';
+import { Accordion, Checkbox, Group, Text } from '@mantine/core';
+import { IconChevronDown } from '@tabler/icons-react';
 import { useMemo } from 'react';
 import { SEARCHABLE_FIELDS, type SearchableFieldName } from '../../config/searchConfig';
 import type { MetadataField } from '../../types/metadata';
@@ -69,34 +60,28 @@ export default function SearchFilters({
 	// Render filter controls
 	const filterControls = (
 		<>
-			<FormGroup>
-				{SEARCHABLE_FIELDS.map((field) => {
-					const isActive = activeFields.includes(field.fieldName);
-					const label = fieldLabels.get(field.fieldName) || field.fieldName;
-
-					return (
-						<FormControlLabel
-							key={field.fieldName}
-							control={
-								<Checkbox
-									checked={isActive}
-									onChange={() => onToggleField(field.fieldName)}
-									disabled={disabled}
-									inputProps={{
-										'aria-label': `Search in ${label}`,
-									}}
-								/>
-							}
-							label={label}
-						/>
-					);
-				})}
-			</FormGroup>
+			<Checkbox.Group value={activeFields}>
+				<Group gap="sm" wrap="wrap">
+					{SEARCHABLE_FIELDS.map((field) => {
+						const label = fieldLabels.get(field.fieldName) || field.fieldName;
+						return (
+							<Checkbox
+								key={field.fieldName}
+								value={field.fieldName}
+								label={label}
+								disabled={disabled}
+								onChange={() => onToggleField(field.fieldName)}
+								color="brand"
+							/>
+						);
+					})}
+				</Group>
+			</Checkbox.Group>
 
 			{activeFields.length === 0 && (
-				<Typography variant="caption" color="error" sx={{ mt: 1, display: 'block' }}>
+				<Text size="xs" c="red" mt="xs">
 					Select at least one field to search
-				</Typography>
+				</Text>
 			)}
 		</>
 	);
@@ -104,26 +89,24 @@ export default function SearchFilters({
 	// Inline mode: render without Accordion
 	if (inline) {
 		return (
-			<Box>
-				<Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 'bold' }}>
-					Search Fields {selectionState.displayText}
-				</Typography>
+			<div>
+				<Text size="xs" fw={500} tt="uppercase" mb="xs">
+					Search in
+				</Text>
 				{filterControls}
-			</Box>
+			</div>
 		);
 	}
 
 	// Standard mode: render with Accordion
 	return (
-		<Accordion elevation={1} defaultExpanded={false}>
-			<AccordionSummary
-				expandIcon={<ExpandMoreIcon />}
-				aria-controls="search-filters-content"
-				id="search-filters-header"
-			>
-				<Typography>Search Fields {selectionState.displayText}</Typography>
-			</AccordionSummary>
-			<AccordionDetails>{filterControls}</AccordionDetails>
+		<Accordion chevron={<IconChevronDown />} variant="contained">
+			<Accordion.Item value="search-fields">
+				<Accordion.Control aria-controls="search-filters-content" id="search-filters-header">
+					Search Fields {selectionState.displayText}
+				</Accordion.Control>
+				<Accordion.Panel id="search-filters-content">{filterControls}</Accordion.Panel>
+			</Accordion.Item>
 		</Accordion>
 	);
 }

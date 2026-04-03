@@ -1,6 +1,7 @@
-import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import { Box, Button, Container, Paper, Typography } from '@mui/material';
+import { Button, Container, Group, Image, Text, Title } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
+import invalidObjectImage from './InvalidObjectImage.svg';
+import classes from './InvalidObjectPage.module.css';
 
 interface InvalidObjectPageProps {
 	readonly reason: 'missing-identifier' | 'invalid-data';
@@ -13,10 +14,6 @@ interface InvalidObjectPageProps {
  */
 export default function InvalidObjectPage({ reason, objectId }: InvalidObjectPageProps) {
 	const navigate = useNavigate();
-
-	const handleGoHome = () => {
-		navigate('/');
-	};
 
 	const messages = {
 		'missing-identifier': {
@@ -33,29 +30,25 @@ export default function InvalidObjectPage({ reason, objectId }: InvalidObjectPag
 	const { title, description } = messages[reason];
 
 	return (
-		<Container maxWidth="md" sx={{ mt: 8, mb: 4 }}>
-			<Paper elevation={2} sx={{ p: 4, textAlign: 'center' }}>
-				<ErrorOutlineIcon sx={{ fontSize: 80, color: 'warning.main', mb: 2 }} />
-				<Typography variant="h4" component="h1" gutterBottom>
-					{title}
-				</Typography>
-				<Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-					{description}
-				</Typography>
-				{objectId && (
-					<Typography variant="body2" color="text.secondary" sx={{ mb: 3, fontFamily: 'monospace' }}>
-						Object ID: {objectId}
-					</Typography>
-				)}
-				<Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-					<Button variant="contained" onClick={handleGoHome}>
-						Return to Home
-					</Button>
-					<Button variant="outlined" onClick={() => navigate(-1)}>
-						Go Back
-					</Button>
-				</Box>
-			</Paper>
+		<Container size="md" className={classes.root}>
+			<Image src={invalidObjectImage} className={classes.image} />
+			<Title className={classes.title}>{title}</Title>
+			<Text c="dimmed" size="lg" ta="center" className={classes.description}>
+				{description}
+			</Text>
+			{objectId && (
+				<Text size="sm" c="dimmed" ff="monospace" ta="center" className={classes.objectId}>
+					Object ID: {objectId}
+				</Text>
+			)}
+			<Group justify="center">
+				<Button size="md" onClick={() => navigate('/')}>
+					Return to Home
+				</Button>
+				<Button size="md" variant="subtle" onClick={() => navigate(-1)}>
+					Go Back
+				</Button>
+			</Group>
 		</Container>
 	);
 }

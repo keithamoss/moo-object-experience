@@ -108,14 +108,10 @@ test.describe('Object Detail Page', () => {
 		expect(response?.status()).toBeLessThan(500);
 
 		// Should display NotFoundPage component
-		const notFoundHeading = page.locator('h1:has-text("404")');
-		await expect(notFoundHeading).toBeVisible();
-
-		// Should show "Page Not Found" message in the heading
-		await expect(page.getByRole('heading', { name: /page not found/i })).toBeVisible();
+		await expect(page.getByRole('heading', { name: /something is not right/i })).toBeVisible();
 
 		// Should have a button to go back home
-		const homeButton = page.getByRole('button', { name: /go to home/i });
+		const homeButton = page.getByRole('button', { name: /get back to home page/i });
 		await expect(homeButton).toBeVisible();
 	});
 
@@ -152,10 +148,9 @@ test.describe('Object Detail Page', () => {
 		await firstResult.click();
 		await page.waitForURL(/\/object\/.+/);
 
-		// The detail page renders metadata in a two-column grid layout.
-		// At least one Paper section with a heading should be visible.
-		const papers = page.locator('.MuiPaper-root');
-		await expect(papers.first()).toBeVisible();
+		// The detail page renders metadata in a Paper section with a heading.
+		const metadataSection = page.getByTestId('metadata-section');
+		await expect(metadataSection).toBeVisible();
 	});
 
 	test('should show Home link in breadcrumb that navigates to homepage', async ({ page }) => {
@@ -169,7 +164,7 @@ test.describe('Object Detail Page', () => {
 		await firstResult.click();
 		await page.waitForURL(/\/object\/.+/);
 
-		const homeLink = page.getByRole('link', { name: /home/i });
+		const homeLink = page.getByRole('link', { name: 'Home', exact: true });
 		await expect(homeLink).toBeVisible();
 		await homeLink.click();
 

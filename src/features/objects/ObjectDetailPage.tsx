@@ -1,5 +1,5 @@
-import BrokenImageIcon from '@mui/icons-material/BrokenImage';
-import { Alert, AlertTitle, Box, Container, Divider, Grid, List, ListItem, ListItemText, Paper, Typography } from '@mui/material';
+import { Alert, Box, Container, Grid, Image, Paper, Stack, Table, Text, Title } from '@mantine/core';
+import { IconLinkOff } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
 import { useParams, useSearchParams } from 'react-router-dom';
 import Breadcrumbs from '../../components/Breadcrumbs';
@@ -13,6 +13,7 @@ import { selectSearchQuery } from '../../store/searchSlice';
 import { getErrorMessage } from '../../utils/errorUtils';
 import { buildSearchURL } from '../../utils/urlUtils';
 import { FieldValue } from './FieldValue';
+import classes from './ObjectDetailPage.module.css';
 import { extractObjectDisplayData } from './useObjectDisplay';
 
 export default function ObjectDetailPage() {
@@ -79,10 +80,9 @@ export default function ObjectDetailPage() {
 	const dataError = isErrorMetadata ? metadataError : isErrorObject ? objectError : null;
 	if (dataError) {
 		return (
-			<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-				<Alert severity="error">
-					<AlertTitle>Error loading object</AlertTitle>
-					<Typography variant="body2">{getErrorMessage(dataError)}</Typography>
+			<Container size="lg" mt="lg" mb="lg">
+				<Alert color="red" title="Error loading object">
+					<Text size="sm">{getErrorMessage(dataError)}</Text>
 				</Alert>
 			</Container>
 		);
@@ -125,134 +125,105 @@ export default function ObjectDetailPage() {
 	});
 
 	return (
-		<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+		<Container size="lg" mt="lg" mb="xl">
 			<PageMetadata title={`${title} | Museum Object Experience`} />
 
 			{/* Breadcrumb navigation */}
 			<Breadcrumbs items={breadcrumbItems} />
 
-			{/* Hero Section */}
-			<Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-				<Typography variant="h4" component="h1" gutterBottom>
-					{title}
-				</Typography>
-				<Typography variant="body2" color="text.secondary">
+			{/* Page header — bare, no Paper */}
+			<Stack gap={4} mb="lg">
+				<Title order={1}>{title}</Title>
+				<Text size="sm" c="dimmed">
 					{identifierLabel}: {identifier}
-				</Typography>
-			</Paper>
+				</Text>
+			</Stack>
 
-			{/* Main Content: 2-column layout on desktop, stacked on mobile */}
-			<Grid container spacing={3}>
-				{/* Left Column: Description and Images */}
-				<Grid size={{ xs: 12, md: 6 }}>
-					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+			{/* Main content: asymmetric 2-column layout */}
+			<Grid gap="md" align="flex-start">
+				{/* Left column: Description and Images (wider) */}
+				<Grid.Col span={{ base: 12, md: 7 }}>
+					<Stack gap="md">
 						{/* Description Section */}
 						{description && (
-							<Paper elevation={2} sx={{ p: 3 }}>
-								<Typography variant="h6" component="h2" gutterBottom>
+							<Paper withBorder p="md" radius="md">
+								<Text fw={700} size="xs" tt="uppercase" c="dimmed" mb="xs">
 									{descriptionLabel}
-								</Typography>
-								<Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
-									{description}
-								</Typography>
+								</Text>
+								<Text style={{ whiteSpace: 'pre-line' }}>{description}</Text>
 							</Paper>
 						)}
 
 						{/* Images Section */}
 						{imageUrls.length > 0 && (
-							<Paper elevation={2} sx={{ p: 3 }}>
-								<Typography variant="h6" component="h2" gutterBottom>
+							<Paper withBorder p="md" radius="md">
+								<Text fw={700} size="xs" tt="uppercase" c="dimmed" mb="xs">
 									Images
-								</Typography>
-								{imageUrls.map((url, idx) => (
-									<Box key={url} sx={{ mb: idx < imageUrls.length - 1 ? 2 : 0 }}>
-										{brokenImages.has(idx) ? (
-											<Box
-												sx={{
-													width: '100%',
-													minHeight: 200,
-													display: 'flex',
-													flexDirection: 'column',
-													alignItems: 'center',
-													justifyContent: 'center',
-													backgroundColor: 'grey.100',
-													borderRadius: 1,
-													p: 3,
-												}}
-											>
-												<BrokenImageIcon sx={{ fontSize: 48, color: 'grey.400', mb: 1 }} />
-												<Typography variant="body2" color="text.secondary" textAlign="center">
-													Image unavailable
-												</Typography>
-											</Box>
-										) : (
-											<img
-												src={url}
-												alt={`${title} ${idx + 1}`}
-												loading="lazy"
-												onError={() => handleImageError(idx)}
-												style={{
-													width: '100%',
-													height: 'auto',
-													display: 'block',
-													borderRadius: '4px',
-												}}
-											/>
-										)}
-									</Box>
-								))}
+								</Text>
+								<Stack gap="md">
+									{imageUrls.map((url, idx) => (
+										<Box key={url}>
+											{brokenImages.has(idx) ? (
+												<Stack
+													align="center"
+													justify="center"
+													style={{
+														width: '100%',
+														minHeight: 200,
+														backgroundColor: 'var(--mantine-color-gray-1)',
+														borderRadius: 'var(--mantine-radius-sm)',
+														padding: 'var(--mantine-spacing-md)',
+													}}
+												>
+													<IconLinkOff size={48} color="var(--mantine-color-gray-4)" />
+													<Text size="sm" c="dimmed" ta="center">
+														Image unavailable
+													</Text>
+												</Stack>
+											) : (
+												<Image
+													src={url}
+													alt={`${title} ${idx + 1}`}
+													loading="lazy"
+													onError={() => handleImageError(idx)}
+													radius="sm"
+												/>
+											)}
+										</Box>
+									))}
+								</Stack>
 							</Paper>
 						)}
-					</Box>
-				</Grid>
+					</Stack>
+				</Grid.Col>
 
-				{/* Right Column: Metadata Fields */}
-				<Grid size={{ xs: 12, md: 6 }}>
-					<Paper elevation={2} sx={{ p: 3 }}>
-						<Typography variant="h6" component="h2" gutterBottom>
+				{/* Right column: Metadata sidebar (narrower, sticky) */}
+				<Grid.Col span={{ base: 12, md: 5 }} className={classes.sidebar}>
+					<Paper withBorder p="md" radius="md" data-testid="metadata-section">
+						<Text fw={700} size="xs" tt="uppercase" c="dimmed" mb="md">
 							Metadata
-						</Typography>
-						<Divider sx={{ mb: 2 }} />
+						</Text>
 
 						{fieldsToDisplay.length === 0 ? (
-							<Typography variant="body2" color="text.secondary">
+							<Text size="sm" c="dimmed">
 								No additional metadata available
-							</Typography>
+							</Text>
 						) : (
-							<List disablePadding>
-								{fieldsToDisplay.map((field, idx) => (
-									<ListItem
-										key={field.field}
-										alignItems="flex-start"
-										sx={{
-											px: 0,
-											py: 1.5,
-											borderBottom: idx < fieldsToDisplay.length - 1 ? '1px solid' : 'none',
-											borderColor: 'divider',
-										}}
-									>
-										<ListItemText
-											primary={field.label}
-											secondary={
+							<Table variant="vertical" layout="fixed" verticalSpacing="xs" horizontalSpacing="sm">
+								<Table.Tbody>
+									{fieldsToDisplay.map((field) => (
+										<Table.Tr key={field.field}>
+											<Table.Th w={140}>{field.label}</Table.Th>
+											<Table.Td>
 												<FieldValue value={object[field.field]} fieldTypeAndControls={field.fieldTypeAndControls} />
-											}
-											primaryTypographyProps={{
-												variant: 'body2',
-												fontWeight: 'bold',
-												color: 'text.secondary',
-											}}
-											secondaryTypographyProps={{
-												variant: 'body1',
-												color: 'text.primary',
-												component: 'div',
-											}}
-										/>
-									</ListItem>
-								))}
-							</List>
+											</Table.Td>
+										</Table.Tr>
+									))}
+								</Table.Tbody>
+							</Table>
 						)}
 					</Paper>
-				</Grid>
+				</Grid.Col>
 			</Grid>
 		</Container>
 	);

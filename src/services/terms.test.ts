@@ -48,8 +48,8 @@ describe('TermsService', () => {
 			const objects: ObjectData[] = [
 				{
 					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
-					[OBJECT_FIELDS.TITLE]: null as any,
-					[OBJECT_FIELDS.DESCRIPTION]: undefined as any,
+					[OBJECT_FIELDS.TITLE]: null as unknown as string,
+					[OBJECT_FIELDS.DESCRIPTION]: undefined,
 				},
 				{
 					[OBJECT_FIELDS.IDENTIFIER]: 'obj-2',
@@ -69,9 +69,9 @@ describe('TermsService', () => {
 			const objects: ObjectData[] = [
 				{
 					[OBJECT_FIELDS.IDENTIFIER]: 'obj-1',
-					[OBJECT_FIELDS.TITLE]: 123 as any,
-					[OBJECT_FIELDS.DESCRIPTION]: { text: 'object' } as any,
-					[OBJECT_FIELDS.CREATOR]: ['array'] as any,
+					[OBJECT_FIELDS.TITLE]: 123 as unknown as string,
+					[OBJECT_FIELDS.DESCRIPTION]: { text: 'object' } as unknown as string,
+					[OBJECT_FIELDS.CREATOR]: ['array'] as unknown as string,
 				},
 			];
 

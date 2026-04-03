@@ -3,8 +3,9 @@
  * Provides common patterns for testing React components with Redux and Router
  */
 
+import { MantineProvider } from '@mantine/core';
 import { configureStore } from '@reduxjs/toolkit';
-import { type RenderOptions, render } from '@testing-library/react';
+import { type RenderOptions, render as renderWithMantine } from '@testing-library/react';
 import type { PropsWithChildren, ReactElement } from 'react';
 import { Provider } from 'react-redux';
 import { MemoryRouter, type MemoryRouterProps } from 'react-router-dom';
@@ -13,6 +14,7 @@ import { OBJECT_FIELDS } from '../constants/objectFields';
 import { sheetsApi } from '../store/api';
 import searchReducer, { type SearchState } from '../store/searchSlice';
 import type { RootState } from '../store/store';
+import { theme } from '../theme/theme';
 
 /**
  * Create a test store with optional preloaded state
@@ -59,11 +61,13 @@ export function AllTheProviders({
 	routerProps?: MemoryRouterProps;
 }>) {
 	return (
-		<Provider store={store}>
-			<PageMetadataProvider>
-				<MemoryRouter {...routerProps}>{children}</MemoryRouter>
-			</PageMetadataProvider>
-		</Provider>
+		<MantineProvider theme={theme}>
+			<Provider store={store}>
+				<PageMetadataProvider>
+					<MemoryRouter {...routerProps}>{children}</MemoryRouter>
+				</PageMetadataProvider>
+			</Provider>
+		</MantineProvider>
 	);
 }
 
@@ -90,7 +94,7 @@ export function renderWithProviders(
 
 	return {
 		store,
-		...render(ui, { wrapper: Wrapper, ...renderOptions }),
+		...renderWithMantine(ui, { wrapper: Wrapper, ...renderOptions }),
 	};
 }
 
@@ -138,7 +142,16 @@ export function createMockSearchResult(overrides = {}) {
  */
 export const waitForAsync = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-// Re-export everything from testing library
+// Re-export everything from testing library (render is overridden below)
 export * from '@testing-library/react';
 export { default as userEvent } from '@testing-library/user-event';
 
+/**
+ * Plain render with MantineProvider — use when no Redux/Router context needed
+ */
+export function render(ui: ReactElement, options?: Omit<RenderOptions, 'wrapper'>) {
+	function Wrapper({ children }: PropsWithChildren) {
+		return <MantineProvider theme={theme}>{children}</MantineProvider>;
+	}
+	return renderWithMantine(ui, { wrapper: Wrapper, ...options });
+}

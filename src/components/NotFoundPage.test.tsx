@@ -3,30 +3,29 @@ import { renderWithProviders, screen, userEvent } from '../test-utils/test-helpe
 import NotFoundPage from './NotFoundPage';
 
 describe('NotFoundPage', () => {
-	it('should render 404 heading', () => {
+	it('should render error heading', () => {
 		renderWithProviders(<NotFoundPage />);
 
-		expect(screen.getByText('404')).toBeInTheDocument();
-		expect(screen.getByText('Page Not Found')).toBeInTheDocument();
+		expect(screen.getByText('Something is not right...')).toBeInTheDocument();
 	});
 
 	it('should render descriptive message', () => {
 		renderWithProviders(<NotFoundPage />);
 
-		expect(screen.getByText(/sorry, the page you're looking for doesn't exist/i)).toBeInTheDocument();
+		expect(screen.getByText(/the page you are trying to open does not exist/i)).toBeInTheDocument();
 	});
 
-	it('should render Go to Home button', () => {
+	it('should render Get back to home page button', () => {
 		renderWithProviders(<NotFoundPage />);
 
-		expect(screen.getByRole('button', { name: /go to home/i })).toBeInTheDocument();
+		expect(screen.getByRole('button', { name: /get back to home page/i })).toBeInTheDocument();
 	});
 
 	it('should navigate to home when button is clicked', async () => {
 		const user = userEvent.setup();
 		renderWithProviders(<NotFoundPage />);
 
-		const homeButton = screen.getByRole('button', { name: /go to home/i });
+		const homeButton = screen.getByRole('button', { name: /get back to home page/i });
 		await user.click(homeButton);
 
 		// Button should be clickable (no errors thrown)

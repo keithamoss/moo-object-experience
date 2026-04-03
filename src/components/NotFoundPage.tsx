@@ -1,41 +1,29 @@
-import { Box, Button, Container, Typography } from '@mui/material';
+import { Button, Container, Image, SimpleGrid, Text, Title } from '@mantine/core';
 import { useNavigate } from 'react-router-dom';
+import notFoundImage from './NotFoundImage.svg';
+import classes from './NotFoundPage.module.css';
 import { PageMetadata } from './PageMetadata';
 
 export default function NotFoundPage() {
 	const navigate = useNavigate();
 
-	const handleGoHome = () => {
-		navigate('/');
-	};
-
 	return (
-		<Container maxWidth="md">
+		<Container className={classes.root}>
 			<PageMetadata title="Page Not Found | Westralian People's Museum" />
-
-			<Box
-				sx={{
-					display: 'flex',
-					flexDirection: 'column',
-					alignItems: 'center',
-					justifyContent: 'center',
-					minHeight: '50vh',
-					textAlign: 'center',
-				}}
-			>
-				<Typography variant="h1" component="h1" gutterBottom>
-					404
-				</Typography>
-				<Typography variant="h4" component="h2" gutterBottom>
-					Page Not Found
-				</Typography>
-				<Typography variant="body1" color="text.secondary" paragraph>
-					Sorry, the page you're looking for doesn't exist.
-				</Typography>
-				<Button variant="contained" onClick={handleGoHome} sx={{ mt: 2 }}>
-					Go to Home
-				</Button>
-			</Box>
+			<SimpleGrid spacing={{ base: 40, sm: 80 }} cols={{ base: 1, sm: 2 }}>
+				<Image src={notFoundImage} className={classes.mobileImage} alt="Page not found" />
+				<div>
+					<Title className={classes.title}>Something is not right...</Title>
+					<Text c="dimmed" size="lg">
+						The page you are trying to open does not exist. You may have mistyped the address, or the page has been
+						moved to another URL.
+					</Text>
+					<Button variant="outline" size="md" mt="xl" className={classes.control} onClick={() => navigate('/')}>
+						Get back to home page
+					</Button>
+				</div>
+				<Image src={notFoundImage} className={classes.desktopImage} alt="Page not found" />
+			</SimpleGrid>
 		</Container>
 	);
 }

@@ -442,7 +442,7 @@ test.describe('Homepage', () => {
 		// Select first suggestion via keyboard
 		await searchBox.press('ArrowDown');
 		await page.waitForTimeout(200);
-		const firstSuggestion = page.locator('[role="option"][data-option-index="0"]');
+		const firstSuggestion = page.locator('[role="option"]').first();
 		const firstTerm = (await firstSuggestion.textContent()) || '';
 		await searchBox.press('Enter');
 
@@ -466,7 +466,7 @@ test.describe('Homepage', () => {
 		// Select first suggestion via keyboard
 		await searchBox.press('ArrowDown');
 		await page.waitForTimeout(200);
-		const secondSuggestion = page.locator('[role="option"][data-option-index="0"]');
+		const secondSuggestion = page.locator('[role="option"]').first();
 		const secondTerm = (await secondSuggestion.textContent()) || '';
 		await searchBox.press('Enter');
 

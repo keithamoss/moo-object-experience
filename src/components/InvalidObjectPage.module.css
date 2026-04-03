@@ -1,0 +1,31 @@
+.root {
+	padding-top: 80px;
+	padding-bottom: 80px;
+}
+
+.image {
+	max-width: 280px;
+	margin: 0 auto calc(1.5 * var(--mantine-spacing-xl));
+}
+
+.title {
+	text-align: center;
+	font-weight: 900;
+	font-size: rem(38px);
+
+	@media (max-width: $mantine-breakpoint-sm) {
+		font-size: rem(32px);
+	}
+}
+
+.description {
+	max-width: 500px;
+	margin: auto;
+	margin-top: var(--mantine-spacing-xl);
+	margin-bottom: calc(1.5 * var(--mantine-spacing-xl));
+}
+
+.objectId {
+	text-align: center;
+	margin-bottom: var(--mantine-spacing-xl);
+}

@@ -118,11 +118,7 @@ describe('SearchFilters', () => {
 
 	it('should show error message when no fields are selected', () => {
 		renderWithProviders(
-			<SearchFilters
-				metadataFields={mockMetadataFields}
-				activeFields={[]}
-				onToggleField={vi.fn()}
-			/>,
+			<SearchFilters metadataFields={mockMetadataFields} activeFields={[]} onToggleField={vi.fn()} />,
 		);
 
 		expect(screen.getByText(/select at least one field/i)).toBeInTheDocument();

@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Typography } from '@mui/material';
+import { Loader, Stack, Text } from '@mantine/core';
 
 interface LoadingIndicatorProps {
 	readonly message?: string;
@@ -6,24 +6,19 @@ interface LoadingIndicatorProps {
 
 export default function LoadingIndicator({ message = 'Loading...' }: LoadingIndicatorProps) {
 	return (
-		<Box
+		<Stack
 			data-testid="loading-indicator"
 			role="status"
 			aria-live="polite"
 			aria-label={message}
-			sx={{
-				display: 'flex',
-				flexDirection: 'column',
-				alignItems: 'center',
-				justifyContent: 'center',
-				minHeight: '200px',
-				gap: 2,
-			}}
+			align="center"
+			justify="center"
+			style={{ minHeight: '200px' }}
 		>
-			<CircularProgress aria-label="Loading" />
-			<Typography variant="body2" color="text.secondary" aria-hidden="true">
+			<Loader data-testid="loader" aria-label="Loading" />
+			<Text size="sm" c="dimmed" aria-hidden="true">
 				{message}
-			</Typography>
-		</Box>
+			</Text>
+		</Stack>
 	);
 }

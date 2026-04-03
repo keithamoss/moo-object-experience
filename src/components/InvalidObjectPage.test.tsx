@@ -46,10 +46,9 @@ describe('InvalidObjectPage', () => {
 		expect(homeButton).toBeInTheDocument();
 	});
 
-	it('should render error icon', () => {
-		const { container } = renderWithProviders(<InvalidObjectPage reason="missing-identifier" />);
+	it('should render illustration image', () => {
+		const { getByRole } = renderWithProviders(<InvalidObjectPage reason="missing-identifier" />);
 
-		const icon = container.querySelector('[data-testid="ErrorOutlineIcon"]');
-		expect(icon).toBeInTheDocument();
+		expect(getByRole('img')).toBeInTheDocument();
 	});
 });

@@ -1,4 +1,4 @@
-import { Box, Chip } from '@mui/material';
+import { Badge, Group } from '@mantine/core';
 import { formatDate } from '../../utils/dateUtils';
 
 interface FieldValueProps {
@@ -49,11 +49,13 @@ function renderCommaSeparated(value: string): React.ReactNode {
 		.filter((item) => item.length > 0);
 
 	return (
-		<Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+		<Group gap={4} wrap="wrap">
 			{items.map((item) => (
-				<Chip key={item} label={item} size="small" />
+				<Badge key={item} variant="light" color="gray" size="sm">
+					{item}
+				</Badge>
 			))}
-		</Box>
+		</Group>
 	);
 }
 

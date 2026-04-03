@@ -33,26 +33,20 @@ const testObjects: ObjectData[] = [
 
 describe('SearchContainer', () => {
 	it('should render a search input', () => {
-		renderWithProviders(
-			<SearchContainer metadata={[searchableField]} objects={testObjects} />,
-		);
+		renderWithProviders(<SearchContainer metadata={[searchableField]} objects={testObjects} />);
 
 		expect(screen.getByTestId('search-box')).toBeInTheDocument();
 	});
 
 	it('should render a disabled search input when disabled prop is true', () => {
-		renderWithProviders(
-			<SearchContainer metadata={[searchableField]} objects={testObjects} disabled />,
-		);
+		renderWithProviders(<SearchContainer metadata={[searchableField]} objects={testObjects} disabled />);
 
 		const input = screen.getByTestId('search-box');
 		expect(input).toBeDisabled();
 	});
 
 	it('should accept typed input', () => {
-		renderWithProviders(
-			<SearchContainer metadata={[searchableField]} objects={testObjects} />,
-		);
+		renderWithProviders(<SearchContainer metadata={[searchableField]} objects={testObjects} />);
 
 		const input = screen.getByTestId('search-box');
 		fireEvent.change(input, { target: { value: 'stone' } });
@@ -61,32 +55,24 @@ describe('SearchContainer', () => {
 	});
 
 	it('should show search results after pressing Enter on a query', async () => {
-		renderWithProviders(
-			<SearchContainer metadata={[searchableField]} objects={testObjects} />,
-		);
+		renderWithProviders(<SearchContainer metadata={[searchableField]} objects={testObjects} />);
 
 		const input = screen.getByTestId('search-box');
 		fireEvent.change(input, { target: { value: 'stone' } });
 		fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
 		// Results heading should appear — "Aboriginal Stone Axe" matches "stone"
-		await waitFor(() =>
-			expect(screen.getByText(/result/i)).toBeInTheDocument(),
-		);
+		await waitFor(() => expect(screen.getByText(/result/i)).toBeInTheDocument());
 	});
 
 	it('should show an empty state when a query matches nothing', async () => {
-		renderWithProviders(
-			<SearchContainer metadata={[searchableField]} objects={testObjects} />,
-		);
+		renderWithProviders(<SearchContainer metadata={[searchableField]} objects={testObjects} />);
 
 		const input = screen.getByTestId('search-box');
 		fireEvent.change(input, { target: { value: 'zzznomatch' } });
 		fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
 
-		await waitFor(() =>
-			expect(screen.getByRole('alert')).toBeInTheDocument(),
-		);
+		await waitFor(() => expect(screen.getByTestId('no-results')).toBeInTheDocument());
 		expect(screen.getByText(/no results found/i)).toBeInTheDocument();
 	});
 });

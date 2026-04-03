@@ -3,8 +3,6 @@
  * Renders a keyboard key in a styled box for UI hints
  */
 
-import { Box } from '@mui/material';
-
 export interface KeyboardKeyProps {
 	/** The keyboard key to display */
 	readonly children: React.ReactNode;
@@ -15,9 +13,8 @@ export interface KeyboardKeyProps {
  */
 export default function KeyboardKey({ children }: KeyboardKeyProps) {
 	return (
-		<Box
-			component="kbd"
-			sx={{
+		<kbd
+			style={{
 				padding: '2px 6px',
 				borderRadius: '3px',
 				border: '1px solid #ccc',
@@ -27,6 +24,6 @@ export default function KeyboardKey({ children }: KeyboardKeyProps) {
 			}}
 		>
 			{children}
-		</Box>
+		</kbd>
 	);
 }

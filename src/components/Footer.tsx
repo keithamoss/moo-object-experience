@@ -1,36 +1,25 @@
-import { Box, Container, Link, Typography } from '@mui/material';
+import { Anchor, Container, Group, Text } from '@mantine/core';
+import classes from './Footer.module.css';
+
+const links = [{ link: 'mailto:contact@example.com', label: 'Contact' }];
 
 export default function Footer() {
 	const currentYear = new Date().getFullYear();
 
+	const items = links.map((link) => (
+		<Anchor c="dimmed" key={link.label} href={link.link} size="sm">
+			{link.label}
+		</Anchor>
+	));
+
 	return (
-		<Box
-			component="footer"
-			sx={{
-				py: 3,
-				px: 2,
-				mt: 'auto',
-				backgroundColor: (theme) => theme.palette.grey[200],
-			}}
-		>
-			<Container maxWidth="lg">
-				<Typography variant="body2" color="text.secondary" align="center">
+		<footer className={classes.footer}>
+			<Container size="lg" className={classes.inner}>
+				<Text size="sm" c="dimmed">
 					© {currentYear} Westralian People's Museum of Objects of Interest and Reference Library
-				</Typography>
-				<Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 1 }}>
-					<Link
-						href="mailto:contact@example.com"
-						sx={{
-							color: 'text.primary',
-							'&:hover': {
-								color: 'primary.dark',
-							},
-						}}
-					>
-						Contact
-					</Link>
-				</Typography>
+				</Text>
+				<Group className={classes.links}>{items}</Group>
 			</Container>
-		</Box>
+		</footer>
 	);
 }

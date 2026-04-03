@@ -1,0 +1,10 @@
+.parallax {
+	height: 100%;
+}
+
+.card {
+	height: 100%;
+	cursor: pointer;
+	text-decoration: none;
+	color: inherit;
+}

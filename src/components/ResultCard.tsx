@@ -3,14 +3,15 @@
  * Displays a single search result with metadata
  */
 
-import { Card, CardActionArea, CardContent, Grid, Typography } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Parallax } from '@gfazioli/mantine-parallax';
+import { Card, Text, Title } from '@mantine/core';
+import { Link } from 'react-router-dom';
 import { OBJECT_FIELDS } from '../constants/objectFields';
 import type { SearchResult } from '../services/search';
-import { CARD_HOVER_SX } from '../theme/cardStyles';
 import type { ObjectData } from '../types/metadata';
 import { highlightSearchTerms } from '../utils/highlightText';
 import { generateObjectUrl } from '../utils/urlUtils';
+import classes from './ResultCard.module.css';
 
 export interface ResultCardProps {
 	/** Search result with score and ID */
@@ -43,8 +44,7 @@ function extractObjectFields(object: ObjectData): {
 	};
 }
 
-export default function ResultCard({ result, object, query = '' }: ResultCardProps) {
-	const navigate = useNavigate();
+export default function ResultCard({ object, query = '' }: ResultCardProps) {
 	const { title, description, identifier, creator } = extractObjectFields(object);
 
 	// Highlighted versions
@@ -52,73 +52,48 @@ export default function ResultCard({ result, object, query = '' }: ResultCardPro
 	const highlightedDescription = highlightSearchTerms(description, query);
 	const highlightedCreator = highlightSearchTerms(creator, query);
 
-	const handleClick = () => {
-		// Don't navigate if identifier is missing
-		if (!identifier) {
-			return;
-		}
-		try {
-			const url = generateObjectUrl(identifier, title);
-			navigate(url);
-		} catch (_error) {
-			// Error already logged by validation
-		}
-	};
+	const url = identifier
+		? (() => {
+				try {
+					return generateObjectUrl(identifier, title);
+				} catch {
+					return null;
+				}
+			})()
+		: null;
 
 	return (
-		<Grid size={{ xs: 12, sm: 12, md: 6 }} key={result.id}>
+		<Parallax className={classes.parallax} lightEffect lightOverlay lightIntensity={0.08} hoverScale={1.03} radius="md">
 			<Card
 				data-testid="result-card"
-				elevation={2}
-				sx={{
-					height: '100%',
-					display: 'flex',
-					flexDirection: 'column',
-					...CARD_HOVER_SX,
-				}}
+				withBorder
+				shadow="sm"
+				padding="md"
+				className={classes.card}
+				{...(url ? ({ component: Link, to: url } as object) : {})}
 			>
-				<CardActionArea
-					onClick={handleClick}
-					sx={{
-						height: '100%',
-						display: 'flex',
-						flexDirection: 'column',
-						alignItems: 'stretch',
-					}}
-				>
-					<CardContent sx={{ flexGrow: 1, width: '100%' }}>
-						<Typography variant="h6" component="h3" gutterBottom>
-							{highlightedTitle}
-						</Typography>
-
-						<Typography variant="caption" color="text.secondary" display="block" gutterBottom>
-							{identifier}
-						</Typography>
-
-						{creator && (
-							<Typography variant="body2" color="text.secondary" gutterBottom>
-								<strong>Creator:</strong> {highlightedCreator}
-							</Typography>
-						)}
-
-						{description && (
-							<Typography
-								variant="body2"
-								sx={{
-									mt: 1,
-									display: '-webkit-box',
-									WebkitLineClamp: DESCRIPTION_LINE_CLAMP,
-									WebkitBoxOrient: 'vertical',
-									overflow: 'hidden',
-									textOverflow: 'ellipsis',
-								}}
-							>
-								{highlightedDescription}
-							</Typography>
-						)}
-					</CardContent>
-				</CardActionArea>
+				<Card.Section inheritPadding pt="md" pb="sm" mb="sm">
+					<Title order={3} size="h6" mb={4}>
+						{highlightedTitle}
+					</Title>
+					<Text size="xs" c="dimmed">
+						{identifier}
+					</Text>
+				</Card.Section>
+				{creator && (
+					<Text size="sm" mb={4}>
+						<Text component="span" size="sm" fw={600}>
+							Creator:{' '}
+						</Text>
+						{highlightedCreator}
+					</Text>
+				)}
+				{description && (
+					<Text size="sm" lineClamp={DESCRIPTION_LINE_CLAMP} mt={4}>
+						{highlightedDescription}
+					</Text>
+				)}
 			</Card>
-		</Grid>
+		</Parallax>
 	);
 }

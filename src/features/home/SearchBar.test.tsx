@@ -67,13 +67,13 @@ describe('SearchBar', () => {
 		it('should render search input', () => {
 			renderWithProviders(<SearchBar {...defaultProps} />);
 
-			expect(screen.getByLabelText('Search the collection')).toBeInTheDocument();
+			expect(screen.getByTestId('search-box')).toBeInTheDocument();
 		});
 
 		it('should display the current query', () => {
 			renderWithProviders(<SearchBar {...defaultProps} query="stone" />);
 
-			const input = screen.getByLabelText('Search the collection') as HTMLInputElement;
+			const input = screen.getByTestId('search-box') as HTMLInputElement;
 			expect(input.value).toBe('stone');
 		});
 
@@ -103,7 +103,7 @@ describe('SearchBar', () => {
 
 			renderWithProviders(<SearchBar {...defaultProps} onQueryChange={onQueryChange} />);
 
-			const input = screen.getByLabelText('Search the collection');
+			const input = screen.getByTestId('search-box');
 			await user.type(input, 'test');
 
 			expect(onQueryChange).toHaveBeenCalled();
@@ -115,7 +115,7 @@ describe('SearchBar', () => {
 
 			renderWithProviders(<SearchBar {...defaultProps} query="test" onCommit={onCommit} />);
 
-			const input = screen.getByLabelText('Search the collection');
+			const input = screen.getByTestId('search-box');
 			await user.click(input);
 			await user.keyboard('{Enter}');
 
@@ -128,7 +128,7 @@ describe('SearchBar', () => {
 
 			renderWithProviders(<SearchBar {...defaultProps} query="test" onClear={onClear} />);
 
-			const input = screen.getByLabelText('Search the collection');
+			const input = screen.getByTestId('search-box');
 			await user.click(input);
 			await user.keyboard('{Escape}');
 
@@ -146,7 +146,6 @@ describe('SearchBar', () => {
 
 			expect(onClear).toHaveBeenCalledTimes(1);
 		});
-
 	});
 
 	describe('double history entry bug fix', () => {
@@ -161,7 +160,7 @@ describe('SearchBar', () => {
 				</>,
 			);
 
-			const input = screen.getByLabelText('Search the collection');
+			const input = screen.getByTestId('search-box');
 			await user.click(input);
 
 			// Press Enter (which will blur the input internally)
@@ -183,18 +182,12 @@ describe('SearchBar', () => {
 
 			renderWithProviders(
 				<>
-					<SearchBar
-						{...defaultProps}
-						query="sto"
-
-						onCommit={onCommit}
-						onQueryChange={onQueryChange}
-					/>
+					<SearchBar {...defaultProps} query="sto" onCommit={onCommit} onQueryChange={onQueryChange} />
 					<button type="button">Outside</button>
 				</>,
 			);
 
-			const input = screen.getByLabelText('Search the collection');
+			const input = screen.getByTestId('search-box');
 			await user.click(input);
 
 			// Type to trigger suggestions (this should show "stone" in dropdown)
@@ -224,7 +217,7 @@ describe('SearchBar', () => {
 
 			renderWithProviders(<SearchBar {...defaultProps} query="test" onCommit={onCommit} />);
 
-			const input = screen.getByLabelText('Search the collection');
+			const input = screen.getByTestId('search-box');
 
 			// First Enter press
 			await user.click(input);
@@ -252,33 +245,22 @@ describe('SearchBar', () => {
 		it('should toggle filters when filter button is clicked', async () => {
 			const user = userEvent.setup();
 
-			const { container } = renderWithProviders(<SearchBar {...defaultProps} />);
+			renderWithProviders(<SearchBar {...defaultProps} />);
 
 			const filterButton = screen.getByLabelText('Toggle search filters');
 
-			// Filters should be collapsed initially (height: 0)
-			const collapseElement = container.querySelector('.MuiCollapse-root');
-			expect(collapseElement).toHaveClass('MuiCollapse-hidden');
+			// Filters should be collapsed initially
+			expect(filterButton).toHaveAttribute('aria-expanded', 'false');
 
 			// Click to show filters
 			await user.click(filterButton);
 
-			// Wait for collapse animation
-			await act(async () => {
-				await new Promise((resolve) => setTimeout(resolve, 300));
-			});
-
-			expect(collapseElement).not.toHaveClass('MuiCollapse-hidden');
+			expect(filterButton).toHaveAttribute('aria-expanded', 'true');
 
 			// Click to hide filters
 			await user.click(filterButton);
 
-			// Wait for collapse animation
-			await act(async () => {
-				await new Promise((resolve) => setTimeout(resolve, 300));
-			});
-
-			expect(collapseElement).toHaveClass('MuiCollapse-hidden');
+			expect(filterButton).toHaveAttribute('aria-expanded', 'false');
 		});
 
 		it('should call onToggleField when a filter checkbox is toggled', async () => {
@@ -292,7 +274,7 @@ describe('SearchBar', () => {
 			await user.click(filterButton);
 
 			// Find and click a field checkbox
-			const titleCheckbox = screen.getByLabelText(/Search in Title/i);
+			const titleCheckbox = screen.getByLabelText(/^Title$/i);
 			await user.click(titleCheckbox);
 
 			expect(onToggleField).toHaveBeenCalledWith('dcterms:title');
@@ -303,7 +285,7 @@ describe('SearchBar', () => {
 		it('should disable input when disabled prop is true', () => {
 			renderWithProviders(<SearchBar {...defaultProps} disabled />);
 
-			const input = screen.getByLabelText('Search the collection') as HTMLInputElement;
+			const input = screen.getByTestId('search-box') as HTMLInputElement;
 			expect(input).toBeDisabled();
 		});
 

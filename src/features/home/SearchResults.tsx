@@ -4,12 +4,13 @@
  * Responsive grid layout with empty state
  */
 
-import { Alert, Box, CircularProgress, Grid, Typography } from '@mui/material';
+import { Center, Grid, Image, Loader, Overlay, Paper, Stack, Text, Title } from '@mantine/core';
 import { useMemo } from 'react';
 import ResultCard from '../../components/ResultCard';
 import { OBJECT_FIELDS } from '../../constants/objectFields';
 import type { SearchResult } from '../../services/search';
 import type { ObjectData } from '../../types/metadata';
+import noResultsImage from './NoResultsImage.svg';
 
 export interface SearchResultsProps {
 	/** Search results with scores */
@@ -37,14 +38,16 @@ export default function SearchResults({ results, objects, query, isSearching = f
 	// Show empty state if no results
 	if (results.length === 0 && query.trim().length > 0) {
 		return (
-			<Alert severity="info" sx={{ mt: 3 }}>
-				<Typography variant="body1">
-					No results found for <strong>"{query}"</strong>
-				</Typography>
-				<Typography variant="body2" sx={{ mt: 1 }}>
-					Try adjusting your search terms or enabling more search fields.
-				</Typography>
-			</Alert>
+			<Stack align="center" mt={60} mb={60} gap="lg" data-testid="no-results">
+				<Image src={noResultsImage} maw={280} mx="auto" />
+				<Title order={2} size="h3" ta="center">
+					No results found
+				</Title>
+				<Text size="md" ta="center" maw={420}>
+					Nothing matched <strong>"{query}"</strong> — try fewer words, check your spelling, or enable more search
+					fields.
+				</Text>
+			</Stack>
 		);
 	}
 
@@ -54,40 +57,32 @@ export default function SearchResults({ results, objects, query, isSearching = f
 	}
 
 	return (
-		<Box sx={{ mt: 3, position: 'relative' }}>
+		<Paper withBorder p="md" radius="md" mt="lg" style={{ position: 'relative' }}>
 			{/* Loading overlay */}
 			{isSearching && (
-				<Box
-					sx={{
-						position: 'absolute',
-						top: 0,
-						left: 0,
-						right: 0,
-						bottom: 0,
-						display: 'flex',
-						alignItems: 'center',
-						justifyContent: 'center',
-						bgcolor: 'rgba(255, 255, 255, 0.8)',
-						zIndex: 1,
-						pointerEvents: 'none',
-					}}
-				>
-					<CircularProgress />
-				</Box>
+				<Overlay backgroundOpacity={0.8} color="#fff" zIndex={1} style={{ pointerEvents: 'none' }} radius="md">
+					<Center h="100%">
+						<Loader role="progressbar" aria-label="Searching..." />
+					</Center>
+				</Overlay>
 			)}
 
-			<Typography variant="h6" gutterBottom>
+			<Title order={6} mb="sm" fw={700} size="xs" tt="uppercase">
 				{results.length} {results.length === 1 ? 'result' : 'results'} for "{query}"
-			</Typography>
+			</Title>
 
-			<Grid container spacing={2} sx={{ mt: 1, opacity: isSearching ? 0.5 : 1 }}>
+			<Grid mt="xs">
 				{results.map((result) => {
 					const object = objectsById.get(result.id);
 					if (!object) return null;
 
-					return <ResultCard key={result.id} result={result} object={object} query={query} />;
+					return (
+						<Grid.Col key={result.id} span={{ base: 12, md: 6 }} data-testid="result-card-grid">
+							<ResultCard result={result} object={object} query={query} />
+						</Grid.Col>
+					);
 				})}
 			</Grid>
-		</Box>
+		</Paper>
 	);
 }

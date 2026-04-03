@@ -12,9 +12,7 @@ describe('useData', () => {
 
 	beforeEach(() => {
 		store = createTestStore();
-		wrapper = ({ children }: PropsWithChildren) => (
-			<AllTheProviders store={store}>{children}</AllTheProviders>
-		);
+		wrapper = ({ children }: PropsWithChildren) => <AllTheProviders store={store}>{children}</AllTheProviders>;
 	});
 
 	it('should return loading state initially', () => {

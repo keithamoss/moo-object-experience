@@ -1,4 +1,4 @@
-import { Box, Container, Divider, Grid, Paper, Skeleton } from '@mui/material';
+import { Box, Container, Grid, Paper, Skeleton, Stack } from '@mantine/core';
 import { PageMetadata } from './PageMetadata';
 
 /**
@@ -7,57 +7,75 @@ import { PageMetadata } from './PageMetadata';
  */
 export default function ObjectDetailSkeleton() {
 	return (
-		<Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+		<Container size="lg" mt="lg" mb="xl" data-testid="object-detail-skeleton">
 			<PageMetadata title="Loading... | Museum Object Experience" description="Loading object details" />
 
 			{/* Breadcrumbs skeleton */}
-			<Box sx={{ mb: 2 }}>
-				<Skeleton variant="text" width={300} height={24} />
+			<Box mb="md">
+				<Skeleton height={24} width={300} />
 			</Box>
 
-			{/* Hero Section skeleton */}
-			<Paper elevation={2} sx={{ p: 3, mb: 3 }}>
-				<Skeleton variant="text" width="70%" height={48} sx={{ mb: 1 }} />
-				<Skeleton variant="text" width="40%" height={24} />
-			</Paper>
+			{/* Page header skeleton — bare, matching the new hero layout */}
+			<Stack gap={4} mb="lg">
+				<Skeleton height={48} width="75%" />
+				<Skeleton height={18} width="25%" />
+			</Stack>
 
-			{/* Main Content: 2-column layout */}
-			<Grid container spacing={3}>
-				{/* Left Column skeleton */}
-				<Grid size={{ xs: 12, md: 6 }}>
-					<Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+			{/* Main content: asymmetric 2-column layout */}
+			<Grid gap="md" align="flex-start">
+				{/* Left column skeleton */}
+				<Grid.Col span={{ base: 12, md: 7 }}>
+					<Stack gap="md">
 						{/* Description Section skeleton */}
-						<Paper elevation={2} sx={{ p: 3 }}>
-							<Skeleton variant="text" width="30%" height={32} sx={{ mb: 2 }} />
-							<Skeleton variant="text" width="100%" />
-							<Skeleton variant="text" width="100%" />
-							<Skeleton variant="text" width="90%" />
-							<Skeleton variant="text" width="95%" />
+						<Paper withBorder p="md" radius="md">
+							<Skeleton height={12} width="25%" mb="xs" />
+							<Skeleton height={18} width="100%" mb="xs" />
+							<Skeleton height={18} width="100%" mb="xs" />
+							<Skeleton height={18} width="100%" mb="xs" />
+							<Skeleton height={18} width="100%" mb="xs" />
+							<Skeleton height={18} width="100%" mb="xs" />
+							<Skeleton height={18} width="100%" mb="xs" />
+							<Skeleton height={18} width="55%" />
 						</Paper>
 
 						{/* Images Section skeleton */}
-						<Paper elevation={2} sx={{ p: 3 }}>
-							<Skeleton variant="text" width="20%" height={32} sx={{ mb: 2 }} />
-							<Skeleton variant="rectangular" width="100%" height={300} sx={{ borderRadius: 1 }} />
+						<Paper withBorder p="md" radius="md">
+							<Skeleton height={12} width="18%" mb="xs" />
+							<Skeleton height={400} width="100%" radius="sm" />
 						</Paper>
-					</Box>
-				</Grid>
+					</Stack>
+				</Grid.Col>
 
-				{/* Right Column skeleton */}
-				<Grid size={{ xs: 12, md: 6 }}>
-					<Paper elevation={2} sx={{ p: 3 }}>
-						<Skeleton variant="text" width="30%" height={32} sx={{ mb: 1 }} />
-						<Divider sx={{ mb: 2 }} />
+				{/* Right column skeleton */}
+				<Grid.Col span={{ base: 12, md: 5 }}>
+					<Paper withBorder p="md" radius="md">
+						<Skeleton height={12} width="30%" mb="md" />
 
-						{/* Metadata fields skeleton */}
-						{[1, 2, 3, 4, 5].map((i) => (
-							<Box key={i} sx={{ py: 1.5, borderBottom: i < 5 ? '1px solid' : 'none', borderColor: 'divider' }}>
-								<Skeleton variant="text" width="35%" height={20} sx={{ mb: 0.5 }} />
-								<Skeleton variant="text" width="60%" height={24} />
+						{/* Metadata fields — widths vary to simulate real data */}
+						{(
+							[
+								['30%', '75%'],
+								['45%', '55%'],
+								['25%', '90%'],
+								['40%', '60%'],
+								['30%', '80%'],
+								['50%', '45%'],
+								['35%', '70%'],
+								['40%', '85%'],
+								['28%', '65%'],
+							] as const
+						).map(([labelW, valueW], i) => (
+							<Box
+								key={`${labelW}-${valueW}`}
+								py="xs"
+								style={{ borderTop: i > 0 ? '1px solid var(--mantine-color-gray-2)' : 'none' }}
+							>
+								<Skeleton height={14} width={labelW} mb={6} />
+								<Skeleton height={18} width={valueW} />
 							</Box>
 						))}
 					</Paper>
-				</Grid>
+				</Grid.Col>
 			</Grid>
 		</Container>
 	);

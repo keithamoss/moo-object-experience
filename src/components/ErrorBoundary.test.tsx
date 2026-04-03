@@ -79,8 +79,8 @@ describe('ErrorBoundary', () => {
 			</ErrorBoundary>,
 		);
 
-		// MUI ErrorOutlineIcon renders with specific test class
-		const icon = container.querySelector('[data-testid="ErrorOutlineIcon"]');
+		// Tabler IconAlertCircle renders as an SVG element
+		const icon = container.querySelector('svg');
 		expect(icon).toBeInTheDocument();
 	});
 });

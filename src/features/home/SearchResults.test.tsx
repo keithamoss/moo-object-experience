@@ -19,9 +19,7 @@ describe('SearchResults', () => {
 		const objects = [makeObject()];
 		const results = [makeResult({ id: 'TEST-001' })];
 
-		renderWithProviders(
-			<SearchResults results={results} objects={objects} query="test" />,
-		);
+		renderWithProviders(<SearchResults results={results} objects={objects} query="test" />);
 
 		expect(screen.getByText(/1 result for/i)).toBeInTheDocument();
 	});
@@ -32,50 +30,39 @@ describe('SearchResults', () => {
 			makeObject({ [OBJECT_FIELDS.IDENTIFIER]: 'B', [OBJECT_FIELDS.TITLE]: 'Beta' }),
 		];
 
-		const results = [
-			makeResult({ id: 'A', score: 2 }),
-			makeResult({ id: 'B', score: 1 }),
-		];
+		const results = [makeResult({ id: 'A', score: 2 }), makeResult({ id: 'B', score: 1 })];
 
-		renderWithProviders(
-			<SearchResults results={results} objects={objects} query="test" />,
-		);
+		renderWithProviders(<SearchResults results={results} objects={objects} query="test" />);
 
 		expect(screen.getByText(/2 results for/i)).toBeInTheDocument();
 	});
 
-	it('should render an info alert when there are no results but a query exists', () => {
-		renderWithProviders(
-			<SearchResults results={[]} objects={[]} query="nonexistent" />,
-		);
+	it('should render empty state when there are no results but a query exists', () => {
+		renderWithProviders(<SearchResults results={[]} objects={[]} query="nonexistent" />);
 
-		expect(screen.getByRole('alert')).toBeInTheDocument();
-		expect(screen.getByText(/no results found for/i)).toBeInTheDocument();
+		expect(screen.getByTestId('no-results')).toBeInTheDocument();
+		expect(screen.getByText(/no results found/i)).toBeInTheDocument();
 	});
 
 	it('should render nothing when query is empty', () => {
-		const { container } = renderWithProviders(
-			<SearchResults results={[]} objects={[]} query="" />,
-		);
+		renderWithProviders(<SearchResults results={[]} objects={[]} query="" />);
 
-		expect(container.firstChild).toBeNull();
+		expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('no-results')).not.toBeInTheDocument();
 	});
 
 	it('should render nothing when query is only whitespace', () => {
-		const { container } = renderWithProviders(
-			<SearchResults results={[]} objects={[]} query="   " />,
-		);
+		renderWithProviders(<SearchResults results={[]} objects={[]} query="   " />);
 
-		expect(container.firstChild).toBeNull();
+		expect(screen.queryByRole('heading')).not.toBeInTheDocument();
+		expect(screen.queryByTestId('no-results')).not.toBeInTheDocument();
 	});
 
 	it('should show a loading spinner when isSearching is true', () => {
 		const objects = [makeObject()];
 		const results = [makeResult({ id: 'TEST-001' })];
 
-		renderWithProviders(
-			<SearchResults results={results} objects={objects} query="test" isSearching />,
-		);
+		renderWithProviders(<SearchResults results={results} objects={objects} query="test" isSearching />);
 
 		expect(screen.getByRole('progressbar')).toBeInTheDocument();
 	});
@@ -84,9 +71,7 @@ describe('SearchResults', () => {
 		const objects = [makeObject()];
 		const results = [makeResult({ id: 'TEST-001' })];
 
-		renderWithProviders(
-			<SearchResults results={results} objects={objects} query="test" isSearching={false} />,
-		);
+		renderWithProviders(<SearchResults results={results} objects={objects} query="test" isSearching={false} />);
 
 		expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
 	});
@@ -98,9 +83,7 @@ describe('SearchResults', () => {
 			makeResult({ id: 'UNKNOWN', score: 1 }), // No corresponding object
 		];
 
-		renderWithProviders(
-			<SearchResults results={results} objects={objects} query="test" />,
-		);
+		renderWithProviders(<SearchResults results={results} objects={objects} query="test" />);
 
 		// Only 1 result should be rendered (UNKNOWN is silently dropped)
 		expect(screen.getByText(/2 results for/i)).toBeInTheDocument();
@@ -111,9 +94,7 @@ describe('SearchResults', () => {
 		const objects = [makeObject()];
 		const results = [makeResult({ id: 'TEST-001' })];
 
-		renderWithProviders(
-			<SearchResults results={results} objects={objects} query="stone axe" />,
-		);
+		renderWithProviders(<SearchResults results={results} objects={objects} query="stone axe" />);
 
 		expect(screen.getByText(/"stone axe"/i)).toBeInTheDocument();
 	});

@@ -24,11 +24,10 @@ describe('LoadingIndicator', () => {
 		expect(status).toHaveAttribute('aria-label', 'Please wait');
 	});
 
-	it('should render CircularProgress component', () => {
-		const { container } = render(<LoadingIndicator />);
+	it('should render a spinner element', () => {
+		render(<LoadingIndicator />);
 
-		// MUI CircularProgress renders with specific class
-		const progress = container.querySelector('.MuiCircularProgress-root');
-		expect(progress).toBeInTheDocument();
+		// Mantine Loader is rendered inside the status container
+		expect(screen.getByTestId('loader')).toBeInTheDocument();
 	});
 });

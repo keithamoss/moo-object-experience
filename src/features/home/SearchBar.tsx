@@ -4,19 +4,8 @@
  * Syncs with URL query parameter (?q=)
  */
 
-import ClearIcon from '@mui/icons-material/Clear';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import {
-    Autocomplete,
-    Badge,
-    Box,
-    Collapse,
-    IconButton,
-    InputAdornment,
-    Paper,
-    TextField,
-    Typography,
-} from '@mui/material';
+import { ActionIcon, Autocomplete, Box, Collapse, Group, Indicator, Paper, Text } from '@mantine/core';
+import { IconFilter, IconX } from '@tabler/icons-react';
 import { useMemo, useRef, useState } from 'react';
 import KeyboardKey from '../../components/KeyboardKey';
 import type { SearchableFieldName } from '../../config/searchConfig';
@@ -64,8 +53,10 @@ export default function SearchBar({
 	// Ref to access the input element directly
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	// Ref to track if user is navigating suggestions with keyboard
-	const isNavigatingSuggestionsRef = useRef(false);
+	// Tracks whether the user is navigating suggestions with arrow keys.
+	// Prevents handleKeyDown Enter from committing the partial query when
+	// handleOptionSubmit will commit the selected suggestion instead.
+	const isNavigatingSuggestions = useRef(false);
 
 	// State for showing/hiding filters
 	const [showFilters, setShowFilters] = useState(false);
@@ -80,7 +71,6 @@ export default function SearchBar({
 			return;
 		}
 
-		// Get the last word being typed (for multi-word queries)
 		const words = inputValue.split(/\s+/);
 		const lastWord = words[words.length - 1];
 
@@ -92,89 +82,64 @@ export default function SearchBar({
 		}
 	};
 
-	const handleInputChange = (_event: React.SyntheticEvent, newValue: string, reason: string) => {
-		// Only update on input, not on selection
-		if (reason === 'input') {
-			onQueryChange(newValue);
-			updateSuggestions(newValue);
-			// Reset navigation flag when user types
-			isNavigatingSuggestionsRef.current = false;
+	const handleChange = (newValue: string) => {
+		onQueryChange(newValue);
+		updateSuggestions(newValue);
+	};
+
+	const handleOptionSubmit = (value: string) => {
+		isNavigatingSuggestions.current = false;
+
+		// Replace the last word with the selected suggestion
+		const words = query.split(/\s+/).filter((w) => w.length > 0);
+		let updatedQuery = '';
+
+		if (words.length > 1) {
+			words[words.length - 1] = value;
+			updatedQuery = words.join(' ');
+		} else {
+			updatedQuery = value;
+		}
+
+		setSuggestions([]);
+
+		// Blur input to dismiss keyboard on mobile
+		if (inputRef.current) {
+			inputRef.current.blur();
+		}
+
+		if (onCommitWithQuery) {
+			onCommitWithQuery(updatedQuery);
+		} else {
+			onQueryChange(updatedQuery);
+			setTimeout(() => {
+				onCommit();
+			}, 0);
 		}
 	};
 
-	const handleChange = (_event: React.SyntheticEvent, newValue: string | null, reason: string) => {
-		// When a suggestion is selected (clicked or via keyboard)
-		if (newValue !== null && reason === 'selectOption') {
-			// Replace the last word with the selected suggestion
-			// Filter out empty strings from split to handle trailing whitespace
-			const words = query.split(/\s+/).filter((w) => w.length > 0);
-			let updatedQuery = '';
-
-			if (words.length > 1) {
-				// Multi-word query: replace just the last word
-				words[words.length - 1] = newValue;
-				updatedQuery = words.join(' ');
-			} else {
-				// Single word or empty: use the selected value directly
-				updatedQuery = newValue;
-			}
-
-			// Clear suggestions and navigation flag
-			setSuggestions([]);
-			isNavigatingSuggestionsRef.current = false;
-
-			// Blur input to dismiss keyboard on mobile
-			if (inputRef.current) {
-				inputRef.current.blur();
-			}
-
-			// Commit the search with the updated query
-			if (onCommitWithQuery) {
-				onCommitWithQuery(updatedQuery);
-			} else {
-				// Fallback to old behavior if callback not provided
-				onQueryChange(updatedQuery);
-				setTimeout(() => {
-					onCommit();
-				}, 0);
-			}
-
-		}
-	};
-
-	const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
-		// Track when user navigates suggestions with arrow keys
+	const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
 		if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
 			if (suggestions.length > 0) {
-				isNavigatingSuggestionsRef.current = true;
+				isNavigatingSuggestions.current = true;
 			}
-			// Don't preventDefault - let Autocomplete handle arrow navigation
 		} else if (event.key === 'Enter') {
-			event.preventDefault(); // Prevent form submission
-
-			// If user is navigating suggestions with keyboard, let Autocomplete's onChange handle it
-			// This prevents double-commit when selecting with ArrowDown + Enter
-			if (isNavigatingSuggestionsRef.current && suggestions.length > 0) {
-				// onChange will fire with the selected value via handleChange
+			if (isNavigatingSuggestions.current) {
+				// An option is highlighted — let handleOptionSubmit commit the selection.
+				isNavigatingSuggestions.current = false;
 				return;
 			}
-
-			// Blur to dismiss keyboard on mobile
+			event.preventDefault();
 			if (inputRef.current) {
 				inputRef.current.blur();
 			}
 			onCommit();
 			setSuggestions([]);
-			isNavigatingSuggestionsRef.current = false;
 		} else if (event.key === 'Escape') {
+			isNavigatingSuggestions.current = false;
 			onClear();
 			setSuggestions([]);
-			isNavigatingSuggestionsRef.current = false;
 		}
-	};
-
-	const handleBlur = () => {
-		isNavigatingSuggestionsRef.current = false;
 	};
 
 	const handleToggleFilters = () => {
@@ -185,98 +150,73 @@ export default function SearchBar({
 	const hasCustomFields = !areAllFieldsSelected(activeFields);
 
 	return (
-		<Paper elevation={2} sx={{ p: 2, mb: 3 }}>
+		<Paper shadow="sm" withBorder p="md" radius="md" mb="md">
 			<Autocomplete
-				freeSolo
-				disableClearable
-				options={suggestions}
-				inputValue={query}
-				onInputChange={handleInputChange}
+				value={query}
 				onChange={handleChange}
+				onOptionSubmit={handleOptionSubmit}
+				data={suggestions}
+				filter={({ options }) => options}
 				disabled={disabled}
-				filterOptions={(x) => x} // Don't filter - we handle filtering
-				renderInput={(params) => (
-					<TextField
-						{...params}
-						fullWidth
-						label="Search"
-						placeholder="Search the collection..."
-						variant="outlined"
-						inputRef={inputRef}
-						onBlur={handleBlur}
-						inputProps={{
-							...params.inputProps,
-							'aria-label': 'Search the collection',
-							'data-testid': 'search-box',
-							'data-ready': !disabled,
-							enterKeyHint: 'search', // Mobile keyboard shows "Search" button
-							spellCheck: false,
-							autoComplete: 'off',
-						}}
-						InputProps={{
-							...params.InputProps,
-							endAdornment: (
-								<>
-									{params.InputProps.endAdornment}
-									{/* Filter button */}
-									<InputAdornment position="end">
-										<IconButton
-											aria-label="Toggle search filters"
-											onClick={handleToggleFilters}
-											edge="end"
-											size="small"
-											disabled={disabled}
-											color={showFilters ? 'primary' : 'default'}
-										>
-											<Badge
-												variant="dot"
-												color="error"
-												invisible={!hasCustomFields}
-												sx={{ '& .MuiBadge-badge': { right: 3, top: 3 } }}
-											>
-												<FilterListIcon />
-											</Badge>
-										</IconButton>
-									</InputAdornment>
-									{/* Clear button (always available when there's text) */}
-									{showClearButton && (
-										<InputAdornment position="end">
-											<IconButton
-												aria-label="Clear search"
-												onClick={onClear}
-												edge="end"
-												size="small"
-												disabled={disabled}
-											>
-												<ClearIcon />
-											</IconButton>
-										</InputAdornment>
-									)}
-								</>
-							),
-						}}
-					/>
-				)}
+				label="Search the collection"
+				styles={{ label: { marginBottom: 8 } }}
+				size="xl"
+				ref={inputRef}
 				onKeyDown={handleKeyDown}
-				componentsProps={{
-					popper: {
-						placement: 'bottom-start',
-					},
-				}}
+				data-testid="search-box"
+				data-ready={!disabled}
+				inputMode="search"
+				autoComplete="off"
+				spellCheck={false}
+				comboboxProps={{ position: 'bottom-start' }}
+				mb="sm"
+				rightSection={
+					<Group gap={4} wrap="nowrap" pr={32}>
+						<Indicator disabled={!hasCustomFields} color="red" size={8} offset={4}>
+							<ActionIcon
+								aria-label="Toggle search filters"
+								aria-expanded={showFilters}
+								onClick={handleToggleFilters}
+								variant="filled"
+								radius="xl"
+								size="lg"
+								disabled={disabled}
+								color="brand"
+							>
+								<IconFilter size={18} stroke={1.5} />
+							</ActionIcon>
+						</Indicator>
+						{showClearButton && (
+							<ActionIcon
+								aria-label="Clear search"
+								onClick={onClear}
+								variant="filled"
+								radius="xl"
+								size="lg"
+								disabled={disabled}
+								color="gray.5"
+								ml={4}
+							>
+								<IconX size={16} />
+							</ActionIcon>
+						)}
+					</Group>
+				}
+				rightSectionWidth={showClearButton ? 64 : 36}
 			/>
 
 			{/* Keyboard shortcut hints (desktop only) */}
 			{!isMobile && (
-				<Box sx={{ mt: 0.5, textAlign: 'right' }}>
-					<Typography variant="caption" color="text.secondary">
+				<Box mt={4} style={{ textAlign: 'right' }}>
+					<Text size="xs" c="dimmed">
 						<KeyboardKey>Enter</KeyboardKey> to search · <KeyboardKey>Esc</KeyboardKey> to clear
-					</Typography>
+					</Text>
 				</Box>
 			)}
 
 			{/* Inline search filters */}
-			<Collapse in={showFilters}>
-				<Box sx={{ mt: 2 }}>
+			<Collapse expanded={showFilters} data-testid="filter-collapse">
+				<Box mt="md">
 					<SearchFilters
 						metadataFields={metadataFields}
 						activeFields={activeFields}

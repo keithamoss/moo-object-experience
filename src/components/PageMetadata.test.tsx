@@ -591,7 +591,7 @@ describe('PageMetadata', () => {
 				);
 			}
 
-			const { rerender } = render(<TestComponent />);
+			render(<TestComponent />);
 
 			const titleElement = document.querySelector('title');
 
