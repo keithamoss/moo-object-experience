@@ -28,6 +28,9 @@ jobs:
       - name: Update fixtures from live Google Sheet
         run: npm run fixtures:update
 
+      - name: Format generated fixtures
+        run: npx biome format --write e2e/fixtures/
+
       - name: Check for fixture changes
         id: diff
         run: |
