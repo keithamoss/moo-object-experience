@@ -2,7 +2,7 @@ import { fireEvent, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ALL_SEARCHABLE_FIELD_NAMES, SEARCHABLE_FIELDS } from '../../config/searchConfig';
 import { OBJECT_FIELDS } from '../../constants/objectFields';
-import { renderWithProviders } from '../../test-utils/test-helpers';
+import { renderWithProviders, userEvent } from '../../test-utils/test-helpers';
 import type { MetadataField } from '../../types/metadata';
 import SearchFilters from './SearchFilters';
 
@@ -170,5 +170,63 @@ describe('SearchFilters', () => {
 
 		// With no label mapping, checkboxes should still render (using raw field name as label)
 		expect(screen.getAllByRole('checkbox').length).toBe(SEARCHABLE_FIELDS.length);
+	});
+
+	describe('accordion (default) mode', () => {
+		it('should render an Accordion trigger button with text "Search Fields"', () => {
+			renderWithProviders(
+				<SearchFilters
+					metadataFields={mockMetadataFields}
+					activeFields={ALL_SEARCHABLE_FIELD_NAMES}
+					onToggleField={vi.fn()}
+				/>,
+			);
+
+			expect(screen.getByRole('button', { name: /search fields/i })).toBeInTheDocument();
+		});
+
+		it('should start closed (aria-expanded=false) and open on click (aria-expanded=true)', async () => {
+			const user = userEvent.setup();
+			renderWithProviders(
+				<SearchFilters
+					metadataFields={mockMetadataFields}
+					activeFields={ALL_SEARCHABLE_FIELD_NAMES}
+					onToggleField={vi.fn()}
+				/>,
+			);
+
+			const trigger = screen.getByRole('button', { name: /search fields/i });
+			expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+			await user.click(trigger);
+
+			expect(trigger).toHaveAttribute('aria-expanded', 'true');
+		});
+
+		it('should show partial selection count inside the Accordion trigger text', () => {
+			renderWithProviders(
+				<SearchFilters
+					metadataFields={mockMetadataFields}
+					activeFields={[OBJECT_FIELDS.TITLE]}
+					onToggleField={vi.fn()}
+				/>,
+			);
+
+			// Accessible name: "Search Fields (1/4 selected)" — count is inside the button
+			expect(screen.getByRole('button', { name: /search fields.*\d+\/\d+ selected/i })).toBeInTheDocument();
+		});
+
+		it('should show "(All selected)" inside the Accordion trigger text', () => {
+			renderWithProviders(
+				<SearchFilters
+					metadataFields={mockMetadataFields}
+					activeFields={ALL_SEARCHABLE_FIELD_NAMES}
+					onToggleField={vi.fn()}
+				/>,
+			);
+
+			// Accessible name: "Search Fields (All selected)"
+			expect(screen.getByRole('button', { name: /search fields.*all selected/i })).toBeInTheDocument();
+		});
 	});
 });

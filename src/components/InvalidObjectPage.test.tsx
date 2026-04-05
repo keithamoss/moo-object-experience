@@ -51,4 +51,18 @@ describe('InvalidObjectPage', () => {
 
 		expect(getByRole('img')).toBeInTheDocument();
 	});
+
+	it('should navigate back when Go Back button is clicked', async () => {
+		const user = userEvent.setup();
+		// Provide a history entry so navigate(-1) has somewhere to go
+		renderWithProviders(<InvalidObjectPage reason="missing-identifier" />, {
+			routerProps: { initialEntries: ['/prev', '/current'], initialIndex: 1 },
+		});
+
+		const goBackButton = screen.getByRole('button', { name: /go back/i });
+		expect(goBackButton).toBeInTheDocument();
+
+		// Clicking should not throw (navigate(-1) is called internally)
+		await user.click(goBackButton);
+	});
 });

@@ -7,7 +7,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { ALL_SEARCHABLE_FIELD_NAMES } from '../../config/searchConfig';
 import { OBJECT_FIELDS } from '../../constants/objectFields';
 import { termsService } from '../../services/terms';
-import { createMockObjectData, renderWithProviders, screen, userEvent } from '../../test-utils/test-helpers';
+import { createMockObjectData, renderWithProviders, screen, userEvent, waitFor } from '../../test-utils/test-helpers';
 import type { MetadataField } from '../../types/metadata';
 import SearchBar from './SearchBar';
 
@@ -261,6 +261,37 @@ describe('SearchBar', () => {
 			await user.click(filterButton);
 
 			expect(filterButton).toHaveAttribute('aria-expanded', 'false');
+		});
+
+		it('should mount SearchFilters checkboxes into the DOM after opening the filter panel', async () => {
+			const user = userEvent.setup();
+
+			renderWithProviders(<SearchBar {...defaultProps} />);
+
+			// Before: content has display:none (Mantine Collapse initial state) — not accessible
+			expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+
+			await user.click(screen.getByLabelText('Toggle search filters'));
+
+			// After opening: Mantine Collapse removes display:none via requestAnimationFrame.
+			// waitFor gives the rAF time to fire and update inline styles.
+			await waitFor(() => expect(screen.getAllByRole('checkbox').length).toBeGreaterThan(0));
+		});
+
+		it('should hide SearchFilters checkboxes again when the filter panel is closed', async () => {
+			const user = userEvent.setup();
+
+			renderWithProviders(<SearchBar {...defaultProps} />);
+
+			const filterButton = screen.getByLabelText('Toggle search filters');
+
+			// Open and wait for checkboxes to become accessible
+			await user.click(filterButton);
+			await waitFor(() => expect(screen.getAllByRole('checkbox').length).toBeGreaterThan(0));
+
+			// Close — Mantine Collapse immediately re-applies aria-hidden=true on the wrapper
+			await user.click(filterButton);
+			await waitFor(() => expect(screen.queryAllByRole('checkbox')).toHaveLength(0));
 		});
 
 		it('should call onToggleField when a filter checkbox is toggled', async () => {

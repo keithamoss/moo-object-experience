@@ -96,7 +96,7 @@ test.describe('Homepage', () => {
 		await searchBox.fill(partialText);
 
 		// Wait for autocomplete dropdown to appear
-		// MUI Autocomplete renders options in a listbox with role="listbox"
+		// Mantine Autocomplete renders options in a listbox with role="listbox"
 		const autocompleteListbox = page.locator('[role="listbox"]');
 		await expect(autocompleteListbox).toBeVisible({ timeout: 2000 });
 
@@ -236,8 +236,7 @@ test.describe('Homepage', () => {
 		// Dropdown should be dismissed
 		await expect(autocompleteListbox).not.toBeVisible();
 
-		// MUI Autocomplete clears the value on Escape (this is standard behavior)
-		// Search box should be cleared
+		// Pressing Escape clears the search box (handled by SearchBar handleKeyDown)
 		await expect(searchBox).toHaveValue('');
 
 		// URL should not have changed (no search committed)
@@ -393,12 +392,12 @@ test.describe('Homepage', () => {
 		const firstSuggestion = page.locator('[role="option"]').first();
 		const _suggestionTexttt = (await firstSuggestion.textContent()) || '';
 
-		// Press Tab to select (note: MUI Autocomplete behavior might vary)
+		// Press Tab to select (note: Mantine Autocomplete behavior may vary)
 		await searchBox.press('Tab');
 		await page.waitForTimeout(500);
 
 		// Search box should contain the selected suggestion or still show partial text
-		// MUI Autocomplete Tab behavior typically selects the highlighted option
+		// Mantine Autocomplete Tab behavior typically selects the highlighted option
 		const searchBoxValue = await searchBox.inputValue();
 
 		// Either the suggestion was selected, or Tab just moved focus
@@ -479,5 +478,153 @@ test.describe('Homepage', () => {
 		// Both selections should have worked
 		expect(firstTerm.length).toBeGreaterThan(0);
 		expect(secondTerm.length).toBeGreaterThan(0);
+	});
+
+	// ─── Search filter toggle flow ────────────────────────────────────────────
+
+	test('should expand the filter panel when the funnel icon is clicked', async ({ page }) => {
+		const _searchBox = await setupSearchTest(page);
+
+		// Filter button is initially collapsed
+		const filterButton = page.getByLabel('Toggle search filters', { exact: true });
+		await expect(filterButton).toHaveAttribute('aria-expanded', 'false');
+
+		await filterButton.click();
+
+		await expect(filterButton).toHaveAttribute('aria-expanded', 'true');
+
+		// At least one checkbox should be visible after expansion
+		const firstCheckbox = page.getByRole('checkbox').first();
+		await expect(firstCheckbox).toBeVisible({ timeout: 2000 });
+	});
+
+	test('should add ?fields= param to URL when a field is unchecked', async ({ page }) => {
+		const searchBox = await setupSearchTest(page);
+
+		// Perform a search first so there is an active query
+		await searchBox.fill('department');
+		await searchBox.press('Enter');
+		await page.waitForURL(/\?q=department/, { timeout: 3000 });
+
+		// Open filter panel
+		const filterButton = page.getByLabel('Toggle search filters', { exact: true });
+		await filterButton.click();
+
+		// Wait for checkboxes to appear
+		const checkboxes = page.getByRole('checkbox');
+		await expect(checkboxes.first()).toBeVisible({ timeout: 2000 });
+
+		// Uncheck the first field
+		await checkboxes.first().click();
+
+		// URL should now contain ?fields=... with the reduced set
+		await page.waitForURL(/[?&]fields=/, { timeout: 3000 });
+		await expect(page).toHaveURL(/[?&]fields=/);
+	});
+
+	test('searching with only one field selected returns fewer results than searching all fields', async ({ page }) => {
+		const searchBox = await setupSearchTest(page);
+
+		// "ancient" appears in ancientStonePottery's title AND harbourTrustPayslip's description,
+		// so all-fields search yields 2 results.
+		await searchBox.fill('ancient');
+		await searchBox.press('Enter');
+		await page.waitForURL(/\?q=ancient/, { timeout: 3000 });
+
+		const resultCards = page.getByTestId('result-card');
+		await expect(resultCards).toHaveCount(2, { timeout: 5000 });
+
+		// Open filter panel and uncheck Description (last checkbox = index 3).
+		// With Description excluded, only the title match (ancientStonePottery) remains.
+		const filterButton = page.getByLabel('Toggle search filters', { exact: true });
+		await filterButton.click();
+		const checkboxes = page.getByRole('checkbox');
+		await expect(checkboxes.last()).toBeVisible({ timeout: 2000 });
+		await checkboxes.last().click(); // uncheck Description
+
+		await page.waitForURL(/[?&]fields=/, { timeout: 3000 });
+
+		await expect(resultCards).toHaveCount(1, { timeout: 5000 });
+	});
+
+	test('should show red indicator dot on funnel icon when fields ≠ all selected', async ({ page }) => {
+		const _searchBox = await setupSearchTest(page);
+
+		// Open filter panel and uncheck one field
+		const filterButton = page.getByLabel('Toggle search filters', { exact: true });
+		await filterButton.click();
+		const checkboxes = page.getByRole('checkbox');
+		await expect(checkboxes.first()).toBeVisible({ timeout: 2000 });
+		await checkboxes.first().click();
+
+		// The Indicator dot marks the custom-fields state; it should now be active
+		// Mantine Indicator conditionally renders the dot div (class mantine-Indicator-indicator) when not disabled
+		const indicator = filterButton.locator('..');
+		await expect(indicator.locator('.mantine-Indicator-indicator')).toBeVisible({ timeout: 2000 });
+	});
+
+	test('should remove red indicator dot when all fields are re-selected', async ({ page }) => {
+		const _searchBox = await setupSearchTest(page);
+
+		// Uncheck then re-check a field
+		const filterButton = page.getByLabel('Toggle search filters', { exact: true });
+		await filterButton.click();
+		const checkboxes = page.getByRole('checkbox');
+		await expect(checkboxes.first()).toBeVisible({ timeout: 2000 });
+		await checkboxes.first().click(); // uncheck
+		await checkboxes.first().click(); // re-check
+
+		// Indicator should no longer be active (disabled={true} on Mantine Indicator — dot div is not rendered)
+		const wrapper = filterButton.locator('..');
+		await expect(wrapper.locator('.mantine-Indicator-indicator')).toHaveCount(0);
+	});
+
+	// ─── Clear button (X icon) ────────────────────────────────────────────────
+
+	test('should clear the search input and reset the URL when the X button is clicked', async ({ page }) => {
+		const searchBox = await setupSearchTest(page);
+
+		// Perform a search
+		await searchBox.fill('pottery');
+		await searchBox.press('Enter');
+		await page.waitForURL(/\?q=pottery/, { timeout: 3000 });
+
+		// Click the clear button
+		const clearButton = page.getByLabel('Clear search', { exact: true });
+		await expect(clearButton).toBeVisible();
+		await clearButton.click();
+
+		// Search box should be empty and URL should have no query
+		await expect(searchBox).toHaveValue('');
+		await expect(page).not.toHaveURL(/\?q=/);
+	});
+
+	// ─── Collection metrics panel ─────────────────────────────────────────────
+
+	test('should show object count and field count in the metrics panel before any search', async ({ page }) => {
+		await goToHomePage(page);
+
+		// The metrics panel heading should be visible
+		const collectionHeading = page.getByText('Collection', { exact: true });
+		await expect(collectionHeading).toBeVisible({ timeout: 5000 });
+
+		// "Objects" and "Metadata fields" labels are shown below the counts
+		await expect(page.getByText('Objects', { exact: true })).toBeVisible();
+		await expect(page.getByText('Metadata fields', { exact: true })).toBeVisible();
+	});
+
+	test('should hide the metrics panel once a search query is active', async ({ page }) => {
+		const searchBox = await setupSearchTest(page);
+
+		// Metrics panel is visible before searching
+		await expect(page.getByText('Collection', { exact: true })).toBeVisible();
+
+		// Perform a search
+		await searchBox.fill('department');
+		await searchBox.press('Enter');
+		await page.waitForURL(/\?q=department/, { timeout: 3000 });
+
+		// Metrics panel should now be hidden
+		await expect(page.getByText('Collection', { exact: true })).not.toBeVisible();
 	});
 });

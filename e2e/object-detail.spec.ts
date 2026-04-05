@@ -170,4 +170,28 @@ test.describe('Object Detail Page', () => {
 
 		await expect(page).toHaveURL(/#\/$/);
 	});
+
+	test('should navigate back to homepage with ?q= preserved when "Search Results" breadcrumb is clicked', async ({
+		page,
+	}) => {
+		const searchBox = await setupSearchTest(page);
+
+		// Perform a search to establish context — the breadcrumb path is built from the Redux query
+		await searchBox.fill('department');
+		await searchBox.press('Enter');
+		await page.waitForURL(/\?q=department/, { timeout: 3000 });
+
+		// Navigate to the first result
+		const firstResult = page.getByTestId('result-card').first();
+		await firstResult.click();
+		await page.waitForURL(/\/object\/.+/, { timeout: 5000 });
+
+		// "Search Results" breadcrumb should link back to the search page
+		const searchResultsLink = page.getByRole('link', { name: 'Search Results', exact: true });
+		await expect(searchResultsLink).toBeVisible();
+		await searchResultsLink.click();
+
+		// URL should contain the original search query
+		await expect(page).toHaveURL(/\?q=department/, { timeout: 3000 });
+	});
 });
