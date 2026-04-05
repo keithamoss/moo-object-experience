@@ -1,5 +1,5 @@
 // @vitest-environment node
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
 import { OBJECT_FIELDS } from '../constants/objectFields';
 import type { ObjectData } from '../types/metadata';
 import { SearchService } from './search';
@@ -33,10 +33,9 @@ describe('SearchService', () => {
 				[OBJECT_FIELDS.DATE_ACCEPTED]: '1750',
 			},
 		];
-	});
-
-	afterEach(() => {
-		service.clear();
+		return () => {
+			service.clear();
+		};
 	});
 
 	describe('buildIndex', () => {

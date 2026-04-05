@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { aroundAll, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '../test-utils/test-helpers';
 import { ErrorBoundary } from './ErrorBoundary';
 
@@ -11,13 +11,11 @@ function ThrowError({ shouldThrow }: { shouldThrow: boolean }) {
 }
 
 describe('ErrorBoundary', () => {
-	// Suppress console.error for these tests
-	const originalError = console.error;
-	beforeAll(() => {
-		console.error = vi.fn();
-	});
-	afterAll(() => {
-		console.error = originalError;
+	// Suppress console.error noise from React's error boundary reporting
+	aroundAll(async (suite) => {
+		const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+		await suite();
+		consoleSpy.mockRestore();
 	});
 
 	it('should render children when no error occurs', () => {

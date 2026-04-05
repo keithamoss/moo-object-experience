@@ -5,7 +5,7 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import { useEffect, useState } from 'react';
-import { describe, expect, it, vi } from 'vitest';
+import { aroundEach, describe, expect, it, vi } from 'vitest';
 import { PageMetadata, PageMetadataProvider } from './PageMetadata';
 
 describe('PageMetadata', () => {
@@ -63,9 +63,15 @@ describe('PageMetadata', () => {
 	});
 
 	describe('Fallback Mode (No Provider)', () => {
-		it('should not render without provider (fail-safe)', () => {
-			const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+		// Suppress expected console.error calls from the provider-missing guard
+		let consoleError: ReturnType<typeof vi.spyOn>;
+		aroundEach(async (test) => {
+			consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+			await test();
+			consoleError.mockRestore();
+		});
 
+		it('should not render without provider (fail-safe)', () => {
 			const { container } = render(<PageMetadata title="Fallback Title" />);
 
 			// Should not render anything (fail-safe behavior)
@@ -76,34 +82,24 @@ describe('PageMetadata', () => {
 			if (import.meta.env.DEV) {
 				expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('PageMetadata: Provider missing'));
 			}
-
-			consoleError.mockRestore();
 		});
 
 		it('should not render description without provider', () => {
-			const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-
 			const { container } = render(<PageMetadata title="Fallback Title" description="Fallback description" />);
 
 			// Should not render anything
 			expect(container.textContent).toBe('');
 			const metaDesc = document.querySelector('meta[name="description"]');
 			expect(metaDesc).toBeNull();
-
-			consoleError.mockRestore();
 		});
 
 		it('should log error when provider is missing', () => {
-			const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
-
 			render(<PageMetadata title="Test" />);
 
 			if (import.meta.env.DEV) {
 				expect(consoleError).toHaveBeenCalledTimes(1);
 				expect(consoleError).toHaveBeenCalledWith(expect.stringContaining('Provider missing'));
 			}
-
-			consoleError.mockRestore();
 		});
 	});
 
