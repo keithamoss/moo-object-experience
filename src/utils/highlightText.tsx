@@ -58,7 +58,7 @@ export function highlightSearchTerms(text: string, query: string): React.ReactNo
 				<mark
 					key={`${index}-${part}`}
 					style={{
-						backgroundColor: '#ffeb3b', // Yellow highlight (Material Design Yellow 400)
+						backgroundColor: 'var(--mantine-color-sand-3)', // Amber highlight
 						color: 'inherit', // Keep text color from parent
 						padding: '0 2px', // Subtle padding for better visual separation
 						fontWeight: 500, // Slightly bolder to draw attention

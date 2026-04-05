@@ -71,7 +71,7 @@ export default function SearchFilters({
 								label={label}
 								disabled={disabled}
 								onChange={() => onToggleField(field.fieldName)}
-								color="brand"
+								color="crimson"
 							/>
 						);
 					})}

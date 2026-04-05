@@ -17,7 +17,7 @@ export default function KeyboardKey({ children }: KeyboardKeyProps) {
 			style={{
 				padding: '2px 6px',
 				borderRadius: '3px',
-				border: '1px solid #ccc',
+				border: '1px solid var(--mantine-color-gray-4)',
 				fontSize: '0.85em',
 				fontFamily: 'monospace',
 				display: 'inline-block',

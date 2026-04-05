@@ -195,7 +195,7 @@ export default function SearchBar({
 								radius="xl"
 								size="lg"
 								disabled={disabled}
-								color="brand"
+								color="crimson"
 							>
 								<IconFilter size={18} stroke={1.5} />
 							</ActionIcon>
