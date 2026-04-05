@@ -510,9 +510,11 @@ test.describe('Homepage', () => {
 		const filterButton = page.getByLabel('Toggle search filters', { exact: true });
 		await filterButton.click();
 
-		// Wait for checkboxes to appear
+		// Wait for ALL checkboxes to be visible — waiting for the last one is the
+		// strongest signal that the Collapse animation has fully completed, since
+		// the last checkbox requires the panel to reach its full height.
 		const checkboxes = page.getByRole('checkbox');
-		await expect(checkboxes.first()).toBeVisible({ timeout: 2000 });
+		await expect(checkboxes.last()).toBeVisible({ timeout: 2000 });
 
 		// Uncheck the first field
 		await checkboxes.first().click();

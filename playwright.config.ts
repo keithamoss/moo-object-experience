@@ -40,6 +40,9 @@ export default defineConfig({
 		// Increased timeouts for actions and navigation
 		actionTimeout: 15000,
 		navigationTimeout: 15000,
+
+		// Disable CSS animations/transitions so animated panels don't cause flakiness
+		reduceMotion: 'reduce',
 	},
 
 	// Configure projects for major browsers
