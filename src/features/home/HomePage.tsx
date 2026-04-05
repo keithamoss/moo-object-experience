@@ -1,5 +1,6 @@
 import {
 	Alert,
+	Badge,
 	Box,
 	Container,
 	Divider,
@@ -44,20 +45,21 @@ export default function HomePage() {
 
 			{/* Hero: full-bleed, two-column layout */}
 			<Box className={classes.heroWrapper}>
-				<Container size="md">
+				<Container size="lg">
 					<div className={classes.inner}>
 						<div className={classes.content}>
 							<Title order={1} className={classes.title} mb="xs">
-								Westralian People's Museum
+								We're creating the Westralian Museum of Objects of Interest
 							</Title>
-							<Title order={2} className={classes.subtitle} mb="lg" fw={300}>
+							{/* <Title order={2} className={classes.subtitle} mb="lg" fw={300}>
 								Object Experience
 							</Title>
-							<Text c="dimmed" mt="md">
+							<Text c="dimmed" className={classes.description} mb="lg">
 								Search and discover objects in the collection
-							</Text>
+							</Text> */}
 							<List
-								mt={30}
+								mt="md"
+								mb="md"
 								spacing="sm"
 								size="sm"
 								icon={
@@ -67,15 +69,23 @@ export default function HomePage() {
 								}
 							>
 								<List.Item>
-									<b>Full-text search</b> – find objects by title, description, material, and more
+									Do you delight in spotting a manhole cover with the logo of the long-gone State Electricity
+									Commission?
 								</List.Item>
 								<List.Item>
-									<b>Rich object detail</b> – explore detailed metadata for every item in the collection
+									Do you wonder what it was like to live under the tyranny of Western Australia's Dried Fruits Board?
 								</List.Item>
+								<List.Item>Do you daydream about travelling in back in time to ride the first bendy bus?</List.Item>
 								<List.Item>
-									<b>Filterable fields</b> – narrow results by any catalogued attribute
+									Do you whisper 'Westralia shall be free!' to yourself when meeting with the Commonwealth?
 								</List.Item>
 							</List>
+							<Text className={classes.description} mb="xs" fw={700} size="xl">
+								Do we have the museum for you.
+							</Text>
+							<Badge size="xl" variant="outline" mb="lg">
+								Live teaser
+							</Badge>
 						</div>
 						<Image src={logoUrl} alt="Westralian People's Museum" className={classes.image} />
 					</div>
