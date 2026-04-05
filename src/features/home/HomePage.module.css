@@ -5,6 +5,15 @@
 	text-align: center;
 }
 
+.logo {
+	max-width: rem(280px);
+	margin: 0 auto var(--mantine-spacing-xl);
+
+	[data-mantine-color-scheme='dark'] & {
+		filter: invert(1);
+	}
+}
+
 .title {
 	font-weight: 900;
 	font-size: rem(80px);

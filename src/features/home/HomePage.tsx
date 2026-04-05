@@ -1,5 +1,6 @@
-import { Alert, Box, Container, Divider, List, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core';
+import { Alert, Box, Container, Divider, Image, List, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { IconAlertCircle } from '@tabler/icons-react';
+import logoUrl from '../../assets/logo.svg';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { PageMetadata } from '../../components/PageMetadata';
 import { OBJECT_FIELDS } from '../../constants/objectFields';
@@ -30,6 +31,7 @@ export default function HomePage() {
 
 			{/* Hero: full-bleed, big typography */}
 			<Box className={classes.heroWrapper}>
+				<Image src={logoUrl} alt="Westralian People's Museum" className={classes.logo} />
 				<Title order={1} className={classes.title} mb="md">
 					Westralian People's Museum
 				</Title>
