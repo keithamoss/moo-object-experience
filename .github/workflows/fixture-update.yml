@@ -34,13 +34,18 @@ jobs:
       - name: Check for fixture changes
         id: diff
         run: |
-          if git diff --quiet; then
+          # Scope to e2e/fixtures/ so that npm ci regenerating public/mockServiceWorker.js
+          # (MSW postinstall) doesn't trigger a false-positive PR.
+          # -I 'CAPTURED_AT' and -I 'Last captured' tell git to ignore any hunk where every
+          # changed line matches those patterns — i.e. the auto-generated timestamp exports and
+          # comments that change on every run even when the sheet data is identical.
+          if git diff --quiet -I 'CAPTURED_AT' -I 'Last captured' -- e2e/fixtures/; then
             echo "changed=false" >> $GITHUB_OUTPUT
             echo "No fixture changes detected."
           else
             echo "changed=true" >> $GITHUB_OUTPUT
             echo "Fixture changes detected — opening PR."
-            git diff --stat
+            git diff --stat -- e2e/fixtures/
           fi
 
       - name: Open PR if fixtures changed
