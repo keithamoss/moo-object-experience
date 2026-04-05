@@ -45,20 +45,19 @@
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"@types/react-redux": "^7.1.33",
-		"@vitejs/plugin-basic-ssl": "^2.1.4",
-		"@vitejs/plugin-react-swc": "^4.2.3",
-		"@vitest/coverage-v8": "^4.0.18",
-		"@vitest/ui": "^4.0.18",
+		"@vitejs/plugin-basic-ssl": "^2.3.0",
+		"@vitejs/plugin-react": "^6.0.1",
+		"@vitest/coverage-v8": "^4.1.2",
+		"@vitest/ui": "^4.1.2",
 		"jsdom": "^28.1.0",
 		"msw": "^2.12.10",
 		"postcss": "^8.5.8",
 		"postcss-preset-mantine": "^1.18.0",
 		"postcss-simple-vars": "^7.0.1",
 		"typescript": "^5.4.5",
-		"vite": "^7.3.1",
+		"vite": "^8.0.3",
 		"vite-plugin-checker": "^0.12.0",
-		"vite-tsconfig-paths": "^6.1.1",
-		"vitest": "^4.0.18"
+		"vitest": "^4.1.2"
 	},
 	"browserslist": {
 		"production": [
