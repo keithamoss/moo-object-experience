@@ -15,6 +15,8 @@
 }
 
 .brand {
+	display: flex;
+	align-items: center;
 	text-decoration: none;
 	color: light-dark(var(--mantine-color-gray-9), var(--mantine-color-white));
 	line-height: 1;
@@ -25,6 +27,16 @@
 
 	@mixin hover {
 		background-color: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-6));
+	}
+}
+
+.logoImg {
+	height: rem(32px);
+	width: rem(32px);
+	flex-shrink: 0;
+
+	[data-mantine-color-scheme='dark'] & {
+		filter: invert(1);
 	}
 }
 

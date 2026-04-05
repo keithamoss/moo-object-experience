@@ -1,6 +1,7 @@
-import { Burger, Container, Divider, Drawer, Group, ScrollArea, Text } from '@mantine/core';
+import { Burger, Container, Divider, Drawer, Group, Image, ScrollArea } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { Link } from 'react-router-dom';
+import logoUrl from '../assets/logo.svg';
 import classes from './Header.module.css';
 
 export default function Header() {
@@ -11,9 +12,12 @@ export default function Header() {
 	return (
 		<header className={classes.header}>
 			<Container size="lg" className={classes.inner}>
-				<Text component={Link} to="/" aria-label="Museum Object Experience - Go to homepage" className={classes.brand}>
-					Museum Object Experience
-				</Text>
+				<Link to="/" aria-label="Museum Object Experience - Go to homepage" className={classes.brand}>
+					<Group gap="xs" wrap="nowrap">
+						<Image src={logoUrl} alt="" className={classes.logoImg} />
+						<span>Museum Object Experience</span>
+					</Group>
+				</Link>
 
 				<Group gap={5} visibleFrom="xs">
 					{items}

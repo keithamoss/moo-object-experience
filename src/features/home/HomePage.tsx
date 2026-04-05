@@ -1,5 +1,18 @@
-import { Alert, Box, Container, Divider, Image, List, Paper, SimpleGrid, Stack, Text, Title } from '@mantine/core';
-import { IconAlertCircle } from '@tabler/icons-react';
+import {
+	Alert,
+	Box,
+	Container,
+	Divider,
+	Image,
+	List,
+	Paper,
+	SimpleGrid,
+	Stack,
+	Text,
+	ThemeIcon,
+	Title,
+} from '@mantine/core';
+import { IconAlertCircle, IconCheck } from '@tabler/icons-react';
 import logoUrl from '../../assets/logo.svg';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import { PageMetadata } from '../../components/PageMetadata';
@@ -29,18 +42,44 @@ export default function HomePage() {
 				description="Search and discover objects in the Westralian People's Museum of Objects of Interest and Reference Library"
 			/>
 
-			{/* Hero: full-bleed, big typography */}
+			{/* Hero: full-bleed, two-column layout */}
 			<Box className={classes.heroWrapper}>
-				<Image src={logoUrl} alt="Westralian People's Museum" className={classes.logo} />
-				<Title order={1} className={classes.title} mb="md">
-					Westralian People's Museum
-				</Title>
-				<Title order={2} className={classes.subtitle} mb="lg" fw={300}>
-					Object Experience
-				</Title>
-				<Text c="dimmed" className={classes.description}>
-					Search and discover objects in the collection
-				</Text>
+				<Container size="md">
+					<div className={classes.inner}>
+						<div className={classes.content}>
+							<Title order={1} className={classes.title} mb="xs">
+								Westralian People's Museum
+							</Title>
+							<Title order={2} className={classes.subtitle} mb="lg" fw={300}>
+								Object Experience
+							</Title>
+							<Text c="dimmed" mt="md">
+								Search and discover objects in the collection
+							</Text>
+							<List
+								mt={30}
+								spacing="sm"
+								size="sm"
+								icon={
+									<ThemeIcon size={20} radius="xl">
+										<IconCheck size={12} stroke={1.5} />
+									</ThemeIcon>
+								}
+							>
+								<List.Item>
+									<b>Full-text search</b> – find objects by title, description, material, and more
+								</List.Item>
+								<List.Item>
+									<b>Rich object detail</b> – explore detailed metadata for every item in the collection
+								</List.Item>
+								<List.Item>
+									<b>Filterable fields</b> – narrow results by any catalogued attribute
+								</List.Item>
+							</List>
+						</div>
+						<Image src={logoUrl} alt="Westralian People's Museum" className={classes.image} />
+					</div>
+				</Container>
 			</Box>
 
 			{/* Search + content: constrained to readable width */}
